@@ -1,0 +1,6 @@
+import type { HTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
+
+export function Alert({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div role="alert" className={cn("rounded-lg bg-[var(--danger-bg)] px-4 py-3 text-sm text-[var(--danger)]", className)} {...props} />;
+}

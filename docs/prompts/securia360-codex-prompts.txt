@@ -1,0 +1,394 @@
+SECURIA360 — BIBLIOTECA COMPLETA DE PROMPTS PARA CODEX
+Versión: 1.0
+
+PROPÓSITO
+
+Este archivo divide la construcción completa de Securia360 en entregas controladas. Ejecuta los prompts en orden y abre una tarea nueva de Codex para cada uno. No combines varias etapas en una sola solicitud.
+
+REGLAS DE USO
+
+1. Mantén AGENTS.md en la raíz: es la especificación maestra del producto.
+2. Antes de cada etapa, confirma que la anterior pasó typecheck, lint, tests y build.
+3. Conserva las migraciones y el lockfile en Git.
+4. No pegues service_role, secretos, contraseñas ni datos personales en prompts.
+5. Usa un proyecto o rama de desarrollo antes de modificar producción.
+6. Toda interpretación normativa debe quedar marcada para revisión de un profesional SST/jurídico. No copies extensamente textos normativos protegidos.
+7. No aceptes una historia si RLS, integridad histórica o separación requirement/standard/methodology quedan comprometidas.
+
+PROMPT BASE — USAR AL INICIO DE TODAS LAS ETAPAS
+
+Lee completamente AGENTS.md y respétalo como especificación del producto. Inspecciona primero el repositorio, el estado de Git, las dependencias, las migraciones locales y remotas, el esquema Supabase, RLS, patrones y documentación existente. Preserva cambios ajenos y reutiliza componentes existentes. Resume el estado, los archivos afectados, migraciones, riesgos y plan breve antes de implementar. Trabaja solo en el alcance solicitado. Para cambios de base de datos usa migraciones versionadas, claves foráneas, constraints, índices y RLS. No expongas service_role. Verifica al terminar con typecheck, lint, tests y build; cuando corresponda prueba migraciones, RLS, aislamiento multiempresa y asesores de Supabase. Actualiza documentación y tipos generados. Si detectas un problema de seguridad crítico, corrígelo dentro del alcance antes de cerrar.
+
+======================================================================
+ETAPA 00 — AUDITORÍA DEL ESTADO ACTUAL
+======================================================================
+
+Usa el PROMPT BASE. Realiza una auditoría de solo lectura del estado actual de Securia360. Compara repositorio, aplicación y Supabase contra la primera iteración definida en AGENTS.md. Identifica qué está completo, parcial o ausente en Auth, perfiles, organizaciones, miembros, RBAC, RLS, razones sociales, sedes, áreas, selector de organización, onboarding, layout, settings, dashboard, seed, pruebas, documentación y ADR. Revisa específicamente drift entre migraciones locales y remotas, grants del Data API, tablas públicas sin RLS, funciones SECURITY DEFINER, claves foráneas sin índice y secretos expuestos. Entrega un backlog priorizado P0/P1/P2 con dependencias. No modifiques código ni base de datos.
+
+CRITERIO: diagnóstico respaldado por evidencia, sin cambios.
+
+======================================================================
+ETAPA 01 — CERRAR BRECHAS DEL NÚCLEO SAAS
+======================================================================
+
+Usa el PROMPT BASE y el resultado de la Etapa 00. Implementa únicamente las brechas P0/P1 del núcleo SaaS de la primera iteración. Completa Auth, perfiles, organizaciones, membresías, RBAC centralizado, RLS, estructura empresarial, selector de tenant y manejo consistente del tenant activo. No implementes todavía el dominio normativo ni módulos operativos. Asegura que un usuario multiempresa pueda cambiar de organización sin mezclar caché, consultas, rutas ni datos. Añade pruebas User A/Org A permitido y Org B denegado mediante acceso real equivalente al Data API. Documenta decisiones.
+
+CRITERIO: núcleo completo, aislamiento probado, sin service_role en cliente.
+
+======================================================================
+ETAPA 02 — DESIGN SYSTEM Y APP SHELL
+======================================================================
+
+Usa el PROMPT BASE. Construye el design system base y el app shell B2B de Securia360 con Tailwind y shadcn/ui, respetando el estilo profesional, limpio y gerencial de AGENTS.md. Crea o completa Button, Input, Textarea, Select, Combobox, Checkbox, Radio, Switch, Badge, Card, KpiCard, Alert, Dialog, Drawer, DataTable, Tabs, Breadcrumb, Avatar, Tooltip, DropdownMenu, CommandPalette, EmptyState, LoadingSkeleton, PageHeader y StatusBadge. Implementa sidebar, header, breadcrumbs, organización actual, búsqueda, notificaciones placeholder y menú de perfil. Los módulos futuros deben mostrarse como “Próximamente”. Garantiza responsive, navegación por teclado, estados focus, contraste y reduced motion. No conectes aún módulos de negocio futuros.
+
+CRITERIO: catálogo reutilizable, layout privado coherente, accesibilidad básica y pruebas de componentes críticos.
+
+======================================================================
+ETAPA 03 — ONBOARDING EMPRESARIAL COMPLETO
+======================================================================
+
+Usa el PROMPT BASE. Implementa el wizard de onboarding de nueve pasos definido en AGENTS.md: organización, razón social, actividad económica, CIIU, trabajadores, clase de riesgo, sedes, responsable SST y caracterización operativa. Usa React Hook Form y Zod, persistencia por pasos, reanudación, validación frontend/server, prevención de duplicados e idempotencia. El usuario creador debe quedar como organization_admin mediante el flujo seguro existente. No calcules todavía el perfil 0312; solo guarda datos fuente y emite un evento de dominio preparado para el clasificador futuro.
+
+CRITERIO: onboarding reanudable, transaccional donde corresponda y aislado por tenant.
+
+======================================================================
+ETAPA 04 — CONFIGURACIÓN Y CRUD EMPRESARIAL
+======================================================================
+
+Usa el PROMPT BASE. Implementa pantallas y acciones CRUD para organización, razones sociales, sedes y áreas jerárquicas. Usa permisos centralizados can(permission), validación Zod, mensajes de error de dominio y confirmaciones seguras. No permitas cambiar organization_id de una fila ni crear relaciones cruzadas entre tenants. Maneja RESTRICT/CASCADE/SET NULL de forma comprensible para el usuario. Añade búsquedas, filtros, paginación y empty states.
+
+CRITERIO: CRUD funcional, permisos aplicados en UI y base de datos, integridad entre tenant/razón social/sede/área probada.
+
+======================================================================
+ETAPA 05 — MIEMBROS, INVITACIONES Y RBAC
+======================================================================
+
+Usa el PROMPT BASE. Implementa gestión de miembros, invitaciones seguras mediante Edge Function, aceptación, suspensión y asignación/retiro de roles. Soporta roles globales de organización y scope opcional por sede. Centraliza can(permission, context) y evita comprobaciones de nombres de rol en componentes. Impide que un administrador se quite el último rol organization_admin o deje la organización sin administrador. Registra auditoría de cambios de acceso. Añade pruebas de escalamiento de privilegios, invitación a otro tenant y scope por sede.
+
+CRITERIO: RBAC administrable, sin autoescalamiento, invitaciones idempotentes y auditadas.
+
+======================================================================
+ETAPA 06 — DOCUMENTOS, EVIDENCIAS Y AVATARES
+======================================================================
+
+Usa el PROMPT BASE. Implementa la base del dominio documents sin construir todavía un DMS completo. Crea metadatos de documentos, versiones, vínculos a entidades, vencimientos, estados y evidencias. Configura buckets privados organization-documents y evidences además de avatars, con rutas organization_id/entity_type/entity_id y políticas Storage coherentes con RLS. Valida MIME, tamaño, nombre, propietario y permisos. Implementa carga, descarga firmada, reemplazo versionado y eliminación lógica. Nunca confíes en el path enviado por el cliente sin validarlo.
+
+CRITERIO: archivos privados, versiones trazables, acceso cruzado denegado y pruebas Storage.
+
+======================================================================
+ETAPA 07 — EVENTOS DE DOMINIO, AUDITORÍA Y OUTBOX
+======================================================================
+
+Usa el PROMPT BASE. Implementa una abstracción simple de domain events y transactional outbox para organization.created, member.invited, site.created, classification.changed, assessment.completed, risk.changed, document.expiring y task.overdue. No introduzcas microservicios. Completa audit_log como append-only desde operaciones server-side, capturando actor, acción, entidad, before/after e IP cuando exista. Evita guardar secretos o datos sensibles innecesarios. Diseña reintentos e idempotency_key para consumidores futuros.
+
+CRITERIO: eventos y cambios críticos atómicos, auditoría inmutable para clientes y documentación del contrato.
+
+======================================================================
+ETAPA 08 — ARQUITECTURA NORMATIVA VERSIONADA
+======================================================================
+
+Usa el PROMPT BASE. Implementa el núcleo normativo respetando estrictamente la separación de AGENTS.md. Crea normative_sources, normative_source_versions y requirements. Modela tipos LAW, DECREE, RESOLUTION, CIRCULAR, TECHNICAL_GUIDE, TECHNICAL_STANDARD e INTERNAL_STANDARD. Una fuente tiene múltiples versiones con vigencia, estado, referencia oficial y supersesión. No crees una tabla genérica regulations que mezcle todo. No implementes aún minimum_standards ni risk_methodologies. Incluye historial, RLS, auditoría, seed estructural para Ley 1562 de 2012, Decreto 1072 de 2015, Resolución 0312 de 2019 y GTC 45 sin copiar texto extenso. Marca contenido interpretativo pendiente de revisión experta.
+
+CRITERIO: versionamiento temporal correcto y requirements vinculados a versiones de fuente.
+
+======================================================================
+ETAPA 09 — ESTÁNDARES MÍNIMOS 0312
+======================================================================
+
+Usa el PROMPT BASE. Implementa minimum_standards, standard_profiles, standard_profile_versions y profile_standards. No representes estándares mínimos como requirements genéricos. Soporta código, descripción funcional, peso, ciclo PHVA, criterio, evidencia esperada, vigencia y perfil aplicable. La ponderación debe versionarse y validarse para impedir conjuntos incoherentes. Carga solo una estructura inicial revisable; no inventes contenido jurídico ni copies extensamente la Resolución 0312. Añade herramientas de importación validadas y revisión humana.
+
+CRITERIO: estándares y perfiles versionados, pesos consistentes y separados de requisitos.
+
+======================================================================
+ETAPA 10 — CLASIFICACIÓN NORMATIVA TEMPORAL
+======================================================================
+
+Usa el PROMPT BASE. Implementa organization_classifications y classification_change_proposals. La clasificación debe depender históricamente de employee_count, risk_class, ciiu_code, economic_activity y standard_profile_id; nunca guardes organization.profile estático. Crea Classification Evaluator versionado y explicable. Los cambios críticos generan propuesta, comparación actual/propuesta, razones y revisión humana; no se aplican automáticamente. Al aprobar, cierra effective_to anterior y crea la nueva clasificación en una transacción.
+
+CRITERIO: una sola clasificación vigente por organización/alcance, histórico preservado y cambios auditados.
+
+======================================================================
+ETAPA 11 — REGLAS DE APLICABILIDAD
+======================================================================
+
+Usa el PROMPT BASE. Implementa applicability_rules y organization_requirements. Las reglas deben ser datos versionados y evaluables, no condicionales dispersos en TypeScript. Soporta variables empresariales, clasificación, caracterización operativa y fechas de vigencia. Cada resultado debe explicar qué regla produjo aplicable/no aplicable/revisión requerida. Los casos ambiguos exigen decisión humana. Diseña pruebas de regresión con escenarios representativos y evita afirmar validez jurídica automática.
+
+CRITERIO: motor determinista, versionado, explicable e histórico.
+
+======================================================================
+ETAPA 12 — SNAPSHOTS NORMATIVOS
+======================================================================
+
+Usa el PROMPT BASE. Implementa organization_standard_snapshots y organization_standard_snapshot_items con tipos CURRENT_STATE, MONTHLY_SNAPSHOT, MANUAL_SNAPSHOT y CLASSIFICATION_CHANGE_SNAPSHOT. Los snapshots históricos deben ser inmutables y nunca reemplazar datos transaccionales. Define deduplicación mensual, actor y motivo para snapshots manuales, vínculo obligatorio para cambios de clasificación y almacenamiento de versión de perfil/reglas utilizadas.
+
+CRITERIO: reproducibilidad histórica, inmutabilidad y pruebas contra actualización/eliminación indebida.
+
+======================================================================
+ETAPA 13 — EVALUACIÓN RESOLUCIÓN 0312
+======================================================================
+
+Usa el PROMPT BASE. Implementa assessments y assessment_items sobre snapshots y versiones de estándares. Soporta borrador, en progreso, completada, validada y anulada; respuestas, evidencia, observación, responsable, puntaje y justificación. Implementa scoring versionado solo con reglas aprobadas y evita números mágicos en UI. Al completar, congela entradas relevantes, calcula brechas y emite assessment.completed. Añade revisión humana y trazabilidad de recalculo.
+
+CRITERIO: evaluación reproducible, puntuación verificable e imposible de alterar silenciosamente tras validación.
+
+======================================================================
+ETAPA 14 — BRECHAS Y PLAN DE MEJORAMIENTO
+======================================================================
+
+Usa el PROMPT BASE. Convierte resultados de evaluación en brechas y acciones de mejoramiento sin duplicar acciones al recalcular. Modela prioridad, origen, responsable, fecha objetivo, estado, evidencia, validación y cierre. Vincula cada acción al assessment item, requirement o hallazgo que la originó. Implementa vistas Detectar → Priorizar → Asignar → Ejecutar → Evidenciar → Verificar → Mejorar.
+
+CRITERIO: trazabilidad completa estándar→brecha→acción→evidencia→validación.
+
+======================================================================
+ETAPA 15 — MOTOR DE TAREAS Y PLAN ANUAL
+======================================================================
+
+Usa el PROMPT BASE. Implementa planning y tasks como dominios reutilizables. Soporta plan anual, actividades, responsables, presupuesto opcional, fechas, recurrencia, dependencias, estados, comentarios, evidencias y aprobación. Una acción de mejora puede originar tareas sin convertirse en la misma entidad. Implementa vencimientos, filtros, tablero y calendario. Protege asignaciones y cambios de estado con permisos y auditoría.
+
+CRITERIO: plan anual y tareas trazables, recurrencias idempotentes y vencimientos calculados en UTC.
+
+======================================================================
+ETAPA 16 — METODOLOGÍAS DE RIESGO Y GTC 45
+======================================================================
+
+Usa el PROMPT BASE. Implementa risk_methodologies y risk_methodology_versions. GTC 45 debe ser una metodología técnica inicial, no una ley ni lógica hardcodeada. Modela variables, catálogos, fórmulas, reglas de interpretación y vigencia como configuración versionada. Documenta la interpretación funcional sin copiar extensamente el contenido de la guía. Toda fórmula y tabla cargada requiere estado draft/reviewed/approved y revisión experta.
+
+CRITERIO: arquitectura admite otras metodologías sin rediseño y cada evaluación referencia versión exacta.
+
+======================================================================
+ETAPA 17 — MATRIZ DE PELIGROS Y VALORACIÓN
+======================================================================
+
+Usa el PROMPT BASE. Implementa processes, activities, risk_tasks, hazard_catalog, risk_identifications, risk_assessments y risk_controls según AGENTS.md. Captura zona/lugar, rutina, peligro, efectos, controles existentes, ND, NE, NP, NC, NR, interpretaciones, aceptabilidad, expuestos, peor consecuencia y requisito legal cuando la metodología lo requiera. Calcula mediante la versión de metodología seleccionada y conserva reevaluaciones históricas.
+
+CRITERIO: flujo Proceso→Actividad→Tarea→Peligro→Evaluación→Control→Reevaluación completo y auditable.
+
+======================================================================
+ETAPA 18 — JERARQUÍA Y SEGUIMIENTO DE CONTROLES
+======================================================================
+
+Usa el PROMPT BASE. Completa controles de riesgo con tipos ELIMINATION, SUBSTITUTION, ENGINEERING, ADMINISTRATIVE y PPE. No guardes el tipo únicamente como texto libre. Añade responsable, fecha, estado, evidencia, efectividad, verificación y vínculo a tareas/acciones. Prioriza visualmente la jerarquía sin sustituir decisión profesional. Implementa seguimiento y alertas de controles vencidos o ineficaces.
+
+CRITERIO: controles estructurados, evidencia privada y eficacia históricamente verificable.
+
+======================================================================
+ETAPA 19 — INSPECCIONES Y HALLAZGOS
+======================================================================
+
+Usa el PROMPT BASE. Implementa plantillas versionadas de inspección, programación, ejecución web/móvil preparada, respuestas, fotos, firmas cuando corresponda, hallazgos y acciones. Un hallazgo debe poder originar acción/tarea sin duplicación. Usa inspection-media privado, compresión segura, metadatos y políticas por tenant. Permite trabajo interrumpido y sincronización posterior sin sobrescribir datos más recientes.
+
+CRITERIO: inspección completa, hallazgos trazables y media aislada.
+
+======================================================================
+ETAPA 20 — CAPACITACIONES Y COMPETENCIAS
+======================================================================
+
+Usa el PROMPT BASE. Implementa catálogo, plan de capacitación, sesiones, convocatorias, asistencia, evaluaciones, certificados, vencimientos y evidencias. Relaciona requisitos/estándares, cargos o grupos expuestos cuando aplique. Protege información personal y evita almacenar más datos de los necesarios. Añade indicadores de cobertura y eficacia sin mezclar su cálculo con UI.
+
+CRITERIO: trazabilidad plan→sesión→asistencia→evaluación→evidencia.
+
+======================================================================
+ETAPA 21 — EPP
+======================================================================
+
+Usa el PROMPT BASE. Implementa catálogo de EPP, inventario opcional, asignación, entrega, aceptación, reposición, inspección, vida útil y baja. Vincula EPP con peligros/controles, trabajador y sede. Maneja tallas y datos necesarios con privacidad. Registra evidencia de entrega y evita balances negativos mediante transacciones y constraints.
+
+CRITERIO: historial por trabajador y elemento, stock consistente y controles RBAC.
+
+======================================================================
+ETAPA 22 — CONTRATISTAS Y PROVEEDORES
+======================================================================
+
+Usa el PROMPT BASE. Implementa organizaciones contratistas, contactos, contratos, requisitos documentales, trabajadores contratistas, accesos por sede, vencimientos, evaluación y aprobación. El rol contractor nunca debe acceder a otras organizaciones ni a información interna fuera de su alcance. Diseña invitaciones y portales limitados. Vincula contratación con requisitos del Decreto 1072 sin codificar interpretaciones rígidas.
+
+CRITERIO: portal restringido, documentos verificables y aislamiento entre contratistas.
+
+======================================================================
+ETAPA 23 — INCIDENTES, ACCIDENTES Y ENFERMEDADES
+======================================================================
+
+Usa el PROMPT BASE. Implementa reporte inicial, clasificación, investigación, personas involucradas, causas, acciones, evidencia, comunicaciones y cierre. Trata este dominio como información altamente sensible: mínimos privilegios, campos sensibles separados, auditoría reforzada y descargas firmadas. No automatices conclusiones médicas o jurídicas. Prepara exportes y formatos versionados sin afirmar que sustituyen reportes oficiales.
+
+CRITERIO: privacidad reforzada, trazabilidad y acceso probado por rol/tenant.
+
+======================================================================
+ETAPA 24 — SALUD OCUPACIONAL
+======================================================================
+
+Usa el PROMPT BASE. Diseña e implementa únicamente el mínimo necesario para administrar conceptos de aptitud, restricciones laborales, programas de vigilancia y vencimientos sin guardar historias clínicas ni diagnósticos innecesarios. Separa acceso de SST, talento humano y personal médico autorizado. Documenta clasificación de datos, retención y responsabilidades. Requiere confirmación humana para decisiones que afecten a una persona.
+
+CRITERIO: privacidad por diseño, acceso mínimo y ausencia de datos clínicos fuera de alcance.
+
+======================================================================
+ETAPA 25 — EMERGENCIAS
+======================================================================
+
+Usa el PROMPT BASE. Implementa sedes y escenarios de emergencia, recursos, brigadas, responsables, planes versionados, simulacros, resultados, hallazgos y acciones. Permite directorio operativo con visibilidad controlada y modo de consulta resiliente. No construyas comunicaciones masivas todavía; emite eventos para notificaciones futuras.
+
+CRITERIO: plan→simulacro→hallazgo→acción trazable por sede.
+
+======================================================================
+ETAPA 26 — COMITÉS Y REUNIONES
+======================================================================
+
+Usa el PROMPT BASE. Implementa comités configurables, periodos, miembros, roles internos, reuniones, agenda, asistencia, actas, compromisos, evidencias y seguimiento. Soporta COPASST y Comité de Convivencia como configuraciones iniciales sin hardcodear toda su lógica. Versiona plantillas y controla firmas/aprobaciones.
+
+CRITERIO: histórico por periodo, actas inmutables tras aprobación y compromisos conectados a tareas.
+
+======================================================================
+ETAPA 27 — AUDITORÍAS Y REVISIÓN POR LA DIRECCIÓN
+======================================================================
+
+Usa el PROMPT BASE. Implementa programas de auditoría, alcance, criterios, equipo auditor, agenda, listas, evidencias, hallazgos, clasificación, informe, acciones y cierre. Añade revisión por la dirección con entradas, decisiones, compromisos y acta. Protege independencia del auditor mediante permisos; quien audita no debe autoaprobar cierres cuando la configuración lo prohíba.
+
+CRITERIO: auditoría reproducible y segregación de funciones comprobada.
+
+======================================================================
+ETAPA 28 — INDICADORES Y ANALÍTICA
+======================================================================
+
+Usa el PROMPT BASE. Implementa catálogo y versiones de indicadores, fórmula, fuente, periodicidad, meta, responsable, dimensiones y resultados históricos. Calcula del lado servidor con jobs idempotentes. Construye dashboard gerencial para cumplimiento, plan anual, acciones, documentos y vencimientos. No mezcles current state con snapshots. Añade filtros por organización, razón social, sede, periodo y comparación histórica.
+
+CRITERIO: indicadores explicables, reproducibles y sin fugas entre tenants.
+
+======================================================================
+ETAPA 29 — NOTIFICACIONES
+======================================================================
+
+Usa el PROMPT BASE. Implementa preferencias, plantillas versionadas, notificaciones in-app y cola de entrega preparada para correo. Consume eventos de dominio con idempotencia. Añade deduplicación, reintentos, estado, prioridad, quiet hours y enlaces seguros. Nunca incluyas información sensible completa en correo o push. Usa Realtime solo para actualizar la bandeja si aporta valor.
+
+CRITERIO: una notificación por evento lógico, reintentos seguros y preferencias respetadas.
+
+======================================================================
+ETAPA 30 — AUTOMATIZACIONES
+======================================================================
+
+Usa el PROMPT BASE. Implementa un motor limitado de reglas evento→condiciones→acciones para vencimientos, tareas, documentos y evaluaciones. No permitas SQL o código arbitrario del usuario. Versiona reglas, registra cada ejecución, aplica límites, idempotencia, dry-run y desactivación de emergencia. Usa Cron solo para revisiones agregadas; las importaciones masivas deben emitir un único evento completed y un solo recálculo de clasificación.
+
+CRITERIO: automatizaciones seguras, observables y sin tormentas de eventos.
+
+======================================================================
+ETAPA 31 — SECURIA COPILOT
+======================================================================
+
+Usa el PROMPT BASE. Diseña Securia Copilot como asistente con recuperación autorizada por tenant. Empieza con búsqueda y explicación sobre datos a los que el usuario ya tiene acceso. No permitas que la IA cambie clasificación, cierre hallazgos, apruebe evaluaciones o tome decisiones legales/médicas sin confirmación humana. Registra fuentes, versión normativa, contexto, actor, propuesta y aceptación/rechazo. Protege contra prompt injection en documentos y limita herramientas por permiso.
+
+CRITERIO: respuestas con fuentes, aislamiento probado, acciones críticas siempre confirmadas y auditadas.
+
+======================================================================
+ETAPA 32 — IMPORTACIONES E INTEGRACIONES
+======================================================================
+
+Usa el PROMPT BASE. Implementa framework de integraciones y una primera importación CSV/XLSX de trabajadores/estructura empresarial con staging, validación, preview, errores por fila, idempotencia y rollback lógico. No conectes servicios externos sin autorización explícita. Tras una importación masiva emite workforce.import.completed una vez y solicita un solo recálculo. Documenta contratos, mapeos y límites.
+
+CRITERIO: importación segura, repetible, observable y sin cientos de recálculos.
+
+======================================================================
+ETAPA 33 — APLICACIÓN MÓVIL
+======================================================================
+
+Usa el PROMPT BASE. Crea apps/mobile con Expo, React Native y TypeScript compartiendo packages/types, validation y domain sin acoplar UI web. Implementa Auth seguro, selector de organización, tareas, inspecciones y captura de evidencia como primer alcance. Diseña cola offline, sincronización idempotente, resolución explícita de conflictos, cifrado local y borrado de sesión. No almacenes service_role ni secretos en el dispositivo.
+
+CRITERIO: flujo móvil mínimo funcional, offline controlado y aislamiento por tenant.
+
+======================================================================
+ETAPA 34 — FACTURACIÓN Y ADMINISTRACIÓN SAAS
+======================================================================
+
+Usa el PROMPT BASE. Diseña planes, suscripciones, límites de uso, periodos, trial, estado de facturación y feature flags sin acoplar permisos de seguridad al estado comercial. Implementa un proveedor de pagos solo si está autorizado y disponible; usa webhooks firmados, idempotencia y reconciliación. Una suspensión comercial no debe borrar datos. Separa administración interna de Reinova Labs del tenant y audita toda suplantación o soporte.
+
+CRITERIO: límites consistentes, webhooks seguros y administración interna aislada.
+
+======================================================================
+ETAPA 35 — SEGURIDAD INTEGRAL
+======================================================================
+
+Usa el PROMPT BASE. Ejecuta una auditoría y hardening integral: RLS en toda tabla expuesta, grants mínimos, funciones/views/triggers, Storage, secretos, SSR Auth, cookies, CSRF, redirect validation, XSS, rate limits, dependencias, logs, PII, subida de archivos y encabezados. Prueba IDOR/BOLA entre tenants y sedes, escalamiento RBAC, usuarios suspendidos, JWT vencido y acceso directo al Data API. Corrige hallazgos P0/P1 y documenta P2. Usa asesores de Supabase.
+
+CRITERIO: cero hallazgos críticos/altos abiertos y matriz de pruebas reproducible.
+
+======================================================================
+ETAPA 36 — CALIDAD, E2E Y ACCESIBILIDAD
+======================================================================
+
+Usa el PROMPT BASE. Crea una estrategia de pruebas por pirámide. Amplía unit tests de validadores, permisos, fórmulas y helpers; integración de membresías, RLS, Storage y eventos; E2E de login, onboarding, cambio de organización, evaluación, acción y logout. Añade factories y datos deterministas sin secretos. Audita accesibilidad WCAG 2.2 AA en flujos críticos, navegación por teclado y lectores de pantalla. Define cobertura útil sin perseguir un porcentaje vacío.
+
+CRITERIO: suite estable en CI, escenarios críticos cubiertos y cero bloqueadores de accesibilidad.
+
+======================================================================
+ETAPA 37 — RENDIMIENTO Y ESCALABILIDAD
+======================================================================
+
+Usa el PROMPT BASE. Perfila consultas y páginas con datos representativos. Corrige N+1, índices ausentes, políticas RLS costosas, cargas excesivas, paginación y caché insegura. Usa EXPLAIN ANALYZE con cuidado y métricas antes/después. Revisa TanStack Query por tenant, invalidación al cambiar organización, Server Components y tamaños de bundle. No introduzcas microservicios; conserva el monolito modular.
+
+CRITERIO: presupuestos de rendimiento documentados y mejoras medidas, no supuestas.
+
+======================================================================
+ETAPA 38 — OBSERVABILIDAD, BACKUPS Y RECUPERACIÓN
+======================================================================
+
+Usa el PROMPT BASE. Implementa logging estructurado sin secretos/PII, correlation IDs, monitoreo de errores, métricas de jobs/outbox, alertas y health checks. Documenta backups de Supabase, retención, RPO/RTO, restauración y simulacro de recuperación. Añade runbooks para Auth, migración fallida, fuga de acceso, cola atascada y proveedor externo caído.
+
+CRITERIO: incidentes detectables, runbooks accionables y restauración ensayada en entorno seguro.
+
+======================================================================
+ETAPA 39 — CI/CD Y DESPLIEGUE
+======================================================================
+
+Usa el PROMPT BASE. Configura CI con install reproducible, typecheck, lint, unit/integration tests, build, revisión de migraciones y escaneo de secretos/dependencias. Diseña promoción desarrollo→staging→producción, migraciones forward-only, variables por entorno, previews sin datos productivos y rollback de aplicación compatible con schema. No despliegues a producción sin aprobación explícita del usuario.
+
+CRITERIO: pipeline reproducible, gates claros y despliegue documentado.
+
+======================================================================
+ETAPA 40 — REVISIÓN NORMATIVA Y VALIDACIÓN EXPERTA
+======================================================================
+
+Usa el PROMPT BASE. Prepara un paquete de revisión para experto SST/jurídico: inventario de fuentes y versiones, requisitos interpretados, estándares 0312, perfiles, reglas de aplicabilidad, fórmulas GTC 45, textos UI, supuestos y casos de prueba. Incluye herramientas para aprobar, rechazar y versionar correcciones sin editar históricos. No declares cumplimiento legal por cuenta propia.
+
+CRITERIO: cada regla/contenido tiene fuente, versión, estado de revisión y responsable humano.
+
+======================================================================
+ETAPA 41 — PREPARACIÓN PARA PRODUCCIÓN
+======================================================================
+
+Usa el PROMPT BASE. Ejecuta una revisión final go-live de producto, seguridad, datos, normativa, privacidad, rendimiento, accesibilidad, observabilidad, backups, soporte y documentación. Verifica migraciones locales/remotas, ambientes, dominios, Auth redirect URLs, SMTP, políticas de retención, términos, consentimiento y contactos de incidente. Produce checklist Go/No-Go con evidencia y bloqueadores. No publiques ni migres datos reales sin autorización explícita.
+
+CRITERIO: decisión Go/No-Go sustentada y cero bloqueadores críticos.
+
+======================================================================
+ETAPA 42 — AUDITORÍA FINAL DE ARQUITECTURA
+======================================================================
+
+Usa el PROMPT BASE. Audita el producto completo contra AGENTS.md y los ADR. Confirma monolito modular, límites de dominio, PostgreSQL como fuente de verdad, multi-tenancy, RBAC, RLS, versionamiento normativo, snapshots, clasificación temporal y separación requirement/minimum standard/methodology. Identifica deuda accidental, duplicaciones y acoplamientos. Corrige solo hallazgos críticos claramente seguros; convierte el resto en roadmap priorizado con esfuerzo, riesgo y dependencia.
+
+CRITERIO: arquitectura lista para evolucionar sin reconstruir el núcleo.
+
+======================================================================
+PROMPTS DE MANTENIMIENTO RECURRENTE
+======================================================================
+
+M1 — ACTUALIZAR DEPENDENCIAS
+
+Usa el PROMPT BASE. Revisa changelogs oficiales y actualiza únicamente dependencias estables compatibles. Identifica breaking changes, migra código, conserva lockfile, ejecuta la suite completa y auditoría. No mezcles la actualización con nuevas funcionalidades.
+
+M2 — CAMBIO NORMATIVO
+
+Usa el PROMPT BASE. Registra una nueva versión de la fuente normativa sin sobrescribir la anterior. Modela vigencia y supersesión, propone cambios en requirements/standards/methodology, ejecuta análisis de impacto por organización y genera propuestas humanas. No reclasifiques ni modifiques evaluaciones históricas automáticamente.
+
+M3 — NUEVO MÓDULO
+
+Usa el PROMPT BASE. Antes de implementar el módulo [NOMBRE], define límite de dominio, entidades, organization_id, permisos, eventos, auditoría, Storage, RLS, integraciones y relación con requirements/actions/tasks/evidence. Presenta ADR si introduce una decisión arquitectónica nueva. Implementa verticalmente una historia mínima antes de ampliar.
+
+M4 — INVESTIGAR UN BUG
+
+Usa el PROMPT BASE. Reproduce y diagnostica [BUG] con evidencia. Identifica causa raíz, alcance por tenant, impacto de seguridad/datos y prueba de regresión. No implementes la corrección hasta tener una reproducción fiable; después aplica el cambio mínimo seguro y ejecuta verificaciones proporcionales al riesgo.
+
+M5 — REVISAR UNA MIGRACIÓN
+
+Usa el PROMPT BASE. Revisa la migración [ARCHIVO] sin aplicarla: locks, pérdida de datos, compatibilidad hacia atrás, RLS, grants, constraints, índices, funciones, vistas, triggers, reversibilidad operativa y tiempo estimado. Entrega hallazgos priorizados y una versión corregida solo si se solicita.
+
+M6 — REVISIÓN DE RELEASE
+
+Usa el PROMPT BASE. Compara el release actual contra el anterior, revisa migraciones, permisos, nuevas rutas, cambios de contrato, telemetría, documentación y rollback. Ejecuta pruebas críticas multiempresa y produce notas de versión comprensibles para usuarios y equipo interno.
+
+FIN DEL ARCHIVO
