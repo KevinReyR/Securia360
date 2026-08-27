@@ -11,6 +11,7 @@
     "build": "npm run build --workspace @securia360/web",
     "lint": "npm run lint --workspace @securia360/web",
     "test": "npm run test --workspace @securia360/web",
+    "test:integration": "npm run test:integration --workspace @securia360/web",
     "typecheck": "npm run typecheck --workspace @securia360/web"
   },
   "engines": {

@@ -9,6 +9,7 @@
     "build": "next build",
     "lint": "node ../../node_modules/eslint/bin/eslint.js . --max-warnings=0",
     "test": "vitest run",
+    "test:integration": "vitest run src/tests/data-api-rls.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
