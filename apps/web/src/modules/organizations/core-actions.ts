@@ -41,16 +41,18 @@ export async function createOrganization(formData: FormData) {
   // Use the client that verified the session. Creating a second server client
   // can lose a just-refreshed access token during the same Server Action.
   const { userId, supabase } = await requireAuthenticatedUser();
-  const { data, error } = await supabase
+  // The membership is provisioned by an AFTER INSERT trigger. Do not request a
+  // RETURNING row here: its organizations_select policy depends on that new
+  // membership, which is not visible to the same PostgREST statement.
+  const organizationId = crypto.randomUUID();
+  const { error } = await supabase
     .from("organizations")
-    .insert({ ...parsed.data, created_by: userId, updated_by: userId })
-    .select("id")
-    .single();
+    .insert({ id: organizationId, ...parsed.data, created_by: userId, updated_by: userId });
   if (error?.code === "23505") redirect("/organizations?error=conflict");
-  if (error || !data) redirect("/organizations?error=unexpected");
+  if (error) redirect("/organizations?error=unexpected");
   const cookieStore = await cookies();
-  cookieStore.set(ACTIVE_ORGANIZATION_COOKIE, data.id, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 31_536_000 });
-  redirect(`/org/${data.id}/onboarding`);
+  cookieStore.set(ACTIVE_ORGANIZATION_COOKIE, organizationId, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 31_536_000 });
+  redirect(`/org/${organizationId}/onboarding`);
 }
 
 export async function updateProfile(formData: FormData) {
