@@ -18,7 +18,7 @@ export async function requireAuthenticatedUser() {
   const claims = data?.claims;
   const userId = typeof claims?.sub === "string" ? claims.sub : null;
   if (error || !userId) redirect("/auth/login");
-  return { userId, email: typeof claims?.email === "string" ? claims.email : "" };
+  return { userId, email: typeof claims?.email === "string" ? claims.email : "", supabase };
 }
 
 export async function listOrganizations(): Promise<OrganizationSummary[]> {

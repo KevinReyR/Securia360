@@ -38,13 +38,9 @@ async function requirePermission(organizationId: string, permission: PermissionC
 export async function createOrganization(formData: FormData) {
   const parsed = organizationSchema.safeParse({ name: value(formData, "name"), slug: value(formData, "slug"), nit: value(formData, "nit") });
   if (!parsed.success) redirect("/organizations?error=validation");
-  let userId: string;
-  try {
-    ({ userId } = await requireAuthenticatedUser());
-  } catch {
-    redirect("/organizations?error=auth");
-  }
-  const supabase = await createClient();
+  // Use the client that verified the session. Creating a second server client
+  // can lose a just-refreshed access token during the same Server Action.
+  const { userId, supabase } = await requireAuthenticatedUser();
   const { data, error } = await supabase
     .from("organizations")
     .insert({ ...parsed.data, created_by: userId, updated_by: userId })
