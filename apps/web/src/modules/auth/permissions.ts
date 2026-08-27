@@ -37,6 +37,9 @@ export const permissionCodes = [
   "improvements.read",
   "improvements.manage",
   "improvements.validate",
+  "risks.read",
+  "risks.manage",
+  "risks.validate",
 ] as const;
 
 export type PermissionCode = (typeof permissionCodes)[number];

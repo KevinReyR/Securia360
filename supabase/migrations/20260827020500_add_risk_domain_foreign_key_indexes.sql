@@ -1,0 +1,20 @@
+-- Cover foreign keys introduced by the risk matrix and control follow-up domains.
+create index if not exists processes_created_by_idx on public.processes(created_by);
+create index if not exists activities_process_id_idx on public.activities(process_id);
+create index if not exists activities_created_by_idx on public.activities(created_by);
+create index if not exists risk_tasks_activity_id_idx on public.risk_tasks(activity_id);
+create index if not exists risk_tasks_created_by_idx on public.risk_tasks(created_by);
+create index if not exists risk_identifications_risk_task_id_idx on public.risk_identifications(risk_task_id);
+create index if not exists risk_identifications_hazard_id_idx on public.risk_identifications(hazard_id);
+create index if not exists risk_identifications_created_by_idx on public.risk_identifications(created_by);
+create index if not exists risk_assessments_risk_identification_id_idx on public.risk_assessments(risk_identification_id);
+create index if not exists risk_assessments_parent_id_idx on public.risk_assessments(parent_risk_assessment_id);
+create index if not exists risk_controls_risk_identification_id_idx on public.risk_controls(risk_identification_id);
+create index if not exists risk_controls_responsible_user_id_idx on public.risk_controls(responsible_user_id);
+create index if not exists risk_controls_evidence_document_version_id_idx on public.risk_controls(evidence_document_version_id);
+create index if not exists risk_controls_task_id_idx on public.risk_controls(task_id);
+create index if not exists risk_controls_improvement_action_id_idx on public.risk_controls(improvement_action_id);
+create index if not exists risk_controls_last_verified_by_idx on public.risk_controls(last_verified_by);
+create index if not exists risk_control_verifications_risk_control_id_idx on public.risk_control_verifications(risk_control_id);
+create index if not exists risk_control_verifications_evidence_document_version_id_idx on public.risk_control_verifications(evidence_document_version_id);
+create index if not exists risk_control_verifications_verified_by_idx on public.risk_control_verifications(verified_by);

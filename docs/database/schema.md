@@ -14,6 +14,13 @@
 | Mejoramiento | `improvement_findings`, `improvement_gaps`, `improvement_actions` | Trazabilidad desde la evaluación, requisito o hallazgo hacia acción, evidencia y validación. |
 | Planificación | `annual_plans`, `plan_activities`, `tasks` y tablas auxiliares | Plan anual, actividades y tareas reutilizables con dependencias, recurrencia y evidencia. |
 | Riesgos | `risk_methodologies`, versiones y configuraciones | Metodologías técnicas versionadas y evaluaciones que conservan la versión exacta usada. |
+| Matriz de riesgos | `processes`, `activities`, `risk_tasks`, `risk_identifications`, `risk_controls`, `risk_control_verifications`, `risk_control_alerts` | Cadena auditable de peligro, valoración, control, eficacia histórica y alertas. |
+| Capacitación | `training_catalog`, `training_plans`, `training_sessions`, `training_enrollments`, `training_attendances`, `training_evaluations`, `training_certificates` | Trazabilidad de capacitación con mínima información personal y evidencia privada. |
+| EPP | `ppe_catalog`, `ppe_inventory`, `ppe_assignments`, `ppe_deliveries`, `ppe_inspections`, `ppe_retirements` | Inventario consistente e historial por miembro y elemento. |
+| Contratistas | `contractor_organizations`, `contracts`, requisitos, documentos, evaluaciones y accesos portal | Portal limitado por contrato/sede y documentos verificables. |
+| Incidentes | `incidents`, investigación, causas, acciones, evidencia y detalles sensibles separados | Privacidad reforzada y trazabilidad sin conclusiones automáticas. |
+| Salud ocupacional | conceptos de aptitud, restricciones, programas y decisiones confirmadas | Datos mínimos, sin historias clínicas ni diagnósticos. |
+| Emergencias | escenarios, recursos, brigadas, planes, simulacros, resultados, hallazgos y acciones | Preparación y simulacros trazables por sede, con planes versionados y acciones verificables. |
 
 ## Convenciones
 
@@ -45,6 +52,16 @@ Las entidades normativas (`normative_sources`, `requirements`, `minimum_standard
 - `20260826250000_add_improvement_plan.sql`: convierte resultados no cumplidos en brechas y acciones idempotentes, con evidencia, validación, auditoría y RLS.
 - `20260826260000_add_planning_and_tasks.sql`: agrega plan anual, actividades, tareas, dependencias, comentarios, evidencias y recurrencias UTC idempotentes.
 - `20260826270000_add_versioned_risk_methodologies.sql`: añade metodologías técnicas, GTC 45 estructural y evaluaciones con versión exacta.
+- `20260827010000_add_risk_matrix.sql`: añade matriz de peligros, controles jerarquizados, cálculos configurables y reevaluaciones históricas.
+- `20260827020000_add_risk_control_follow_up.sql`: agrega verificación append-only, relaciones seguras con tareas, acciones y evidencia, además de alertas de vencimiento o ineficacia.
+- `20260827020500_add_risk_domain_foreign_key_indexes.sql`: cubre las claves foráneas del dominio de matriz y seguimiento de controles.
+- `20260827021000_include_control_status_in_alerts.sql`: incluye controles marcados ineficaces en las alertas abiertas.
+- `20260827021500_schedule_risk_control_alerts.sql`: programa la evaluación diaria de alertas vencidas mediante `pg_cron`.
+- `20260827030000_add_training_and_competencies.sql`: agrega catálogo, planes, sesiones, convocatoria, asistencia, evaluación, certificados e indicadores seguros.
+- `20260827040000_add_ppe_domain.sql`: agrega catálogo, inventario, asignación, entrega transaccional, inspección y baja de EPP.
+- `20260827050000_add_contractors_and_suppliers.sql`: agrega contratistas, contratos, requisitos, portal restringido y aprobaciones auditables.
+- `20260827060000_add_incidents_and_health_sensitive_domain.sql`: agrega reporte, investigación, evidencia y detalle sensible protegido.
+- `20260827070000_add_minimal_occupational_health.sql`: agrega salud ocupacional mínima y controles de privacidad por rol.
 - `20260826131521_allow_tenant_cascade_cleanup.sql`: conserva esa protección en operaciones directas sin bloquear cascadas del tenant.
 - `20260826131659_skip_audit_during_tenant_cascade.sql`: evita recrear auditoría hija durante el borrado explícito de una organización.
 - `20260826132501_preserve_existing_membership_status.sql`: una reinvitación no degrada membresías activas o suspendidas.

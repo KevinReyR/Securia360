@@ -14,6 +14,173 @@ export type Database = {
   }
   public: {
     Tables: {
+      activities: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          process_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          process_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          process_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_process_id_fkey"
+            columns: ["process_id"]
+            isOneToOne: false
+            referencedRelation: "processes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      annual_plans: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          budget: number | null
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          organization_id: string
+          status: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          budget?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          status?: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          budget?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          status?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "annual_plans_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      applicability_rules: {
+        Row: {
+          conditions: Json
+          created_at: string
+          effective_from: string
+          effective_to: string | null
+          expert_review_status: string
+          explanation_template: string
+          id: string
+          outcome: string
+          requirement_id: string
+          rule_code: string
+          status: string
+          supersedes_rule_id: string | null
+          updated_at: string
+          version_number: number
+        }
+        Insert: {
+          conditions?: Json
+          created_at?: string
+          effective_from: string
+          effective_to?: string | null
+          expert_review_status?: string
+          explanation_template: string
+          id?: string
+          outcome: string
+          requirement_id: string
+          rule_code: string
+          status?: string
+          supersedes_rule_id?: string | null
+          updated_at?: string
+          version_number: number
+        }
+        Update: {
+          conditions?: Json
+          created_at?: string
+          effective_from?: string
+          effective_to?: string | null
+          expert_review_status?: string
+          explanation_template?: string
+          id?: string
+          outcome?: string
+          requirement_id?: string
+          rule_code?: string
+          status?: string
+          supersedes_rule_id?: string | null
+          updated_at?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applicability_rules_requirement_id_fkey"
+            columns: ["requirement_id"]
+            isOneToOne: false
+            referencedRelation: "requirements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applicability_rules_supersedes_rule_id_fkey"
+            columns: ["supersedes_rule_id"]
+            isOneToOne: false
+            referencedRelation: "applicability_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       areas: {
         Row: {
           code: string
@@ -71,6 +238,197 @@ export type Database = {
           },
         ]
       }
+      assessment_items: {
+        Row: {
+          assessment_id: string
+          created_at: string
+          evidence_document_version_id: string | null
+          id: string
+          justification: string | null
+          observation: string | null
+          response: string
+          responsible_user_id: string | null
+          score: number | null
+          snapshot_item_id: string
+          updated_at: string
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string
+          evidence_document_version_id?: string | null
+          id?: string
+          justification?: string | null
+          observation?: string | null
+          response?: string
+          responsible_user_id?: string | null
+          score?: number | null
+          snapshot_item_id: string
+          updated_at?: string
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string
+          evidence_document_version_id?: string | null
+          id?: string
+          justification?: string | null
+          observation?: string | null
+          response?: string
+          responsible_user_id?: string | null
+          score?: number | null
+          snapshot_item_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_items_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_items_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_items_snapshot_item_id_fkey"
+            columns: ["snapshot_item_id"]
+            isOneToOne: false
+            referencedRelation: "organization_standard_snapshot_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assessment_scoring_rules: {
+        Row: {
+          code: string
+          created_at: string
+          expert_review_status: string
+          id: string
+          response_multipliers: Json
+          standard_profile_version_id: string
+          status: string
+          version_number: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expert_review_status?: string
+          id?: string
+          response_multipliers: Json
+          standard_profile_version_id: string
+          status?: string
+          version_number: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expert_review_status?: string
+          id?: string
+          response_multipliers?: Json
+          standard_profile_version_id?: string
+          status?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_scoring_rules_standard_profile_version_id_fkey"
+            columns: ["standard_profile_version_id"]
+            isOneToOne: false
+            referencedRelation: "standard_profile_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assessments: {
+        Row: {
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          id: string
+          organization_id: string
+          responsible_user_id: string | null
+          score: number | null
+          score_explanation: Json
+          scoring_rule_id: string
+          snapshot_id: string
+          standard_profile_version_id: string
+          status: string
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+          void_reason: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          id?: string
+          organization_id: string
+          responsible_user_id?: string | null
+          score?: number | null
+          score_explanation?: Json
+          scoring_rule_id: string
+          snapshot_id: string
+          standard_profile_version_id: string
+          status?: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          void_reason?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          id?: string
+          organization_id?: string
+          responsible_user_id?: string | null
+          score?: number | null
+          score_explanation?: Json
+          scoring_rule_id?: string
+          snapshot_id?: string
+          standard_profile_version_id?: string
+          status?: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          void_reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessments_scoring_rule_id_fkey"
+            columns: ["scoring_rule_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_scoring_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessments_snapshot_id_fkey"
+            columns: ["snapshot_id"]
+            isOneToOne: false
+            referencedRelation: "organization_standard_snapshots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessments_standard_profile_version_id_fkey"
+            columns: ["standard_profile_version_id"]
+            isOneToOne: false
+            referencedRelation: "standard_profile_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -118,23 +476,792 @@ export type Database = {
           },
         ]
       }
-      documents: {
-        Row: { id: string; organization_id: string; entity_type: string; entity_id: string; title: string; status: string; expires_at: string | null; deleted_at: string | null; deleted_by: string | null; created_by: string | null; updated_by: string | null; created_at: string; updated_at: string }
-        Insert: { id?: string; organization_id: string; entity_type: string; entity_id: string; title: string; status?: string; expires_at?: string | null; deleted_at?: string | null; deleted_by?: string | null; created_by?: string | null; updated_by?: string | null; created_at?: string; updated_at?: string }
-        Update: { id?: string; organization_id?: string; entity_type?: string; entity_id?: string; title?: string; status?: string; expires_at?: string | null; deleted_at?: string | null; deleted_by?: string | null; created_by?: string | null; updated_by?: string | null; created_at?: string; updated_at?: string }
+      classification_change_proposals: {
+        Row: {
+          comparison: Json
+          created_at: string
+          current_classification_id: string | null
+          evaluator_version_id: string
+          id: string
+          organization_id: string
+          proposed_ciiu_code: string | null
+          proposed_economic_activity: string | null
+          proposed_effective_from: string
+          proposed_employee_count: number
+          proposed_risk_class: number
+          proposed_standard_profile_id: string
+          reasons: Json
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          scope_key: string
+          status: string
+        }
+        Insert: {
+          comparison?: Json
+          created_at?: string
+          current_classification_id?: string | null
+          evaluator_version_id: string
+          id?: string
+          organization_id: string
+          proposed_ciiu_code?: string | null
+          proposed_economic_activity?: string | null
+          proposed_effective_from: string
+          proposed_employee_count: number
+          proposed_risk_class: number
+          proposed_standard_profile_id: string
+          reasons?: Json
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          scope_key?: string
+          status?: string
+        }
+        Update: {
+          comparison?: Json
+          created_at?: string
+          current_classification_id?: string | null
+          evaluator_version_id?: string
+          id?: string
+          organization_id?: string
+          proposed_ciiu_code?: string | null
+          proposed_economic_activity?: string | null
+          proposed_effective_from?: string
+          proposed_employee_count?: number
+          proposed_risk_class?: number
+          proposed_standard_profile_id?: string
+          reasons?: Json
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          scope_key?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classification_change_proposa_proposed_standard_profile_id_fkey"
+            columns: ["proposed_standard_profile_id"]
+            isOneToOne: false
+            referencedRelation: "standard_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classification_change_proposals_current_classification_id_fkey"
+            columns: ["current_classification_id"]
+            isOneToOne: false
+            referencedRelation: "organization_classifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classification_change_proposals_evaluator_version_id_fkey"
+            columns: ["evaluator_version_id"]
+            isOneToOne: false
+            referencedRelation: "classification_evaluator_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classification_change_proposals_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classification_evaluator_versions: {
+        Row: {
+          created_at: string
+          effective_from: string | null
+          effective_to: string | null
+          evaluator_id: string
+          expert_review_status: string
+          id: string
+          rules_summary: Json
+          version_code: string
+        }
+        Insert: {
+          created_at?: string
+          effective_from?: string | null
+          effective_to?: string | null
+          evaluator_id: string
+          expert_review_status?: string
+          id?: string
+          rules_summary?: Json
+          version_code: string
+        }
+        Update: {
+          created_at?: string
+          effective_from?: string | null
+          effective_to?: string | null
+          evaluator_id?: string
+          expert_review_status?: string
+          id?: string
+          rules_summary?: Json
+          version_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classification_evaluator_versions_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "classification_evaluators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classification_evaluators: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          name: string
+          status: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          name: string
+          status?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+          status?: string
+        }
         Relationships: []
       }
-      document_versions: {
-        Row: { id: string; organization_id: string; document_id: string; version_number: number; bucket_id: string; storage_path: string; original_name: string; mime_type: string; size_bytes: number; uploaded_by: string | null; created_at: string }
-        Insert: { id?: string; organization_id: string; document_id: string; version_number: number; bucket_id: string; storage_path: string; original_name: string; mime_type: string; size_bytes: number; uploaded_by?: string | null; created_at?: string }
-        Update: { id?: string; organization_id?: string; document_id?: string; version_number?: number; bucket_id?: string; storage_path?: string; original_name?: string; mime_type?: string; size_bytes?: number; uploaded_by?: string | null; created_at?: string }
-        Relationships: []
+      contract_document_requirements: {
+        Row: {
+          contract_id: string
+          created_at: string
+          due_at: string | null
+          id: string
+          organization_id: string
+          required: boolean
+          requirement_id: string | null
+          status: string
+          title: string
+        }
+        Insert: {
+          contract_id: string
+          created_at?: string
+          due_at?: string | null
+          id?: string
+          organization_id: string
+          required?: boolean
+          requirement_id?: string | null
+          status?: string
+          title: string
+        }
+        Update: {
+          contract_id?: string
+          created_at?: string
+          due_at?: string | null
+          id?: string
+          organization_id?: string
+          required?: boolean
+          requirement_id?: string | null
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_document_requirements_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_document_requirements_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_document_requirements_requirement_id_fkey"
+            columns: ["requirement_id"]
+            isOneToOne: false
+            referencedRelation: "requirements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contract_document_submissions: {
+        Row: {
+          contract_document_requirement_id: string
+          document_version_id: string
+          id: string
+          organization_id: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+        }
+        Insert: {
+          contract_document_requirement_id: string
+          document_version_id: string
+          id?: string
+          organization_id: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+        }
+        Update: {
+          contract_document_requirement_id?: string
+          document_version_id?: string
+          id?: string
+          organization_id?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_document_submissions_contract_document_requiremen_fkey"
+            columns: ["contract_document_requirement_id"]
+            isOneToOne: false
+            referencedRelation: "contract_document_requirements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_document_submissions_document_version_id_fkey"
+            columns: ["document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_document_submissions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contract_evaluations: {
+        Row: {
+          contract_id: string
+          created_at: string
+          evaluated_at: string | null
+          evaluated_by: string | null
+          id: string
+          notes: string | null
+          organization_id: string
+          score: number | null
+          status: string
+        }
+        Insert: {
+          contract_id: string
+          created_at?: string
+          evaluated_at?: string | null
+          evaluated_by?: string | null
+          id?: string
+          notes?: string | null
+          organization_id: string
+          score?: number | null
+          status?: string
+        }
+        Update: {
+          contract_id?: string
+          created_at?: string
+          evaluated_at?: string | null
+          evaluated_by?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          score?: number | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_evaluations_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_evaluations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contract_site_accesses: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          contract_id: string
+          id: string
+          organization_id: string
+          site_id: string
+          status: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          contract_id: string
+          id?: string
+          organization_id: string
+          site_id: string
+          status?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          contract_id?: string
+          id?: string
+          organization_id?: string
+          site_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_site_accesses_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_site_accesses_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_site_accesses_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contractor_contacts: {
+        Row: {
+          contractor_organization_id: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          organization_id: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          contractor_organization_id: string
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          organization_id: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          contractor_organization_id?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          organization_id?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contractor_contacts_contractor_organization_id_fkey"
+            columns: ["contractor_organization_id"]
+            isOneToOne: false
+            referencedRelation: "contractor_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contractor_contacts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contractor_organizations: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          legal_name: string
+          organization_id: string
+          status: string
+          tax_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: string
+          legal_name: string
+          organization_id: string
+          status?: string
+          tax_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          legal_name?: string
+          organization_id?: string
+          status?: string
+          tax_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contractor_organizations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contractor_portal_accesses: {
+        Row: {
+          contract_id: string
+          contractor_contact_id: string
+          created_at: string
+          id: string
+          organization_id: string
+          site_id: string | null
+          status: string
+        }
+        Insert: {
+          contract_id: string
+          contractor_contact_id: string
+          created_at?: string
+          id?: string
+          organization_id: string
+          site_id?: string | null
+          status?: string
+        }
+        Update: {
+          contract_id?: string
+          contractor_contact_id?: string
+          created_at?: string
+          id?: string
+          organization_id?: string
+          site_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contractor_portal_accesses_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contractor_portal_accesses_contractor_contact_id_fkey"
+            columns: ["contractor_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contractor_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contractor_portal_accesses_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contractor_portal_accesses_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contractor_workers: {
+        Row: {
+          contractor_organization_id: string
+          created_at: string
+          display_name: string
+          external_reference: string | null
+          id: string
+          organization_id: string
+          site_id: string | null
+          status: string
+        }
+        Insert: {
+          contractor_organization_id: string
+          created_at?: string
+          display_name: string
+          external_reference?: string | null
+          id?: string
+          organization_id: string
+          site_id?: string | null
+          status?: string
+        }
+        Update: {
+          contractor_organization_id?: string
+          created_at?: string
+          display_name?: string
+          external_reference?: string | null
+          id?: string
+          organization_id?: string
+          site_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contractor_workers_contractor_organization_id_fkey"
+            columns: ["contractor_organization_id"]
+            isOneToOne: false
+            referencedRelation: "contractor_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contractor_workers_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contractor_workers_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contracts: {
+        Row: {
+          code: string
+          contractor_organization_id: string
+          created_at: string
+          ends_at: string | null
+          id: string
+          organization_id: string
+          requirement_id: string | null
+          starts_at: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          contractor_organization_id: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          organization_id: string
+          requirement_id?: string | null
+          starts_at: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          contractor_organization_id?: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          organization_id?: string
+          requirement_id?: string | null
+          starts_at?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_contractor_organization_id_fkey"
+            columns: ["contractor_organization_id"]
+            isOneToOne: false
+            referencedRelation: "contractor_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_requirement_id_fkey"
+            columns: ["requirement_id"]
+            isOneToOne: false
+            referencedRelation: "requirements"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       document_evidences: {
-        Row: { id: string; organization_id: string; document_version_id: string; entity_type: string; entity_id: string; created_by: string | null; created_at: string }
-        Insert: { id?: string; organization_id: string; document_version_id: string; entity_type: string; entity_id: string; created_by?: string | null; created_at?: string }
-        Update: { id?: string; organization_id?: string; document_version_id?: string; entity_type?: string; entity_id?: string; created_by?: string | null; created_at?: string }
-        Relationships: []
+        Row: {
+          created_at: string
+          created_by: string | null
+          document_version_id: string
+          entity_id: string
+          entity_type: string
+          id: string
+          organization_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          document_version_id: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          organization_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          document_version_id?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          organization_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_evidences_organization_id_document_version_id_fkey"
+            columns: ["organization_id", "document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      document_versions: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          document_id: string
+          id: string
+          mime_type: string
+          organization_id: string
+          original_name: string
+          size_bytes: number
+          storage_path: string
+          uploaded_by: string | null
+          version_number: number
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          document_id: string
+          id?: string
+          mime_type: string
+          organization_id: string
+          original_name: string
+          size_bytes: number
+          storage_path: string
+          uploaded_by?: string | null
+          version_number: number
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          document_id?: string
+          id?: string
+          mime_type?: string
+          organization_id?: string
+          original_name?: string
+          size_bytes?: number
+          storage_path?: string
+          uploaded_by?: string | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_versions_document_fkey"
+            columns: ["organization_id", "document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          entity_id: string
+          entity_type: string
+          expires_at: string | null
+          id: string
+          organization_id: string
+          status: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          entity_id: string
+          entity_type: string
+          expires_at?: string | null
+          id?: string
+          organization_id: string
+          status?: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          entity_id?: string
+          entity_type?: string
+          expires_at?: string | null
+          id?: string
+          organization_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       domain_events: {
         Row: {
@@ -197,6 +1324,1436 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_actions: {
+        Row: {
+          created_at: string
+          due_at: string | null
+          emergency_finding_id: string
+          evidence_document_version_id: string | null
+          id: string
+          improvement_action_id: string | null
+          organization_id: string
+          responsible_user_id: string | null
+          status: string
+          title: string
+          updated_at: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          due_at?: string | null
+          emergency_finding_id: string
+          evidence_document_version_id?: string | null
+          id?: string
+          improvement_action_id?: string | null
+          organization_id: string
+          responsible_user_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          due_at?: string | null
+          emergency_finding_id?: string
+          evidence_document_version_id?: string | null
+          id?: string
+          improvement_action_id?: string | null
+          organization_id?: string
+          responsible_user_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_actions_emergency_finding_id_fkey"
+            columns: ["emergency_finding_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_findings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_actions_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_actions_improvement_action_id_fkey"
+            columns: ["improvement_action_id"]
+            isOneToOne: false
+            referencedRelation: "improvement_actions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_actions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_brigade_members: {
+        Row: {
+          active: boolean
+          appointed_at: string
+          created_at: string
+          emergency_brigade_id: string
+          id: string
+          organization_id: string
+          organization_member_id: string
+          responsibility: string
+        }
+        Insert: {
+          active?: boolean
+          appointed_at?: string
+          created_at?: string
+          emergency_brigade_id: string
+          id?: string
+          organization_id: string
+          organization_member_id: string
+          responsibility?: string
+        }
+        Update: {
+          active?: boolean
+          appointed_at?: string
+          created_at?: string
+          emergency_brigade_id?: string
+          id?: string
+          organization_id?: string
+          organization_member_id?: string
+          responsibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_brigade_members_emergency_brigade_id_fkey"
+            columns: ["emergency_brigade_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_brigades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_brigade_members_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_brigade_members_organization_member_id_fkey"
+            columns: ["organization_member_id"]
+            isOneToOne: false
+            referencedRelation: "organization_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_brigades: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          organization_id: string
+          site_id: string
+          specialty: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          organization_id: string
+          site_id: string
+          specialty: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          organization_id?: string
+          site_id?: string
+          specialty?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_brigades_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_brigades_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_directory_entries: {
+        Row: {
+          active: boolean
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          display_name: string
+          id: string
+          operational_role: string
+          organization_id: string
+          site_id: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          active?: boolean
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          display_name: string
+          id?: string
+          operational_role: string
+          organization_id: string
+          site_id: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          active?: boolean
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          operational_role?: string
+          organization_id?: string
+          site_id?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_directory_entries_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_directory_entries_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_drill_results: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          emergency_drill_id: string
+          id: string
+          organization_id: string
+          outcome: string
+          participant_count: number | null
+          recorded_by: string | null
+          summary: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          emergency_drill_id: string
+          id?: string
+          organization_id: string
+          outcome: string
+          participant_count?: number | null
+          recorded_by?: string | null
+          summary: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          emergency_drill_id?: string
+          id?: string
+          organization_id?: string
+          outcome?: string
+          participant_count?: number | null
+          recorded_by?: string | null
+          summary?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_drill_results_emergency_drill_id_fkey"
+            columns: ["emergency_drill_id"]
+            isOneToOne: true
+            referencedRelation: "emergency_drills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_drill_results_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_drills: {
+        Row: {
+          conducted_at: string | null
+          coordinator_user_id: string | null
+          created_at: string
+          emergency_plan_version_id: string | null
+          emergency_scenario_id: string | null
+          id: string
+          organization_id: string
+          scheduled_at: string | null
+          site_id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          conducted_at?: string | null
+          coordinator_user_id?: string | null
+          created_at?: string
+          emergency_plan_version_id?: string | null
+          emergency_scenario_id?: string | null
+          id?: string
+          organization_id: string
+          scheduled_at?: string | null
+          site_id: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          conducted_at?: string | null
+          coordinator_user_id?: string | null
+          created_at?: string
+          emergency_plan_version_id?: string | null
+          emergency_scenario_id?: string | null
+          id?: string
+          organization_id?: string
+          scheduled_at?: string | null
+          site_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_drills_emergency_plan_version_id_fkey"
+            columns: ["emergency_plan_version_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_plan_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_drills_emergency_scenario_id_fkey"
+            columns: ["emergency_scenario_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_scenarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_drills_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_drills_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_findings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          emergency_drill_id: string
+          id: string
+          organization_id: string
+          severity: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          emergency_drill_id: string
+          id?: string
+          organization_id: string
+          severity?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          emergency_drill_id?: string
+          id?: string
+          organization_id?: string
+          severity?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_findings_emergency_drill_id_fkey"
+            columns: ["emergency_drill_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_drills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_findings_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_plan_versions: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          created_by: string | null
+          document_version_id: string | null
+          effective_from: string | null
+          effective_to: string | null
+          id: string
+          organization_id: string
+          site_id: string
+          status: string
+          summary: string
+          updated_at: string
+          version_number: number
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_version_id?: string | null
+          effective_from?: string | null
+          effective_to?: string | null
+          id?: string
+          organization_id: string
+          site_id: string
+          status?: string
+          summary: string
+          updated_at?: string
+          version_number: number
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_version_id?: string | null
+          effective_from?: string | null
+          effective_to?: string | null
+          id?: string
+          organization_id?: string
+          site_id?: string
+          status?: string
+          summary?: string
+          updated_at?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_plan_versions_document_version_id_fkey"
+            columns: ["document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_plan_versions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_plan_versions_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_resources: {
+        Row: {
+          created_at: string
+          evidence_document_version_id: string | null
+          expires_at: string | null
+          id: string
+          inspection_due_at: string | null
+          location_description: string | null
+          name: string
+          organization_id: string
+          quantity: number
+          resource_type: string
+          site_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          evidence_document_version_id?: string | null
+          expires_at?: string | null
+          id?: string
+          inspection_due_at?: string | null
+          location_description?: string | null
+          name: string
+          organization_id: string
+          quantity?: number
+          resource_type: string
+          site_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          evidence_document_version_id?: string | null
+          expires_at?: string | null
+          id?: string
+          inspection_due_at?: string | null
+          location_description?: string | null
+          name?: string
+          organization_id?: string
+          quantity?: number
+          resource_type?: string
+          site_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_resources_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_resources_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_resources_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_scenarios: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          site_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          site_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          site_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_scenarios_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_scenarios_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hazard_catalog: {
+        Row: {
+          category: string
+          code: string
+          created_at: string
+          description: string | null
+          expert_review_status: string
+          id: string
+          name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          code: string
+          created_at?: string
+          description?: string | null
+          expert_review_status?: string
+          id?: string
+          name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string
+          description?: string | null
+          expert_review_status?: string
+          id?: string
+          name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      health_program_enrollments: {
+        Row: {
+          created_at: string
+          health_surveillance_program_id: string
+          id: string
+          next_review_at: string | null
+          organization_id: string
+          organization_member_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          health_surveillance_program_id: string
+          id?: string
+          next_review_at?: string | null
+          organization_id: string
+          organization_member_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          health_surveillance_program_id?: string
+          id?: string
+          next_review_at?: string | null
+          organization_id?: string
+          organization_member_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_program_enrollments_health_surveillance_program_id_fkey"
+            columns: ["health_surveillance_program_id"]
+            isOneToOne: false
+            referencedRelation: "health_surveillance_programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_program_enrollments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_program_enrollments_organization_member_id_fkey"
+            columns: ["organization_member_id"]
+            isOneToOne: false
+            referencedRelation: "organization_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      health_surveillance_programs: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_surveillance_programs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      improvement_actions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          evidence_document_version_id: string | null
+          gap_id: string
+          generated_key: string | null
+          id: string
+          organization_id: string
+          priority: string
+          responsible_user_id: string | null
+          status: string
+          target_date: string | null
+          title: string
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+          validation_note: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          evidence_document_version_id?: string | null
+          gap_id: string
+          generated_key?: string | null
+          id?: string
+          organization_id: string
+          priority: string
+          responsible_user_id?: string | null
+          status?: string
+          target_date?: string | null
+          title: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_note?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          evidence_document_version_id?: string | null
+          gap_id?: string
+          generated_key?: string | null
+          id?: string
+          organization_id?: string
+          priority?: string
+          responsible_user_id?: string | null
+          status?: string
+          target_date?: string | null
+          title?: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "improvement_actions_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "improvement_actions_gap_id_fkey"
+            columns: ["gap_id"]
+            isOneToOne: false
+            referencedRelation: "improvement_gaps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "improvement_actions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      improvement_findings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          organization_id: string
+          severity: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          organization_id: string
+          severity?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          organization_id?: string
+          severity?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "improvement_findings_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      improvement_gaps: {
+        Row: {
+          assessment_item_id: string | null
+          created_at: string
+          created_by: string | null
+          deduplication_key: string
+          description: string | null
+          finding_id: string | null
+          id: string
+          last_detected_assessment_id: string | null
+          organization_id: string
+          origin_type: string
+          priority: string
+          requirement_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assessment_item_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deduplication_key: string
+          description?: string | null
+          finding_id?: string | null
+          id?: string
+          last_detected_assessment_id?: string | null
+          organization_id: string
+          origin_type: string
+          priority?: string
+          requirement_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assessment_item_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deduplication_key?: string
+          description?: string | null
+          finding_id?: string | null
+          id?: string
+          last_detected_assessment_id?: string | null
+          organization_id?: string
+          origin_type?: string
+          priority?: string
+          requirement_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "improvement_gaps_assessment_item_id_fkey"
+            columns: ["assessment_item_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "improvement_gaps_finding_id_fkey"
+            columns: ["finding_id"]
+            isOneToOne: false
+            referencedRelation: "improvement_findings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "improvement_gaps_last_detected_assessment_id_fkey"
+            columns: ["last_detected_assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "improvement_gaps_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "improvement_gaps_requirement_id_fkey"
+            columns: ["requirement_id"]
+            isOneToOne: false
+            referencedRelation: "requirements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_actions: {
+        Row: {
+          created_at: string
+          due_at: string | null
+          id: string
+          improvement_action_id: string | null
+          incident_id: string
+          organization_id: string
+          responsible_user_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          due_at?: string | null
+          id?: string
+          improvement_action_id?: string | null
+          incident_id: string
+          organization_id: string
+          responsible_user_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          due_at?: string | null
+          id?: string
+          improvement_action_id?: string | null
+          incident_id?: string
+          organization_id?: string
+          responsible_user_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_actions_improvement_action_id_fkey"
+            columns: ["improvement_action_id"]
+            isOneToOne: false
+            referencedRelation: "improvement_actions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_actions_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_actions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_causes: {
+        Row: {
+          cause_type: string
+          created_at: string
+          description: string
+          id: string
+          incident_investigation_id: string
+          organization_id: string
+        }
+        Insert: {
+          cause_type: string
+          created_at?: string
+          description: string
+          id?: string
+          incident_investigation_id: string
+          organization_id: string
+        }
+        Update: {
+          cause_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          incident_investigation_id?: string
+          organization_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_causes_incident_investigation_id_fkey"
+            columns: ["incident_investigation_id"]
+            isOneToOne: false
+            referencedRelation: "incident_investigations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_causes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_communications: {
+        Row: {
+          communication_type: string
+          created_at: string
+          document_version_id: string | null
+          id: string
+          incident_id: string
+          organization_id: string
+          status: string
+        }
+        Insert: {
+          communication_type: string
+          created_at?: string
+          document_version_id?: string | null
+          id?: string
+          incident_id: string
+          organization_id: string
+          status?: string
+        }
+        Update: {
+          communication_type?: string
+          created_at?: string
+          document_version_id?: string | null
+          id?: string
+          incident_id?: string
+          organization_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_communications_document_version_id_fkey"
+            columns: ["document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_communications_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_communications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_evidences: {
+        Row: {
+          created_at: string
+          document_version_id: string
+          id: string
+          incident_id: string
+          organization_id: string
+          visibility: string
+        }
+        Insert: {
+          created_at?: string
+          document_version_id: string
+          id?: string
+          incident_id: string
+          organization_id: string
+          visibility?: string
+        }
+        Update: {
+          created_at?: string
+          document_version_id?: string
+          id?: string
+          incident_id?: string
+          organization_id?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_evidences_document_version_id_fkey"
+            columns: ["document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_evidences_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_evidences_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_export_templates: {
+        Row: {
+          code: string
+          created_at: string
+          document_version_id: string | null
+          id: string
+          organization_id: string
+          status: string
+          title: string
+          version: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          document_version_id?: string | null
+          id?: string
+          organization_id: string
+          status?: string
+          title: string
+          version: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          document_version_id?: string | null
+          id?: string
+          organization_id?: string
+          status?: string
+          title?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_export_templates_document_version_id_fkey"
+            columns: ["document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_export_templates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_investigations: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          incident_id: string
+          lead_user_id: string | null
+          methodology_note: string | null
+          organization_id: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          incident_id: string
+          lead_user_id?: string | null
+          methodology_note?: string | null
+          organization_id: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          incident_id?: string
+          lead_user_id?: string | null
+          methodology_note?: string | null
+          organization_id?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_investigations_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: true
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_investigations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_people: {
+        Row: {
+          created_at: string
+          display_reference: string | null
+          id: string
+          incident_id: string
+          organization_id: string
+          organization_member_id: string | null
+          role: string
+        }
+        Insert: {
+          created_at?: string
+          display_reference?: string | null
+          id?: string
+          incident_id: string
+          organization_id: string
+          organization_member_id?: string | null
+          role: string
+        }
+        Update: {
+          created_at?: string
+          display_reference?: string | null
+          id?: string
+          incident_id?: string
+          organization_id?: string
+          organization_member_id?: string | null
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_people_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_people_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_people_organization_member_id_fkey"
+            columns: ["organization_member_id"]
+            isOneToOne: false
+            referencedRelation: "organization_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_sensitive_details: {
+        Row: {
+          affected_person_reference: string | null
+          created_at: string
+          health_information_note: string | null
+          incident_id: string
+          organization_id: string
+          restricted_description: string | null
+          updated_at: string
+        }
+        Insert: {
+          affected_person_reference?: string | null
+          created_at?: string
+          health_information_note?: string | null
+          incident_id: string
+          organization_id: string
+          restricted_description?: string | null
+          updated_at?: string
+        }
+        Update: {
+          affected_person_reference?: string | null
+          created_at?: string
+          health_information_note?: string | null
+          incident_id?: string
+          organization_id?: string
+          restricted_description?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_sensitive_details_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: true
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_sensitive_details_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incidents: {
+        Row: {
+          classification: string
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string
+          id: string
+          occurred_at: string | null
+          organization_id: string
+          reference_code: string
+          reported_at: string
+          reported_by: string | null
+          site_id: string | null
+          status: string
+          summary: string
+          updated_at: string
+        }
+        Insert: {
+          classification: string
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          id?: string
+          occurred_at?: string | null
+          organization_id: string
+          reference_code: string
+          reported_at?: string
+          reported_by?: string | null
+          site_id?: string | null
+          status?: string
+          summary: string
+          updated_at?: string
+        }
+        Update: {
+          classification?: string
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          id?: string
+          occurred_at?: string | null
+          organization_id?: string
+          reference_code?: string
+          reported_at?: string
+          reported_by?: string | null
+          site_id?: string | null
+          status?: string
+          summary?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incidents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incidents_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
             referencedColumns: ["id"]
           },
         ]
@@ -311,6 +2868,270 @@ export type Database = {
             columns: ["role_id"]
             isOneToOne: false
             referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      minimum_standards: {
+        Row: {
+          code: string
+          created_at: string
+          criterion: string | null
+          effective_from: string | null
+          effective_to: string | null
+          expected_evidence: string | null
+          expert_review_status: string
+          functional_description: string
+          id: string
+          normative_source_version_id: string
+          phva_cycle: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          criterion?: string | null
+          effective_from?: string | null
+          effective_to?: string | null
+          expected_evidence?: string | null
+          expert_review_status?: string
+          functional_description: string
+          id?: string
+          normative_source_version_id: string
+          phva_cycle: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          criterion?: string | null
+          effective_from?: string | null
+          effective_to?: string | null
+          expected_evidence?: string | null
+          expert_review_status?: string
+          functional_description?: string
+          id?: string
+          normative_source_version_id?: string
+          phva_cycle?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "minimum_standards_normative_source_version_id_fkey"
+            columns: ["normative_source_version_id"]
+            isOneToOne: false
+            referencedRelation: "normative_source_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      normative_source_versions: {
+        Row: {
+          created_at: string
+          effective_from: string | null
+          effective_to: string | null
+          expert_review_status: string
+          id: string
+          interpretive_note: string | null
+          official_reference: string
+          official_url: string | null
+          source_id: string
+          status: string
+          supersedes_version_id: string | null
+          updated_at: string
+          version_code: string
+        }
+        Insert: {
+          created_at?: string
+          effective_from?: string | null
+          effective_to?: string | null
+          expert_review_status?: string
+          id?: string
+          interpretive_note?: string | null
+          official_reference: string
+          official_url?: string | null
+          source_id: string
+          status?: string
+          supersedes_version_id?: string | null
+          updated_at?: string
+          version_code: string
+        }
+        Update: {
+          created_at?: string
+          effective_from?: string | null
+          effective_to?: string | null
+          expert_review_status?: string
+          id?: string
+          interpretive_note?: string | null
+          official_reference?: string
+          official_url?: string | null
+          source_id?: string
+          status?: string
+          supersedes_version_id?: string | null
+          updated_at?: string
+          version_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "normative_source_versions_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "normative_sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_source_versions_supersedes_version_id_fkey"
+            columns: ["supersedes_version_id"]
+            isOneToOne: false
+            referencedRelation: "normative_source_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      normative_sources: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          issuing_authority: string | null
+          jurisdiction: string
+          source_type: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          issuing_authority?: string | null
+          jurisdiction?: string
+          source_type: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          issuing_authority?: string | null
+          jurisdiction?: string
+          source_type?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      occupational_fitness_concepts: {
+        Row: {
+          concept: string
+          created_at: string
+          evidence_document_version_id: string | null
+          expires_at: string | null
+          id: string
+          issued_at: string
+          issued_by_user_id: string | null
+          organization_id: string
+          organization_member_id: string
+        }
+        Insert: {
+          concept: string
+          created_at?: string
+          evidence_document_version_id?: string | null
+          expires_at?: string | null
+          id?: string
+          issued_at: string
+          issued_by_user_id?: string | null
+          organization_id: string
+          organization_member_id: string
+        }
+        Update: {
+          concept?: string
+          created_at?: string
+          evidence_document_version_id?: string | null
+          expires_at?: string | null
+          id?: string
+          issued_at?: string
+          issued_by_user_id?: string | null
+          organization_id?: string
+          organization_member_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "occupational_fitness_concepts_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "occupational_fitness_concepts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "occupational_fitness_concepts_organization_member_id_fkey"
+            columns: ["organization_member_id"]
+            isOneToOne: false
+            referencedRelation: "organization_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      occupational_health_decisions: {
+        Row: {
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          decision_type: string
+          id: string
+          organization_id: string
+          organization_member_id: string
+          reason_summary: string
+          status: string
+        }
+        Insert: {
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          decision_type: string
+          id?: string
+          organization_id: string
+          organization_member_id: string
+          reason_summary: string
+          status?: string
+        }
+        Update: {
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          decision_type?: string
+          id?: string
+          organization_id?: string
+          organization_member_id?: string
+          reason_summary?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "occupational_health_decisions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "occupational_health_decisions_organization_member_id_fkey"
+            columns: ["organization_member_id"]
+            isOneToOne: false
+            referencedRelation: "organization_members"
             referencedColumns: ["id"]
           },
         ]
@@ -430,6 +3251,85 @@ export type Database = {
           },
         ]
       }
+      organization_classifications: {
+        Row: {
+          change_reason: string
+          ciiu_code: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          economic_activity: string | null
+          effective_from: string
+          effective_to: string | null
+          employee_count: number
+          evaluator_version_id: string
+          explanation: Json
+          id: string
+          organization_id: string
+          risk_class: number
+          scope_key: string
+          standard_profile_id: string
+        }
+        Insert: {
+          change_reason: string
+          ciiu_code?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          economic_activity?: string | null
+          effective_from: string
+          effective_to?: string | null
+          employee_count: number
+          evaluator_version_id: string
+          explanation?: Json
+          id?: string
+          organization_id: string
+          risk_class: number
+          scope_key?: string
+          standard_profile_id: string
+        }
+        Update: {
+          change_reason?: string
+          ciiu_code?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          economic_activity?: string | null
+          effective_from?: string
+          effective_to?: string | null
+          employee_count?: number
+          evaluator_version_id?: string
+          explanation?: Json
+          id?: string
+          organization_id?: string
+          risk_class?: number
+          scope_key?: string
+          standard_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_classifications_evaluator_version_id_fkey"
+            columns: ["evaluator_version_id"]
+            isOneToOne: false
+            referencedRelation: "classification_evaluator_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_classifications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_classifications_standard_profile_id_fkey"
+            columns: ["standard_profile_id"]
+            isOneToOne: false
+            referencedRelation: "standard_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_members: {
         Row: {
           created_at: string
@@ -468,23 +3368,214 @@ export type Database = {
           },
         ]
       }
-      improvement_gaps: {
-        Row: { id: string; organization_id: string; origin_type: string; assessment_item_id: string | null; requirement_id: string | null; finding_id: string | null; deduplication_key: string; title: string; description: string | null; priority: string; status: string; last_detected_assessment_id: string | null; created_by: string | null; resolved_at: string | null; resolved_by: string | null; created_at: string; updated_at: string }
-        Insert: { id?: string; organization_id: string; origin_type: string; assessment_item_id?: string | null; requirement_id?: string | null; finding_id?: string | null; deduplication_key: string; title: string; description?: string | null; priority?: string; status?: string; last_detected_assessment_id?: string | null; created_by?: string | null; resolved_at?: string | null; resolved_by?: string | null; created_at?: string; updated_at?: string }
-        Update: { id?: string; organization_id?: string; origin_type?: string; assessment_item_id?: string | null; requirement_id?: string | null; finding_id?: string | null; deduplication_key?: string; title?: string; description?: string | null; priority?: string; status?: string; last_detected_assessment_id?: string | null; created_by?: string | null; resolved_at?: string | null; resolved_by?: string | null; created_at?: string; updated_at?: string }
-        Relationships: []
+      organization_requirements: {
+        Row: {
+          applicability_rule_id: string | null
+          classification_id: string | null
+          evaluated_at: string
+          evaluated_by: string | null
+          explanation: Json
+          id: string
+          input_snapshot: Json
+          is_current: boolean
+          organization_id: string
+          requirement_id: string
+          result: string
+          valid_from: string
+          valid_to: string | null
+        }
+        Insert: {
+          applicability_rule_id?: string | null
+          classification_id?: string | null
+          evaluated_at?: string
+          evaluated_by?: string | null
+          explanation?: Json
+          id?: string
+          input_snapshot?: Json
+          is_current?: boolean
+          organization_id: string
+          requirement_id: string
+          result: string
+          valid_from: string
+          valid_to?: string | null
+        }
+        Update: {
+          applicability_rule_id?: string | null
+          classification_id?: string | null
+          evaluated_at?: string
+          evaluated_by?: string | null
+          explanation?: Json
+          id?: string
+          input_snapshot?: Json
+          is_current?: boolean
+          organization_id?: string
+          requirement_id?: string
+          result?: string
+          valid_from?: string
+          valid_to?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_requirements_applicability_rule_id_fkey"
+            columns: ["applicability_rule_id"]
+            isOneToOne: false
+            referencedRelation: "applicability_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_requirements_classification_id_fkey"
+            columns: ["classification_id"]
+            isOneToOne: false
+            referencedRelation: "organization_classifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_requirements_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_requirements_requirement_id_fkey"
+            columns: ["requirement_id"]
+            isOneToOne: false
+            referencedRelation: "requirements"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      improvement_actions: {
-        Row: { id: string; organization_id: string; gap_id: string; title: string; description: string | null; priority: string; responsible_user_id: string | null; target_date: string | null; status: string; evidence_document_version_id: string | null; validation_note: string | null; validated_at: string | null; validated_by: string | null; generated_key: string | null; created_by: string | null; created_at: string; updated_at: string }
-        Insert: { id?: string; organization_id: string; gap_id: string; title: string; description?: string | null; priority: string; responsible_user_id?: string | null; target_date?: string | null; status?: string; evidence_document_version_id?: string | null; validation_note?: string | null; validated_at?: string | null; validated_by?: string | null; generated_key?: string | null; created_by?: string | null; created_at?: string; updated_at?: string }
-        Update: { id?: string; organization_id?: string; gap_id?: string; title?: string; description?: string | null; priority?: string; responsible_user_id?: string | null; target_date?: string | null; status?: string; evidence_document_version_id?: string | null; validation_note?: string | null; validated_at?: string | null; validated_by?: string | null; generated_key?: string | null; created_by?: string | null; created_at?: string; updated_at?: string }
-        Relationships: []
+      organization_standard_snapshot_items: {
+        Row: {
+          applicability_result: string | null
+          created_at: string
+          id: string
+          item_code: string
+          item_snapshot: Json
+          item_type: string
+          minimum_standard_id: string | null
+          organization_requirement_id: string | null
+          requirement_id: string | null
+          snapshot_id: string
+        }
+        Insert: {
+          applicability_result?: string | null
+          created_at?: string
+          id?: string
+          item_code: string
+          item_snapshot: Json
+          item_type: string
+          minimum_standard_id?: string | null
+          organization_requirement_id?: string | null
+          requirement_id?: string | null
+          snapshot_id: string
+        }
+        Update: {
+          applicability_result?: string | null
+          created_at?: string
+          id?: string
+          item_code?: string
+          item_snapshot?: Json
+          item_type?: string
+          minimum_standard_id?: string | null
+          organization_requirement_id?: string | null
+          requirement_id?: string | null
+          snapshot_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_standard_snapshot_items_minimum_standard_id_fkey"
+            columns: ["minimum_standard_id"]
+            isOneToOne: false
+            referencedRelation: "minimum_standards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_standard_snapshot_items_requirement_id_fkey"
+            columns: ["requirement_id"]
+            isOneToOne: false
+            referencedRelation: "requirements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_standard_snapshot_items_snapshot_id_fkey"
+            columns: ["snapshot_id"]
+            isOneToOne: false
+            referencedRelation: "organization_standard_snapshots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_standard_snapshot_organization_requirement_id_fkey"
+            columns: ["organization_requirement_id"]
+            isOneToOne: false
+            referencedRelation: "organization_requirements"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      improvement_findings: {
-        Row: { id: string; organization_id: string; title: string; description: string | null; severity: string; status: string; created_by: string | null; created_at: string; updated_at: string }
-        Insert: { id?: string; organization_id: string; title: string; description?: string | null; severity?: string; status?: string; created_by?: string | null; created_at?: string; updated_at?: string }
-        Update: { id?: string; organization_id?: string; title?: string; description?: string | null; severity?: string; status?: string; created_by?: string | null; created_at?: string; updated_at?: string }
-        Relationships: []
+      organization_standard_snapshots: {
+        Row: {
+          classification_id: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          organization_id: string
+          reason: string | null
+          rules_snapshot: Json
+          snapshot_date: string
+          snapshot_type: string
+          source_snapshot: Json
+          standard_profile_version_id: string | null
+        }
+        Insert: {
+          classification_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          organization_id: string
+          reason?: string | null
+          rules_snapshot?: Json
+          snapshot_date?: string
+          snapshot_type: string
+          source_snapshot?: Json
+          standard_profile_version_id?: string | null
+        }
+        Update: {
+          classification_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          organization_id?: string
+          reason?: string | null
+          rules_snapshot?: Json
+          snapshot_date?: string
+          snapshot_type?: string
+          source_snapshot?: Json
+          standard_profile_version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_standard_snapshot_standard_profile_version_id_fkey"
+            columns: ["standard_profile_version_id"]
+            isOneToOne: false
+            referencedRelation: "standard_profile_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_standard_snapshots_classification_id_fkey"
+            columns: ["classification_id"]
+            isOneToOne: false
+            referencedRelation: "organization_classifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_standard_snapshots_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       organizations: {
         Row: {
@@ -558,6 +3649,585 @@ export type Database = {
         }
         Relationships: []
       }
+      plan_activities: {
+        Row: {
+          annual_plan_id: string
+          budget: number | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          ends_at: string | null
+          id: string
+          organization_id: string
+          priority: string
+          responsible_user_id: string | null
+          starts_at: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          annual_plan_id: string
+          budget?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          organization_id: string
+          priority?: string
+          responsible_user_id?: string | null
+          starts_at?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          annual_plan_id?: string
+          budget?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          organization_id?: string
+          priority?: string
+          responsible_user_id?: string | null
+          starts_at?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_activities_annual_plan_id_fkey"
+            columns: ["annual_plan_id"]
+            isOneToOne: false
+            referencedRelation: "annual_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_activities_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ppe_assignments: {
+        Row: {
+          assigned_at: string
+          created_at: string
+          created_by: string | null
+          expected_replacement_at: string | null
+          id: string
+          organization_id: string
+          organization_member_id: string
+          ppe_catalog_id: string
+          site_id: string | null
+          size_label: string
+          status: string
+        }
+        Insert: {
+          assigned_at?: string
+          created_at?: string
+          created_by?: string | null
+          expected_replacement_at?: string | null
+          id?: string
+          organization_id: string
+          organization_member_id: string
+          ppe_catalog_id: string
+          site_id?: string | null
+          size_label?: string
+          status?: string
+        }
+        Update: {
+          assigned_at?: string
+          created_at?: string
+          created_by?: string | null
+          expected_replacement_at?: string | null
+          id?: string
+          organization_id?: string
+          organization_member_id?: string
+          ppe_catalog_id?: string
+          site_id?: string | null
+          size_label?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ppe_assignments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_assignments_organization_member_id_fkey"
+            columns: ["organization_member_id"]
+            isOneToOne: false
+            referencedRelation: "organization_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_assignments_ppe_catalog_id_fkey"
+            columns: ["ppe_catalog_id"]
+            isOneToOne: false
+            referencedRelation: "ppe_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_assignments_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ppe_catalog: {
+        Row: {
+          category: string
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          status: string
+          updated_at: string
+          useful_life_days: number | null
+        }
+        Insert: {
+          category: string
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          status?: string
+          updated_at?: string
+          useful_life_days?: number | null
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          status?: string
+          updated_at?: string
+          useful_life_days?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ppe_catalog_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ppe_catalog_controls: {
+        Row: {
+          created_at: string
+          organization_id: string
+          ppe_catalog_id: string
+          risk_control_id: string
+        }
+        Insert: {
+          created_at?: string
+          organization_id: string
+          ppe_catalog_id: string
+          risk_control_id: string
+        }
+        Update: {
+          created_at?: string
+          organization_id?: string
+          ppe_catalog_id?: string
+          risk_control_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ppe_catalog_controls_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_catalog_controls_ppe_catalog_id_fkey"
+            columns: ["ppe_catalog_id"]
+            isOneToOne: false
+            referencedRelation: "ppe_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_catalog_controls_risk_control_id_fkey"
+            columns: ["risk_control_id"]
+            isOneToOne: false
+            referencedRelation: "risk_controls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ppe_catalog_hazards: {
+        Row: {
+          created_at: string
+          hazard_id: string
+          ppe_catalog_id: string
+        }
+        Insert: {
+          created_at?: string
+          hazard_id: string
+          ppe_catalog_id: string
+        }
+        Update: {
+          created_at?: string
+          hazard_id?: string
+          ppe_catalog_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ppe_catalog_hazards_hazard_id_fkey"
+            columns: ["hazard_id"]
+            isOneToOne: false
+            referencedRelation: "hazard_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_catalog_hazards_ppe_catalog_id_fkey"
+            columns: ["ppe_catalog_id"]
+            isOneToOne: false
+            referencedRelation: "ppe_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ppe_deliveries: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          created_by: string | null
+          delivered_at: string
+          evidence_document_version_id: string | null
+          id: string
+          inventory_id: string
+          organization_id: string
+          ppe_assignment_id: string
+          quantity: number
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          delivered_at?: string
+          evidence_document_version_id?: string | null
+          id?: string
+          inventory_id: string
+          organization_id: string
+          ppe_assignment_id: string
+          quantity: number
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          delivered_at?: string
+          evidence_document_version_id?: string | null
+          id?: string
+          inventory_id?: string
+          organization_id?: string
+          ppe_assignment_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ppe_deliveries_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_deliveries_inventory_id_fkey"
+            columns: ["inventory_id"]
+            isOneToOne: false
+            referencedRelation: "ppe_inventory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_deliveries_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_deliveries_ppe_assignment_id_fkey"
+            columns: ["ppe_assignment_id"]
+            isOneToOne: false
+            referencedRelation: "ppe_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ppe_inspections: {
+        Row: {
+          created_at: string
+          evidence_document_version_id: string | null
+          id: string
+          inspected_at: string
+          inspected_by: string | null
+          notes: string | null
+          organization_id: string
+          ppe_assignment_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          evidence_document_version_id?: string | null
+          id?: string
+          inspected_at?: string
+          inspected_by?: string | null
+          notes?: string | null
+          organization_id: string
+          ppe_assignment_id: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          evidence_document_version_id?: string | null
+          id?: string
+          inspected_at?: string
+          inspected_by?: string | null
+          notes?: string | null
+          organization_id?: string
+          ppe_assignment_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ppe_inspections_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_inspections_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_inspections_ppe_assignment_id_fkey"
+            columns: ["ppe_assignment_id"]
+            isOneToOne: false
+            referencedRelation: "ppe_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ppe_inventory: {
+        Row: {
+          id: string
+          organization_id: string
+          ppe_catalog_id: string
+          quantity_on_hand: number
+          reorder_point: number | null
+          site_id: string | null
+          size_label: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          ppe_catalog_id: string
+          quantity_on_hand?: number
+          reorder_point?: number | null
+          site_id?: string | null
+          size_label?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          ppe_catalog_id?: string
+          quantity_on_hand?: number
+          reorder_point?: number | null
+          site_id?: string | null
+          size_label?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ppe_inventory_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_inventory_ppe_catalog_id_fkey"
+            columns: ["ppe_catalog_id"]
+            isOneToOne: false
+            referencedRelation: "ppe_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_inventory_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ppe_retirements: {
+        Row: {
+          created_at: string
+          evidence_document_version_id: string | null
+          id: string
+          organization_id: string
+          ppe_assignment_id: string
+          reason: string
+          retired_at: string
+          retired_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          evidence_document_version_id?: string | null
+          id?: string
+          organization_id: string
+          ppe_assignment_id: string
+          reason: string
+          retired_at?: string
+          retired_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          evidence_document_version_id?: string | null
+          id?: string
+          organization_id?: string
+          ppe_assignment_id?: string
+          reason?: string
+          retired_at?: string
+          retired_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ppe_retirements_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_retirements_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_retirements_ppe_assignment_id_fkey"
+            columns: ["ppe_assignment_id"]
+            isOneToOne: true
+            referencedRelation: "ppe_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      processes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "processes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_standards: {
+        Row: {
+          created_at: string
+          id: string
+          minimum_standard_id: string
+          standard_profile_version_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          minimum_standard_id: string
+          standard_profile_version_id: string
+          weight: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          minimum_standard_id?: string
+          standard_profile_version_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_standards_minimum_standard_id_fkey"
+            columns: ["minimum_standard_id"]
+            isOneToOne: false
+            referencedRelation: "minimum_standards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_standards_standard_profile_version_id_fkey"
+            columns: ["standard_profile_version_id"]
+            isOneToOne: false
+            referencedRelation: "standard_profile_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_path: string | null
@@ -596,6 +4266,745 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      requirements: {
+        Row: {
+          code: string
+          created_at: string
+          expert_review_status: string
+          id: string
+          normative_source_version_id: string
+          status: string
+          summary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expert_review_status?: string
+          id?: string
+          normative_source_version_id: string
+          status?: string
+          summary: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expert_review_status?: string
+          id?: string
+          normative_source_version_id?: string
+          status?: string
+          summary?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "requirements_normative_source_version_id_fkey"
+            columns: ["normative_source_version_id"]
+            isOneToOne: false
+            referencedRelation: "normative_source_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_assessments: {
+        Row: {
+          acceptability: string | null
+          assessed_at: string | null
+          assessed_by: string | null
+          consequence_level: number | null
+          created_at: string
+          deficiency_level: number | null
+          exposure_level: number | null
+          id: string
+          input_data: Json
+          methodology_snapshot: Json
+          organization_id: string
+          parent_risk_assessment_id: string | null
+          probability_interpretation: string | null
+          probability_level: number | null
+          result_data: Json
+          risk_identification_id: string | null
+          risk_interpretation: string | null
+          risk_level: number | null
+          risk_methodology_version_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          acceptability?: string | null
+          assessed_at?: string | null
+          assessed_by?: string | null
+          consequence_level?: number | null
+          created_at?: string
+          deficiency_level?: number | null
+          exposure_level?: number | null
+          id?: string
+          input_data?: Json
+          methodology_snapshot?: Json
+          organization_id: string
+          parent_risk_assessment_id?: string | null
+          probability_interpretation?: string | null
+          probability_level?: number | null
+          result_data?: Json
+          risk_identification_id?: string | null
+          risk_interpretation?: string | null
+          risk_level?: number | null
+          risk_methodology_version_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          acceptability?: string | null
+          assessed_at?: string | null
+          assessed_by?: string | null
+          consequence_level?: number | null
+          created_at?: string
+          deficiency_level?: number | null
+          exposure_level?: number | null
+          id?: string
+          input_data?: Json
+          methodology_snapshot?: Json
+          organization_id?: string
+          parent_risk_assessment_id?: string | null
+          probability_interpretation?: string | null
+          probability_level?: number | null
+          result_data?: Json
+          risk_identification_id?: string | null
+          risk_interpretation?: string | null
+          risk_level?: number | null
+          risk_methodology_version_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_assessments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_parent_risk_assessment_id_fkey"
+            columns: ["parent_risk_assessment_id"]
+            isOneToOne: false
+            referencedRelation: "risk_assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_risk_identification_id_fkey"
+            columns: ["risk_identification_id"]
+            isOneToOne: false
+            referencedRelation: "risk_identifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_risk_methodology_version_id_fkey"
+            columns: ["risk_methodology_version_id"]
+            isOneToOne: false
+            referencedRelation: "risk_methodology_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_control_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          detected_at: string
+          id: string
+          organization_id: string
+          resolved_at: string | null
+          risk_control_id: string
+          updated_at: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          detected_at?: string
+          id?: string
+          organization_id: string
+          resolved_at?: string | null
+          risk_control_id: string
+          updated_at?: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          detected_at?: string
+          id?: string
+          organization_id?: string
+          resolved_at?: string | null
+          risk_control_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_control_alerts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_control_alerts_risk_control_id_fkey"
+            columns: ["risk_control_id"]
+            isOneToOne: false
+            referencedRelation: "risk_controls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_control_verifications: {
+        Row: {
+          created_at: string
+          effectiveness: string
+          evidence_document_version_id: string | null
+          id: string
+          next_verification_at: string | null
+          organization_id: string
+          risk_control_id: string
+          verification_note: string
+          verified_at: string
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          effectiveness: string
+          evidence_document_version_id?: string | null
+          id?: string
+          next_verification_at?: string | null
+          organization_id: string
+          risk_control_id: string
+          verification_note: string
+          verified_at?: string
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          effectiveness?: string
+          evidence_document_version_id?: string | null
+          id?: string
+          next_verification_at?: string | null
+          organization_id?: string
+          risk_control_id?: string
+          verification_note?: string
+          verified_at?: string
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_control_verifications_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_control_verifications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_control_verifications_risk_control_id_fkey"
+            columns: ["risk_control_id"]
+            isOneToOne: false
+            referencedRelation: "risk_controls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_controls: {
+        Row: {
+          control_type: string
+          created_at: string
+          created_by: string | null
+          description: string
+          effectiveness: string | null
+          evidence_document_version_id: string | null
+          id: string
+          improvement_action_id: string | null
+          last_verified_at: string | null
+          last_verified_by: string | null
+          next_verification_at: string | null
+          organization_id: string
+          responsible_user_id: string | null
+          risk_identification_id: string
+          status: string
+          target_date: string | null
+          task_id: string | null
+          updated_at: string
+          verification_status: string
+        }
+        Insert: {
+          control_type: string
+          created_at?: string
+          created_by?: string | null
+          description: string
+          effectiveness?: string | null
+          evidence_document_version_id?: string | null
+          id?: string
+          improvement_action_id?: string | null
+          last_verified_at?: string | null
+          last_verified_by?: string | null
+          next_verification_at?: string | null
+          organization_id: string
+          responsible_user_id?: string | null
+          risk_identification_id: string
+          status?: string
+          target_date?: string | null
+          task_id?: string | null
+          updated_at?: string
+          verification_status?: string
+        }
+        Update: {
+          control_type?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          effectiveness?: string | null
+          evidence_document_version_id?: string | null
+          id?: string
+          improvement_action_id?: string | null
+          last_verified_at?: string | null
+          last_verified_by?: string | null
+          next_verification_at?: string | null
+          organization_id?: string
+          responsible_user_id?: string | null
+          risk_identification_id?: string
+          status?: string
+          target_date?: string | null
+          task_id?: string | null
+          updated_at?: string
+          verification_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_controls_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_controls_improvement_action_id_fkey"
+            columns: ["improvement_action_id"]
+            isOneToOne: false
+            referencedRelation: "improvement_actions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_controls_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_controls_risk_identification_id_fkey"
+            columns: ["risk_identification_id"]
+            isOneToOne: false
+            referencedRelation: "risk_identifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_controls_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_identifications: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string
+          exposed_count: number | null
+          hazard_id: string
+          id: string
+          legal_requirement: boolean
+          organization_id: string
+          possible_effects: string | null
+          risk_task_id: string
+          status: string
+          updated_at: string
+          worst_consequence: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description: string
+          exposed_count?: number | null
+          hazard_id: string
+          id?: string
+          legal_requirement?: boolean
+          organization_id: string
+          possible_effects?: string | null
+          risk_task_id: string
+          status?: string
+          updated_at?: string
+          worst_consequence?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          exposed_count?: number | null
+          hazard_id?: string
+          id?: string
+          legal_requirement?: boolean
+          organization_id?: string
+          possible_effects?: string | null
+          risk_task_id?: string
+          status?: string
+          updated_at?: string
+          worst_consequence?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_identifications_hazard_id_fkey"
+            columns: ["hazard_id"]
+            isOneToOne: false
+            referencedRelation: "hazard_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_identifications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_identifications_risk_task_id_fkey"
+            columns: ["risk_task_id"]
+            isOneToOne: false
+            referencedRelation: "risk_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_methodologies: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          normative_source_version_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          normative_source_version_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          normative_source_version_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_methodologies_normative_source_version_id_fkey"
+            columns: ["normative_source_version_id"]
+            isOneToOne: false
+            referencedRelation: "normative_source_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_methodology_catalogs: {
+        Row: {
+          code: string
+          entries: Json
+          id: string
+          label: string
+          methodology_version_id: string
+        }
+        Insert: {
+          code: string
+          entries?: Json
+          id?: string
+          label: string
+          methodology_version_id: string
+        }
+        Update: {
+          code?: string
+          entries?: Json
+          id?: string
+          label?: string
+          methodology_version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_methodology_catalogs_methodology_version_id_fkey"
+            columns: ["methodology_version_id"]
+            isOneToOne: false
+            referencedRelation: "risk_methodology_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_methodology_formulas: {
+        Row: {
+          code: string
+          expert_review_status: string
+          expression: string
+          id: string
+          interpretation: Json
+          methodology_version_id: string
+          output_variable_code: string
+          status: string
+        }
+        Insert: {
+          code: string
+          expert_review_status?: string
+          expression: string
+          id?: string
+          interpretation?: Json
+          methodology_version_id: string
+          output_variable_code: string
+          status?: string
+        }
+        Update: {
+          code?: string
+          expert_review_status?: string
+          expression?: string
+          id?: string
+          interpretation?: Json
+          methodology_version_id?: string
+          output_variable_code?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_methodology_formulas_methodology_version_id_fkey"
+            columns: ["methodology_version_id"]
+            isOneToOne: false
+            referencedRelation: "risk_methodology_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_methodology_interpretation_rules: {
+        Row: {
+          condition: Json
+          expert_review_status: string
+          explanation: string
+          id: string
+          methodology_version_id: string
+          outcome: Json
+          rule_code: string
+          status: string
+        }
+        Insert: {
+          condition: Json
+          expert_review_status?: string
+          explanation: string
+          id?: string
+          methodology_version_id: string
+          outcome: Json
+          rule_code: string
+          status?: string
+        }
+        Update: {
+          condition?: Json
+          expert_review_status?: string
+          explanation?: string
+          id?: string
+          methodology_version_id?: string
+          outcome?: Json
+          rule_code?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_methodology_interpretation_rul_methodology_version_id_fkey"
+            columns: ["methodology_version_id"]
+            isOneToOne: false
+            referencedRelation: "risk_methodology_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_methodology_variables: {
+        Row: {
+          code: string
+          data_type: string
+          definition: Json
+          display_order: number
+          id: string
+          label: string
+          methodology_version_id: string
+          required: boolean
+        }
+        Insert: {
+          code: string
+          data_type: string
+          definition?: Json
+          display_order?: number
+          id?: string
+          label: string
+          methodology_version_id: string
+          required?: boolean
+        }
+        Update: {
+          code?: string
+          data_type?: string
+          definition?: Json
+          display_order?: number
+          id?: string
+          label?: string
+          methodology_version_id?: string
+          required?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_methodology_variables_methodology_version_id_fkey"
+            columns: ["methodology_version_id"]
+            isOneToOne: false
+            referencedRelation: "risk_methodology_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_methodology_versions: {
+        Row: {
+          configuration: Json
+          created_at: string
+          effective_from: string | null
+          effective_to: string | null
+          expert_review_status: string
+          id: string
+          interpretive_note: string
+          methodology_id: string
+          status: string
+          supersedes_version_id: string | null
+          updated_at: string
+          version_code: string
+        }
+        Insert: {
+          configuration?: Json
+          created_at?: string
+          effective_from?: string | null
+          effective_to?: string | null
+          expert_review_status?: string
+          id?: string
+          interpretive_note: string
+          methodology_id: string
+          status?: string
+          supersedes_version_id?: string | null
+          updated_at?: string
+          version_code: string
+        }
+        Update: {
+          configuration?: Json
+          created_at?: string
+          effective_from?: string | null
+          effective_to?: string | null
+          expert_review_status?: string
+          id?: string
+          interpretive_note?: string
+          methodology_id?: string
+          status?: string
+          supersedes_version_id?: string | null
+          updated_at?: string
+          version_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_methodology_versions_methodology_id_fkey"
+            columns: ["methodology_id"]
+            isOneToOne: false
+            referencedRelation: "risk_methodologies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_methodology_versions_supersedes_version_id_fkey"
+            columns: ["supersedes_version_id"]
+            isOneToOne: false
+            referencedRelation: "risk_methodology_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_tasks: {
+        Row: {
+          activity_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_routine: boolean
+          name: string
+          organization_id: string
+          status: string
+          updated_at: string
+          zone_or_location: string
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_routine?: boolean
+          name: string
+          organization_id: string
+          status?: string
+          updated_at?: string
+          zone_or_location: string
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_routine?: boolean
+          name?: string
+          organization_id?: string
+          status?: string
+          updated_at?: string
+          zone_or_location?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_tasks_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_tasks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       role_permissions: {
         Row: {
@@ -730,9 +5139,931 @@ export type Database = {
           },
         ]
       }
+      standard_profile_versions: {
+        Row: {
+          created_at: string
+          effective_from: string | null
+          effective_to: string | null
+          expert_review_status: string
+          id: string
+          standard_profile_id: string
+          status: string
+          supersedes_version_id: string | null
+          updated_at: string
+          version_code: string
+        }
+        Insert: {
+          created_at?: string
+          effective_from?: string | null
+          effective_to?: string | null
+          expert_review_status?: string
+          id?: string
+          standard_profile_id: string
+          status?: string
+          supersedes_version_id?: string | null
+          updated_at?: string
+          version_code: string
+        }
+        Update: {
+          created_at?: string
+          effective_from?: string | null
+          effective_to?: string | null
+          expert_review_status?: string
+          id?: string
+          standard_profile_id?: string
+          status?: string
+          supersedes_version_id?: string | null
+          updated_at?: string
+          version_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "standard_profile_versions_standard_profile_id_fkey"
+            columns: ["standard_profile_id"]
+            isOneToOne: false
+            referencedRelation: "standard_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "standard_profile_versions_supersedes_version_id_fkey"
+            columns: ["supersedes_version_id"]
+            isOneToOne: false
+            referencedRelation: "standard_profile_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      standard_profiles: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      task_comments: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string | null
+          id: string
+          organization_id: string
+          task_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          organization_id: string
+          task_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          organization_id?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_comments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_comments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_dependencies: {
+        Row: {
+          created_at: string
+          depends_on_task_id: string
+          organization_id: string
+          task_id: string
+        }
+        Insert: {
+          created_at?: string
+          depends_on_task_id: string
+          organization_id: string
+          task_id: string
+        }
+        Update: {
+          created_at?: string
+          depends_on_task_id?: string
+          organization_id?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_dependencies_depends_on_task_id_fkey"
+            columns: ["depends_on_task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_dependencies_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_dependencies_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_evidences: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          document_version_id: string
+          id: string
+          organization_id: string
+          task_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          document_version_id: string
+          id?: string
+          organization_id: string
+          task_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          document_version_id?: string
+          id?: string
+          organization_id?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_evidences_document_version_id_fkey"
+            columns: ["document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_evidences_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_evidences_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_recurrence_rules: {
+        Row: {
+          created_at: string
+          ends_at: string | null
+          frequency: string
+          id: string
+          interval_count: number
+          organization_id: string
+          starts_at: string
+          timezone: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at?: string | null
+          frequency: string
+          id?: string
+          interval_count?: number
+          organization_id: string
+          starts_at: string
+          timezone?: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string | null
+          frequency?: string
+          id?: string
+          interval_count?: number
+          organization_id?: string
+          starts_at?: string
+          timezone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_recurrence_rules_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          annual_plan_id: string | null
+          assigned_to: string | null
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          due_at: string | null
+          id: string
+          improvement_action_id: string | null
+          occurrence_at: string | null
+          occurrence_key: string | null
+          organization_id: string
+          plan_activity_id: string | null
+          priority: string
+          recurrence_rule_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          annual_plan_id?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          improvement_action_id?: string | null
+          occurrence_at?: string | null
+          occurrence_key?: string | null
+          organization_id: string
+          plan_activity_id?: string | null
+          priority?: string
+          recurrence_rule_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          annual_plan_id?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          improvement_action_id?: string | null
+          occurrence_at?: string | null
+          occurrence_key?: string | null
+          organization_id?: string
+          plan_activity_id?: string | null
+          priority?: string
+          recurrence_rule_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_annual_plan_id_fkey"
+            columns: ["annual_plan_id"]
+            isOneToOne: false
+            referencedRelation: "annual_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_improvement_action_id_fkey"
+            columns: ["improvement_action_id"]
+            isOneToOne: false
+            referencedRelation: "improvement_actions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_plan_activity_id_fkey"
+            columns: ["plan_activity_id"]
+            isOneToOne: false
+            referencedRelation: "plan_activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_recurrence_rule_id_fkey"
+            columns: ["recurrence_rule_id"]
+            isOneToOne: false
+            referencedRelation: "task_recurrence_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_attendances: {
+        Row: {
+          checked_at: string
+          checked_by: string | null
+          created_at: string
+          evidence_document_version_id: string | null
+          id: string
+          organization_id: string
+          status: string
+          training_enrollment_id: string
+        }
+        Insert: {
+          checked_at?: string
+          checked_by?: string | null
+          created_at?: string
+          evidence_document_version_id?: string | null
+          id?: string
+          organization_id: string
+          status: string
+          training_enrollment_id: string
+        }
+        Update: {
+          checked_at?: string
+          checked_by?: string | null
+          created_at?: string
+          evidence_document_version_id?: string | null
+          id?: string
+          organization_id?: string
+          status?: string
+          training_enrollment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_attendances_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_attendances_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_attendances_training_enrollment_id_fkey"
+            columns: ["training_enrollment_id"]
+            isOneToOne: true
+            referencedRelation: "training_enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_catalog: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          organization_id: string
+          status: string
+          title: string
+          updated_at: string
+          validity_days: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          organization_id: string
+          status?: string
+          title: string
+          updated_at?: string
+          validity_days?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          organization_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          validity_days?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_catalog_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_certificates: {
+        Row: {
+          certificate_code: string
+          created_at: string
+          evidence_document_version_id: string | null
+          expires_at: string | null
+          id: string
+          issued_at: string
+          issued_by: string | null
+          organization_id: string
+          training_enrollment_id: string
+        }
+        Insert: {
+          certificate_code: string
+          created_at?: string
+          evidence_document_version_id?: string | null
+          expires_at?: string | null
+          id?: string
+          issued_at?: string
+          issued_by?: string | null
+          organization_id: string
+          training_enrollment_id: string
+        }
+        Update: {
+          certificate_code?: string
+          created_at?: string
+          evidence_document_version_id?: string | null
+          expires_at?: string | null
+          id?: string
+          issued_at?: string
+          issued_by?: string | null
+          organization_id?: string
+          training_enrollment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_certificates_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_certificates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_certificates_training_enrollment_id_fkey"
+            columns: ["training_enrollment_id"]
+            isOneToOne: true
+            referencedRelation: "training_enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_enrollments: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          invited_at: string
+          organization_id: string
+          organization_member_id: string
+          status: string
+          training_session_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invited_at?: string
+          organization_id: string
+          organization_member_id: string
+          status?: string
+          training_session_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invited_at?: string
+          organization_id?: string
+          organization_member_id?: string
+          status?: string
+          training_session_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_enrollments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_enrollments_organization_member_id_fkey"
+            columns: ["organization_member_id"]
+            isOneToOne: false
+            referencedRelation: "organization_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_enrollments_training_session_id_fkey"
+            columns: ["training_session_id"]
+            isOneToOne: false
+            referencedRelation: "training_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_evaluations: {
+        Row: {
+          created_at: string
+          evaluated_at: string
+          evaluated_by: string | null
+          evidence_document_version_id: string | null
+          id: string
+          maximum_score: number
+          organization_id: string
+          passed: boolean
+          score: number
+          training_enrollment_id: string
+        }
+        Insert: {
+          created_at?: string
+          evaluated_at?: string
+          evaluated_by?: string | null
+          evidence_document_version_id?: string | null
+          id?: string
+          maximum_score: number
+          organization_id: string
+          passed: boolean
+          score: number
+          training_enrollment_id: string
+        }
+        Update: {
+          created_at?: string
+          evaluated_at?: string
+          evaluated_by?: string | null
+          evidence_document_version_id?: string | null
+          id?: string
+          maximum_score?: number
+          organization_id?: string
+          passed?: boolean
+          score?: number
+          training_enrollment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_evaluations_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_evaluations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_evaluations_training_enrollment_id_fkey"
+            columns: ["training_enrollment_id"]
+            isOneToOne: true
+            referencedRelation: "training_enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_plans: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          minimum_standard_id: string | null
+          organization_id: string
+          owner_user_id: string | null
+          requirement_id: string | null
+          status: string
+          target_group_label: string | null
+          title: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          minimum_standard_id?: string | null
+          organization_id: string
+          owner_user_id?: string | null
+          requirement_id?: string | null
+          status?: string
+          target_group_label?: string | null
+          title: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          minimum_standard_id?: string | null
+          organization_id?: string
+          owner_user_id?: string | null
+          requirement_id?: string | null
+          status?: string
+          target_group_label?: string | null
+          title?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_plans_minimum_standard_id_fkey"
+            columns: ["minimum_standard_id"]
+            isOneToOne: false
+            referencedRelation: "minimum_standards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_plans_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_plans_requirement_id_fkey"
+            columns: ["requirement_id"]
+            isOneToOne: false
+            referencedRelation: "requirements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_sessions: {
+        Row: {
+          capacity: number | null
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          evidence_document_version_id: string | null
+          id: string
+          instructor_user_id: string | null
+          location: string | null
+          organization_id: string
+          starts_at: string
+          status: string
+          title: string
+          training_catalog_id: string | null
+          training_plan_id: string
+          updated_at: string
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          evidence_document_version_id?: string | null
+          id?: string
+          instructor_user_id?: string | null
+          location?: string | null
+          organization_id: string
+          starts_at: string
+          status?: string
+          title: string
+          training_catalog_id?: string | null
+          training_plan_id: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          evidence_document_version_id?: string | null
+          id?: string
+          instructor_user_id?: string | null
+          location?: string | null
+          organization_id?: string
+          starts_at?: string
+          status?: string
+          title?: string
+          training_catalog_id?: string | null
+          training_plan_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_sessions_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_sessions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_sessions_training_catalog_id_fkey"
+            columns: ["training_catalog_id"]
+            isOneToOne: false
+            referencedRelation: "training_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_sessions_training_plan_id_fkey"
+            columns: ["training_plan_id"]
+            isOneToOne: false
+            referencedRelation: "training_plan_indicators"
+            referencedColumns: ["training_plan_id"]
+          },
+          {
+            foreignKeyName: "training_sessions_training_plan_id_fkey"
+            columns: ["training_plan_id"]
+            isOneToOne: false
+            referencedRelation: "training_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_restrictions: {
+        Row: {
+          created_at: string
+          effective_from: string
+          effective_to: string | null
+          id: string
+          occupational_fitness_concept_id: string
+          organization_id: string
+          restriction_summary: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          effective_from: string
+          effective_to?: string | null
+          id?: string
+          occupational_fitness_concept_id: string
+          organization_id: string
+          restriction_summary: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          occupational_fitness_concept_id?: string
+          organization_id?: string
+          restriction_summary?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_restrictions_occupational_fitness_concept_id_fkey"
+            columns: ["occupational_fitness_concept_id"]
+            isOneToOne: false
+            referencedRelation: "occupational_fitness_concepts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_restrictions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      emergency_resilient_directory: {
+        Row: {
+          contact_email: string | null
+          contact_phone: string | null
+          display_name: string | null
+          id: string | null
+          operational_role: string | null
+          organization_id: string | null
+          site_id: string | null
+          updated_at: string | null
+          visibility: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          display_name?: string | null
+          id?: string | null
+          operational_role?: string | null
+          organization_id?: string | null
+          site_id?: string | null
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          display_name?: string | null
+          id?: string | null
+          operational_role?: string | null
+          organization_id?: string | null
+          site_id?: string | null
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_directory_entries_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_directory_entries_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_plan_indicators: {
+        Row: {
+          attended_count: number | null
+          coverage_percent: number | null
+          effectiveness_percent: number | null
+          enrolled_count: number | null
+          evaluated_count: number | null
+          organization_id: string | null
+          passed_count: number | null
+          training_plan_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_plans_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       accept_my_invitations: { Args: never; Returns: number }
@@ -753,13 +6084,16 @@ export type Database = {
         }
         Returns: boolean
       }
-      get_request_auth_context: {
-        Args: never
-        Returns: { role: string; user_id: string | null }[]
-      }
       complete_organization_onboarding: {
         Args: { p_idempotency_key: string; p_organization_id: string }
         Returns: Json
+      }
+      get_request_auth_context: {
+        Args: never
+        Returns: {
+          role: string
+          user_id: string
+        }[]
       }
       save_organization_onboarding_step: {
         Args: { p_data: Json; p_organization_id: string; p_step: number }
@@ -897,3 +6231,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

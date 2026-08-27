@@ -187,6 +187,33 @@ export async function updateImprovementAction(formData: FormData) {
   redirect(`/org/${organizationId}/improvement-plan?status=${error ? "error" : "saved"}`);
 }
 
+const riskControlVerificationSchema = z.object({
+  organizationId: z.uuid(),
+  risk_control_id: z.uuid(),
+  effectiveness: z.enum(["effective", "partially_effective", "ineffective"]),
+  verification_note: z.string().trim().min(3).max(2_000),
+  next_verification_at: z.string().trim().optional().transform((value) => value || null),
+});
+
+export async function verifyRiskControl(formData: FormData) {
+  const parsed = riskControlVerificationSchema.safeParse(Object.fromEntries(formData));
+  const fallbackOrganizationId = tenantIdSchema.safeParse(value(formData, "organizationId"));
+  if (!parsed.success) redirect(fallbackOrganizationId.success ? `/org/${fallbackOrganizationId.data}/risks?status=error` : "/organizations");
+  await requirePermission(parsed.data.organizationId, "risks.validate");
+  const { userId } = await requireAuthenticatedUser();
+  const supabase = await createClient();
+  const { error } = await supabase.from("risk_control_verifications").insert({
+    organization_id: parsed.data.organizationId,
+    risk_control_id: parsed.data.risk_control_id,
+    effectiveness: parsed.data.effectiveness,
+    verification_note: parsed.data.verification_note,
+    next_verification_at: parsed.data.next_verification_at,
+    verified_by: userId,
+  });
+  revalidatePath(`/org/${parsed.data.organizationId}/risks`);
+  redirect(`/org/${parsed.data.organizationId}/risks?status=${error ? "error" : "saved"}`);
+}
+
 const statusSchema = z.object({ organizationId: z.uuid(), table: z.enum(["legal_entities", "sites", "areas"]), id: z.uuid(), status: z.enum(["active", "inactive"]), siteId: z.uuid().optional() });
 
 export async function setStructureStatus(formData: FormData) {
