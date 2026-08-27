@@ -88,12 +88,13 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
     const memberA = memberships.data!.find((member) => member.organization_id === organizationA && member.user_id === userA.id)!;
     const memberC = memberships.data!.find((member) => member.organization_id === organizationA && member.user_id === userC.id)!;
     const memberB = memberships.data!.find((member) => member.organization_id === organizationB && member.user_id === userB.id)!;
-    const roles = await admin.from("member_roles").insert([
-      { organization_id: organizationA, organization_member_id: memberA.id, role_id: adminRole, created_by: userA.id },
-      { organization_id: organizationA, organization_member_id: memberC.id, role_id: adminRole, created_by: userC.id },
-      { organization_id: organizationB, organization_member_id: memberB.id, role_id: adminRole, created_by: userB.id },
-    ]);
-    await assertNoError(roles, "assign administrator roles");
+    const assignUserCRole = await admin.from("member_roles").insert({
+      organization_id: organizationA,
+      organization_member_id: memberC.id,
+      role_id: adminRole,
+      created_by: userC.id,
+    });
+    await assertNoError(assignUserCRole, "assign User C administrator role");
 
     const legalEntities = await admin.from("legal_entities").insert([
       { organization_id: organizationA, legal_name: `CI Legal A ${runId}`, tax_id: `CI-LE-A-${runId}` },
