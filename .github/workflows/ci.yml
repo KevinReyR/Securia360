@@ -34,7 +34,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version-file: .nvmrc, cache: npm }
       - uses: supabase/setup-cli@v1
-        with: { version: latest }
+        # Pinning avoids an unauthenticated GitHub API lookup for "latest".
+        with: { version: 2.116.0 }
       - run: npm ci
       - name: Apply forward-only migrations to the isolated test project
         env:
