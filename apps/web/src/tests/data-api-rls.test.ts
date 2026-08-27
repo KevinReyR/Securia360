@@ -87,7 +87,6 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
     await assertNoError(memberships, "read memberships");
     const memberA = memberships.data!.find((member) => member.organization_id === organizationA && member.user_id === userA.id)!;
     const memberC = memberships.data!.find((member) => member.organization_id === organizationA && member.user_id === userC.id)!;
-    const memberB = memberships.data!.find((member) => member.organization_id === organizationB && member.user_id === userB.id)!;
     const assignUserCRole = await admin.from("member_roles").insert({
       organization_id: organizationA,
       organization_member_id: memberC.id,
