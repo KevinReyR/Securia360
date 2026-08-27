@@ -10,7 +10,7 @@ describe("SidebarNav", () => {
   it("marks the current destination and identifies future modules", () => {
     render(<SidebarNav organizationId="11111111-1111-4111-8111-111111111111" />);
     expect(screen.getByRole("link", { name: "Inicio" })).toHaveAttribute("aria-current", "page");
-    expect(screen.getByText("Planificación").closest("[aria-disabled='true']")).toBeInTheDocument();
-    expect(screen.getAllByText("Próximamente")).toHaveLength(7);
+    expect(screen.getByRole("link", { name: "Planificación" })).toHaveAttribute("href", "/org/11111111-1111-4111-8111-111111111111/improvement-plan");
+    expect(screen.getAllByText("Próximamente")).toHaveLength(6);
   });
 });

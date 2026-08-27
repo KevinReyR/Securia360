@@ -11,6 +11,7 @@ import {
   areaSchema,
   documentUploadSchema,
   inviteMemberSchema,
+  improvementActionSchema,
   legalEntitySchema,
   onboardingStepSchema,
   organizationSchema,
@@ -166,6 +167,24 @@ export async function updateArea(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.from("areas").update({ ...parsed.data, updated_by: userId }).eq("organization_id", organizationId).eq("id", areaId);
   redirect(settingsPath(organizationId, "structure", error ? "error" : "saved"));
+}
+
+export async function updateImprovementAction(formData: FormData) {
+  const organizationId = tenantIdSchema.parse(value(formData, "organizationId"));
+  const parsed = improvementActionSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) redirect(`/org/${organizationId}/improvement-plan?status=error`);
+  await requirePermission(organizationId, parsed.data.status === "verified" ? "improvements.validate" : "improvements.manage");
+  const supabase = await createClient();
+  const { error } = await supabase.from("improvement_actions").update({
+    title: parsed.data.title,
+    status: parsed.data.status,
+    target_date: parsed.data.target_date,
+    responsible_user_id: parsed.data.responsible_user_id,
+    evidence_document_version_id: parsed.data.evidence_document_version_id,
+    validation_note: parsed.data.validation_note,
+  }).eq("organization_id", organizationId).eq("id", parsed.data.action_id);
+  revalidatePath(`/org/${organizationId}/improvement-plan`);
+  redirect(`/org/${organizationId}/improvement-plan?status=${error ? "error" : "saved"}`);
 }
 
 const statusSchema = z.object({ organizationId: z.uuid(), table: z.enum(["legal_entities", "sites", "areas"]), id: z.uuid(), status: z.enum(["active", "inactive"]), siteId: z.uuid().optional() });

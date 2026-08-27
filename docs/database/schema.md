@@ -11,6 +11,9 @@
 | Onboarding | `onboarding_progress`, `organization_characteristics` | Borrador reanudable y caracterización operativa inicial. |
 | Eventos | `domain_events` | Evento transaccional interno para el clasificador futuro; sin acceso directo del Data API. |
 | Auditoría | `audit_log` | Estructura append-only; el cliente autenticado solo puede consultar. |
+| Mejoramiento | `improvement_findings`, `improvement_gaps`, `improvement_actions` | Trazabilidad desde la evaluación, requisito o hallazgo hacia acción, evidencia y validación. |
+| Planificación | `annual_plans`, `plan_activities`, `tasks` y tablas auxiliares | Plan anual, actividades y tareas reutilizables con dependencias, recurrencia y evidencia. |
+| Riesgos | `risk_methodologies`, versiones y configuraciones | Metodologías técnicas versionadas y evaluaciones que conservan la versión exacta usada. |
 
 ## Convenciones
 
@@ -38,6 +41,10 @@ Las entidades normativas (`normative_sources`, `requirements`, `minimum_standard
 - `20260826013555_harden_core_security_and_tenant_api.sql`: defaults seguros, RPC `can`, identidad inmutable de membresía y auditoría.
 - `20260826014615_add_secure_member_invitation_api.sql`: invitación atómica y aceptación de membresías.
 - `20260826015115_protect_last_organization_admin.sql`: evita dejar un tenant sin administrador activo.
+- `20260826243000_allow_creator_admin_bootstrap.sql`: permite únicamente la asignación inicial y segura del creador como administrador global durante el bootstrap de su organización.
+- `20260826250000_add_improvement_plan.sql`: convierte resultados no cumplidos en brechas y acciones idempotentes, con evidencia, validación, auditoría y RLS.
+- `20260826260000_add_planning_and_tasks.sql`: agrega plan anual, actividades, tareas, dependencias, comentarios, evidencias y recurrencias UTC idempotentes.
+- `20260826270000_add_versioned_risk_methodologies.sql`: añade metodologías técnicas, GTC 45 estructural y evaluaciones con versión exacta.
 - `20260826131521_allow_tenant_cascade_cleanup.sql`: conserva esa protección en operaciones directas sin bloquear cascadas del tenant.
 - `20260826131659_skip_audit_during_tenant_cascade.sql`: evita recrear auditoría hija durante el borrado explícito de una organización.
 - `20260826132501_preserve_existing_membership_status.sql`: una reinvitación no degrada membresías activas o suspendidas.

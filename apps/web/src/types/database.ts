@@ -468,6 +468,24 @@ export type Database = {
           },
         ]
       }
+      improvement_gaps: {
+        Row: { id: string; organization_id: string; origin_type: string; assessment_item_id: string | null; requirement_id: string | null; finding_id: string | null; deduplication_key: string; title: string; description: string | null; priority: string; status: string; last_detected_assessment_id: string | null; created_by: string | null; resolved_at: string | null; resolved_by: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; organization_id: string; origin_type: string; assessment_item_id?: string | null; requirement_id?: string | null; finding_id?: string | null; deduplication_key: string; title: string; description?: string | null; priority?: string; status?: string; last_detected_assessment_id?: string | null; created_by?: string | null; resolved_at?: string | null; resolved_by?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; organization_id?: string; origin_type?: string; assessment_item_id?: string | null; requirement_id?: string | null; finding_id?: string | null; deduplication_key?: string; title?: string; description?: string | null; priority?: string; status?: string; last_detected_assessment_id?: string | null; created_by?: string | null; resolved_at?: string | null; resolved_by?: string | null; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
+      improvement_actions: {
+        Row: { id: string; organization_id: string; gap_id: string; title: string; description: string | null; priority: string; responsible_user_id: string | null; target_date: string | null; status: string; evidence_document_version_id: string | null; validation_note: string | null; validated_at: string | null; validated_by: string | null; generated_key: string | null; created_by: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; organization_id: string; gap_id: string; title: string; description?: string | null; priority: string; responsible_user_id?: string | null; target_date?: string | null; status?: string; evidence_document_version_id?: string | null; validation_note?: string | null; validated_at?: string | null; validated_by?: string | null; generated_key?: string | null; created_by?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; organization_id?: string; gap_id?: string; title?: string; description?: string | null; priority?: string; responsible_user_id?: string | null; target_date?: string | null; status?: string; evidence_document_version_id?: string | null; validation_note?: string | null; validated_at?: string | null; validated_by?: string | null; generated_key?: string | null; created_by?: string | null; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
+      improvement_findings: {
+        Row: { id: string; organization_id: string; title: string; description: string | null; severity: string; status: string; created_by: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; organization_id: string; title: string; description?: string | null; severity?: string; status?: string; created_by?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; organization_id?: string; title?: string; description?: string | null; severity?: string; status?: string; created_by?: string | null; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
       organizations: {
         Row: {
           country_code: string

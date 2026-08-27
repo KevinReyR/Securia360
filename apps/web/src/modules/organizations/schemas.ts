@@ -63,6 +63,16 @@ export const documentUploadSchema = z.object({
   title: z.string().trim().min(2).max(180), entity_type: z.string().trim().regex(/^[a-z][a-z0-9_]{0,63}$/), entity_id: z.uuid(), expires_at: z.preprocess((value) => value === "" ? null : value, z.string().datetime().nullable()),
 });
 
+export const improvementActionSchema = z.object({
+  action_id: z.uuid(),
+  title: z.string().trim().min(2).max(240),
+  status: z.enum(["pending", "in_progress", "evidence_submitted", "verified", "cancelled"]),
+  target_date: z.preprocess((value) => value === "" ? null : value, z.string().date().nullable()),
+  responsible_user_id: z.preprocess((value) => value === "" ? null : value, z.uuid().nullable()),
+  evidence_document_version_id: z.preprocess((value) => value === "" ? null : value, z.uuid().nullable()),
+  validation_note: optionalText,
+});
+
 const onboardingOptionalText = z.string().trim().max(200);
 
 export const onboardingOrganizationSchema = z.object({

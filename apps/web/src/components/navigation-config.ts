@@ -15,7 +15,7 @@ import {
 export const navigationItems = [
   { label: "Inicio", suffix: "dashboard", icon: House, available: true, keywords: ["dashboard", "resumen"] },
   { label: "Mi SG-SST", suffix: "onboarding", icon: ShieldCheck, available: true, keywords: ["onboarding", "sistema"] },
-  { label: "Planificación", icon: CalendarCheck, available: false, keywords: ["plan anual", "objetivos"] },
+  { label: "Planificación", suffix: "improvement-plan", icon: CalendarCheck, available: true, keywords: ["plan de mejoramiento", "brechas", "acciones"] },
   { label: "Personas", suffix: "settings/members", icon: UsersThree, available: true, keywords: ["miembros", "roles", "usuarios"] },
   { label: "Riesgos", icon: WarningDiamond, available: false, keywords: ["gtc 45", "peligros"] },
   { label: "Operación", icon: HardHat, available: false, keywords: ["inspecciones", "epp"] },
