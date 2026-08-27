@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createOrganization } from "@/modules/organizations/core-actions";
+import { organizationCreationMessage } from "@/modules/organizations/creation-feedback";
 import { listOrganizations } from "@/modules/organizations/tenant";
 import { switchOrganization } from "@/modules/organizations/tenant-actions";
 
@@ -15,7 +16,7 @@ export default async function OrganizationsPage({ searchParams }: { searchParams
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">Elige una organización</h1>
         <p className="mt-2 text-sm text-[var(--muted)]">Cada empresa mantiene datos, permisos y navegación completamente separados.</p>
       </header>
-      {error ? <p role="alert" className="mb-5 rounded-lg bg-[var(--danger-bg)] p-3 text-sm text-[var(--danger)]">No fue posible completar la operación.</p> : null}
+      {error ? <p role="alert" className="mb-5 rounded-lg bg-[var(--danger-bg)] p-3 text-sm text-[var(--danger)]">{organizationCreationMessage(error)}</p> : null}
       <div className="grid gap-6 lg:grid-cols-[1.2fr_.8fr]">
         <Card>
           <CardHeader><h2 className="font-semibold">Tus organizaciones</h2></CardHeader>

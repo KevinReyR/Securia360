@@ -141,34 +141,55 @@ export type Database = {
           actor_user_id: string | null
           aggregate_id: string
           aggregate_type: string
+          attempt_count: number
+          available_at: string
           event_type: string
           id: string
           idempotency_key: string
+          last_error: string | null
+          locked_at: string | null
+          locked_by: string | null
           occurred_at: string
           organization_id: string
           payload: Json
+          processed_at: string | null
+          status: string
         }
         Insert: {
           actor_user_id?: string | null
           aggregate_id: string
           aggregate_type: string
+          attempt_count?: number
+          available_at?: string
           event_type: string
           id?: string
           idempotency_key: string
+          last_error?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
           occurred_at?: string
           organization_id: string
           payload?: Json
+          processed_at?: string | null
+          status?: string
         }
         Update: {
           actor_user_id?: string | null
           aggregate_id?: string
           aggregate_type?: string
+          attempt_count?: number
+          available_at?: string
           event_type?: string
           id?: string
           idempotency_key?: string
+          last_error?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
           occurred_at?: string
           organization_id?: string
           payload?: Json
+          processed_at?: string | null
+          status?: string
         }
         Relationships: [
           {

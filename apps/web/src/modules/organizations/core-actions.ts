@@ -38,14 +38,20 @@ async function requirePermission(organizationId: string, permission: PermissionC
 export async function createOrganization(formData: FormData) {
   const parsed = organizationSchema.safeParse({ name: value(formData, "name"), slug: value(formData, "slug"), nit: value(formData, "nit") });
   if (!parsed.success) redirect("/organizations?error=validation");
-  const { userId } = await requireAuthenticatedUser();
+  let userId: string;
+  try {
+    ({ userId } = await requireAuthenticatedUser());
+  } catch {
+    redirect("/organizations?error=auth");
+  }
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("organizations")
     .insert({ ...parsed.data, created_by: userId, updated_by: userId })
     .select("id")
     .single();
-  if (error || !data) redirect("/organizations?error=conflict");
+  if (error?.code === "23505") redirect("/organizations?error=conflict");
+  if (error || !data) redirect("/organizations?error=unexpected");
   const cookieStore = await cookies();
   cookieStore.set(ACTIVE_ORGANIZATION_COOKIE, data.id, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 31_536_000 });
   redirect(`/org/${data.id}/onboarding`);

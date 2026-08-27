@@ -25,6 +25,15 @@ export const permissionCodes = [
   "documents.create",
   "documents.update",
   "documents.delete",
+  "classifications.read",
+  "classifications.manage",
+  "applicability.read",
+  "applicability.evaluate",
+  "snapshots.read",
+  "snapshots.create",
+  "assessments.read",
+  "assessments.manage",
+  "assessments.validate",
 ] as const;
 
 export type PermissionCode = (typeof permissionCodes)[number];
