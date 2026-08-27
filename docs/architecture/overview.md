@@ -19,7 +19,13 @@ Todas las claves de TanStack Query comienzan por `['organization', organizationI
 
 - `modules/auth`: identidad y permisos centralizados.
 - `modules/organizations`: tenant, onboarding y estructura empresarial.
+- El onboarding mantiene un borrador por organización y consolida sus nueve pasos mediante una operación PostgreSQL atómica e idempotente.
+- La finalización emite `organization.classification_source_changed` con revisión humana requerida; todavía no ejecuta el clasificador de Resolución 0312.
 - `lib/supabase`: clientes SSR y browser con clave publicable.
 - `supabase/functions`: operaciones privilegiadas como invitaciones.
 
 El dominio normativo y los módulos operativos permanecen fuera de esta etapa.
+
+## Interfaz compartida
+
+Todas las rutas del tenant usan un app shell responsive y el catálogo documentado en `docs/architecture/design-system.md`. El shell solo navega hacia módulos implementados; el resto se comunica como `Próximamente` sin crear dominios vacíos.

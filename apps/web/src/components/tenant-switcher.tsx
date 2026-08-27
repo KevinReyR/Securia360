@@ -1,6 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { Buildings } from "@phosphor-icons/react";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
 import { switchOrganization } from "@/modules/organizations/tenant-actions";
@@ -15,7 +16,9 @@ export function TenantSwitcher({ organizations, activeId }: { organizations: Org
     <form ref={formRef} action={switchOrganization} className="min-w-0">
       <input type="hidden" name="next" value={pathname} />
       <label className="sr-only" htmlFor="organization-switcher">Organización activa</label>
-      <select
+      <div className="flex min-w-0 items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface)] pl-2.5 shadow-[var(--shadow-control)] focus-within:border-[var(--brand)] focus-within:ring-3 focus-within:ring-[var(--focus-ring)]">
+        <Buildings size={17} className="shrink-0 text-[var(--brand)]" aria-hidden />
+        <select
         id="organization-switcher"
         name="organizationId"
         defaultValue={activeId}
@@ -23,14 +26,15 @@ export function TenantSwitcher({ organizations, activeId }: { organizations: Org
           queryClient.clear();
           formRef.current?.requestSubmit();
         }}
-        className="h-9 max-w-56 truncate rounded-lg border border-[var(--sidebar-border)] bg-[var(--sidebar-surface)] px-3 text-sm text-white outline-none focus:ring-2 focus:ring-emerald-300"
+        className="h-9 min-w-0 max-w-64 flex-1 truncate bg-transparent pr-3 text-sm font-semibold text-[var(--foreground)] outline-none"
       >
         {organizations.map((organization) => (
-          <option key={organization.id} value={organization.id} className="text-slate-900">
+          <option key={organization.id} value={organization.id}>
             {organization.name}
           </option>
         ))}
-      </select>
+        </select>
+      </div>
     </form>
   );
 }

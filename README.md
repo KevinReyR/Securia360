@@ -36,6 +36,9 @@ npm run build
 - Perfil, organización, razones sociales, sedes, áreas, miembros, roles y onboarding inicial.
 - Permisos centralizados con `can(permission)` y alcance opcional por sede.
 - Invitaciones mediante Edge Function autenticada; la clave `service_role` existe solo en el runtime de Supabase.
+- Design system estilo shadcn/ui con Tailwind, primitivas Radix y app shell B2B responsive.
+- Onboarding empresarial reanudable de nueve pasos con finalización transaccional e idempotente.
+- Sidebar móvil/escritorio, breadcrumbs, búsqueda `Ctrl/Cmd + K`, notificaciones y menú de perfil.
 
 ## Base de datos
 

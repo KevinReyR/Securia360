@@ -1,45 +1,26 @@
 "use client";
 
-import { Buildings, ChartBar, ClipboardText, Gear, House, ShieldCheck, Users } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { navigationHref, navigationItems } from "@/components/navigation-config";
 import { cn } from "@/lib/utils";
 
-const items = [
-  { suffix: "dashboard", label: "Inicio", icon: House },
-  { suffix: "onboarding", label: "Mi SG-SST", icon: ShieldCheck },
-  { suffix: "settings/structure", label: "Estructura", icon: Buildings },
-  { suffix: "settings/members", label: "Personas", icon: Users },
-  { suffix: "settings/organization", label: "Configuración", icon: Gear },
-] as const;
-
-const futureItems = [
-  { label: "Planificación", icon: ClipboardText },
-  { label: "Analítica", icon: ChartBar },
-] as const;
-
-export function SidebarNav({ organizationId }: { organizationId: string }) {
+export function SidebarNav({ organizationId, onNavigate }: { organizationId: string; onNavigate?: () => void }) {
   const pathname = usePathname();
   return (
     <nav aria-label="Navegación principal" className="grid gap-1">
-      {items.map(({ suffix, label, icon: Icon }) => {
-        const href = `/org/${organizationId}/${suffix}`;
-        const active = pathname === href || (suffix.startsWith("settings") && pathname.startsWith(href));
+      {navigationItems.map(({ label, icon: Icon, available, ...item }) => {
+        const suffix = "suffix" in item ? item.suffix : undefined;
+        const href = suffix ? navigationHref(organizationId, suffix) : undefined;
+        const active = Boolean(href && (pathname === href || (suffix?.startsWith("settings") && pathname.startsWith(href))));
+        if (!available || !href) return <div key={label} aria-disabled="true" className="flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm text-[var(--sidebar-muted)]/65"><Icon size={18} aria-hidden /><span className="flex-1">{label}</span><span className="rounded-full border border-white/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.06em]">Próximamente</span></div>;
         return (
-          <Link key={suffix} href={href} className={cn("flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-emerald-50/75 transition hover:bg-white/8 hover:text-white", active && "bg-white/10 text-white")}>
+          <Link key={label} href={href} onClick={onNavigate} aria-current={active ? "page" : undefined} className={cn("flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-[var(--sidebar-muted)] outline-none transition-[background-color,color,transform] hover:bg-white/8 hover:text-white focus-visible:ring-2 focus-visible:ring-emerald-300 active:scale-[.99]", active && "bg-white/10 text-white shadow-[inset_3px_0_0_#6ee7a0]")}>
             <Icon size={18} weight={active ? "fill" : "regular"} aria-hidden />
             {label}
           </Link>
         );
       })}
-      <div className="my-3 border-t border-[var(--sidebar-border)]" />
-      {futureItems.map(({ label, icon: Icon }) => (
-        <div key={label} className="flex h-10 items-center gap-3 px-3 text-sm text-emerald-50/45">
-          <Icon size={18} aria-hidden />
-          <span className="flex-1">{label}</span>
-          <span className="text-[10px] font-semibold uppercase tracking-wide">Próximamente</span>
-        </div>
-      ))}
     </nav>
   );
 }

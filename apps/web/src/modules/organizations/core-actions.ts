@@ -9,9 +9,10 @@ import { can, type PermissionCode } from "@/modules/auth/permissions";
 import { ACTIVE_ORGANIZATION_COOKIE, requireAuthenticatedUser } from "./tenant";
 import {
   areaSchema,
+  documentUploadSchema,
   inviteMemberSchema,
   legalEntitySchema,
-  onboardingSchema,
+  onboardingStepSchema,
   organizationSchema,
   profileSchema,
   roleAssignmentSchema,
@@ -24,7 +25,7 @@ function value(formData: FormData, key: string) {
   return formData.get(key);
 }
 
-function settingsPath(organizationId: string, section: string, status: "saved" | "error" = "saved") {
+function settingsPath(organizationId: string, section: string, status = "saved") {
   return `/org/${organizationId}/settings/${section}?status=${status}`;
 }
 
@@ -129,6 +130,28 @@ export async function createArea(formData: FormData) {
   redirect(settingsPath(organizationId, "structure", error ? "error" : "saved"));
 }
 
+export async function uploadDocument(formData: FormData) {
+  const organizationId = tenantIdSchema.parse(value(formData, "organizationId"));
+  await requirePermission(organizationId, "documents.create");
+  const parsed = documentUploadSchema.safeParse(Object.fromEntries(formData));
+  const file = formData.get("file");
+  if (!parsed.success || !(file instanceof File) || file.size === 0 || file.size > 26_214_400 || !["application/pdf", "image/jpeg", "image/png", "image/webp"].includes(file.type)) redirect(`/org/${organizationId}/documents?status=error`);
+  const { userId } = await requireAuthenticatedUser();
+  const documentId = crypto.randomUUID(); const versionId = crypto.randomUUID();
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-180) || "archivo";
+  const bucket = parsed.data.entity_type === "evidence" ? "evidences" : "organization-documents";
+  const path = `${organizationId}/${parsed.data.entity_type}/${parsed.data.entity_id}/${documentId}/${safeName}`;
+  const supabase = await createClient();
+  const { error: storageError } = await supabase.storage.from(bucket).upload(path, file, { contentType: file.type, upsert: false });
+  if (storageError) redirect(`/org/${organizationId}/documents?status=error`);
+  const { error } = await supabase.from("documents").insert({ id: documentId, organization_id: organizationId, entity_type: parsed.data.entity_type, entity_id: parsed.data.entity_id, title: parsed.data.title, expires_at: parsed.data.expires_at, created_by: userId, updated_by: userId }).then(async ({ error: documentError }) => {
+    if (documentError) return { error: documentError };
+    return supabase.from("document_versions").insert({ id: versionId, organization_id: organizationId, document_id: documentId, version_number: 1, bucket_id: bucket, storage_path: path, original_name: file.name, mime_type: file.type, size_bytes: file.size, uploaded_by: userId });
+  });
+  if (error) { await supabase.storage.from(bucket).remove([path]); redirect(`/org/${organizationId}/documents?status=error`); }
+  revalidatePath(`/org/${organizationId}/documents`); redirect(`/org/${organizationId}/documents?status=saved`);
+}
+
 export async function updateArea(formData: FormData) {
   const organizationId = tenantIdSchema.parse(value(formData, "organizationId"));
   const areaId = z.uuid().parse(value(formData, "areaId"));
@@ -152,6 +175,52 @@ export async function setStructureStatus(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.from(parsed.data.table).update({ status: parsed.data.status, updated_by: userId }).eq("organization_id", parsed.data.organizationId).eq("id", parsed.data.id);
   redirect(settingsPath(parsed.data.organizationId, "structure", error ? "error" : "saved"));
+}
+
+const deleteStructureSchema = z.object({
+  organizationId: z.uuid(),
+  id: z.uuid(),
+  confirmation: z.string().trim().min(1).max(180),
+});
+
+export async function deleteLegalEntity(formData: FormData) {
+  const parsed = deleteStructureSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) redirect("/organizations");
+  await requirePermission(parsed.data.organizationId, "legal_entities.delete");
+  const supabase = await createClient();
+  const { data: entity } = await supabase.from("legal_entities").select("legal_name").eq("organization_id", parsed.data.organizationId).eq("id", parsed.data.id).maybeSingle();
+  if (!entity || entity.legal_name !== parsed.data.confirmation) redirect(settingsPath(parsed.data.organizationId, "structure", "confirmation"));
+  const { count } = await supabase.from("sites").select("id", { count: "exact", head: true }).eq("organization_id", parsed.data.organizationId).eq("legal_entity_id", parsed.data.id);
+  if ((count ?? 0) > 0) redirect(settingsPath(parsed.data.organizationId, "structure", "restricted"));
+  const { error } = await supabase.from("legal_entities").delete().eq("organization_id", parsed.data.organizationId).eq("id", parsed.data.id);
+  revalidatePath(`/org/${parsed.data.organizationId}/settings/structure`);
+  redirect(settingsPath(parsed.data.organizationId, "structure", error ? "error" : "deleted"));
+}
+
+export async function deleteSite(formData: FormData) {
+  const parsed = deleteStructureSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) redirect("/organizations");
+  await requirePermission(parsed.data.organizationId, "sites.delete", parsed.data.id);
+  const supabase = await createClient();
+  const { data: site } = await supabase.from("sites").select("name").eq("organization_id", parsed.data.organizationId).eq("id", parsed.data.id).maybeSingle();
+  if (!site || site.name !== parsed.data.confirmation) redirect(settingsPath(parsed.data.organizationId, "structure", "confirmation"));
+  const { count } = await supabase.from("areas").select("id", { count: "exact", head: true }).eq("organization_id", parsed.data.organizationId).eq("site_id", parsed.data.id);
+  const { error } = await supabase.from("sites").delete().eq("organization_id", parsed.data.organizationId).eq("id", parsed.data.id);
+  revalidatePath(`/org/${parsed.data.organizationId}/settings/structure`);
+  redirect(settingsPath(parsed.data.organizationId, "structure", error ? "error" : (count ?? 0) > 0 ? "cascade" : "deleted"));
+}
+
+export async function deleteArea(formData: FormData) {
+  const parsed = deleteStructureSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) redirect("/organizations");
+  const supabase = await createClient();
+  const { data: area } = await supabase.from("areas").select("name,site_id").eq("organization_id", parsed.data.organizationId).eq("id", parsed.data.id).maybeSingle();
+  if (!area || area.name !== parsed.data.confirmation) redirect(settingsPath(parsed.data.organizationId, "structure", "confirmation"));
+  await requirePermission(parsed.data.organizationId, "areas.delete", area.site_id);
+  const { count } = await supabase.from("areas").select("id", { count: "exact", head: true }).eq("organization_id", parsed.data.organizationId).eq("parent_area_id", parsed.data.id);
+  const { error } = await supabase.from("areas").delete().eq("organization_id", parsed.data.organizationId).eq("id", parsed.data.id);
+  revalidatePath(`/org/${parsed.data.organizationId}/settings/structure`);
+  redirect(settingsPath(parsed.data.organizationId, "structure", error ? "error" : (count ?? 0) > 0 ? "unlinked" : "deleted"));
 }
 
 export async function inviteMember(formData: FormData) {
@@ -194,53 +263,41 @@ export async function removeRole(formData: FormData) {
   redirect(settingsPath(organizationId, "members", error ? "error" : "saved"));
 }
 
-export async function completeOnboarding(formData: FormData) {
-  const organizationId = tenantIdSchema.parse(value(formData, "organizationId"));
-  await requirePermission(organizationId, "onboarding.manage");
-  const parsed = onboardingSchema.safeParse({
-    ...Object.fromEntries(formData),
-    work_at_height: formData.has("work_at_height"),
-    confined_spaces: formData.has("confined_spaces"),
-    chemical_exposure: formData.has("chemical_exposure"),
-    electrical_work: formData.has("electrical_work"),
-    transport_operations: formData.has("transport_operations"),
-    heavy_machinery: formData.has("heavy_machinery"),
-    night_work: formData.has("night_work"),
-    remote_work: formData.has("remote_work"),
-    manual_load_handling: formData.has("manual_load_handling"),
-  });
-  if (!parsed.success) redirect(`/org/${organizationId}/onboarding?status=error`);
-  const { userId } = await requireAuthenticatedUser();
+export type OnboardingActionResult = { ok: true; currentStep: number } | { ok: false; message: string };
+
+export async function saveOnboardingStep(input: unknown): Promise<OnboardingActionResult> {
+  const parsed = onboardingStepSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, message: parsed.error.issues[0]?.message ?? "Revisa los datos del paso." };
+  }
+
+  await requirePermission(parsed.data.organizationId, "onboarding.manage");
   const supabase = await createClient();
-  const { data: existingEntity } = await supabase.from("legal_entities").select("id").eq("organization_id", organizationId).eq("tax_id", parsed.data.tax_id).maybeSingle();
-  const entityPayload = {
-    legal_name: parsed.data.legal_name,
-    trade_name: parsed.data.trade_name,
-    tax_id: parsed.data.tax_id,
-    ciiu_code: parsed.data.ciiu_code,
-    economic_activity: parsed.data.economic_activity,
-    employee_count: parsed.data.employee_count,
-    risk_class: parsed.data.risk_class,
-    updated_by: userId,
-  };
-  const entityResult = existingEntity
-    ? await supabase.from("legal_entities").update(entityPayload).eq("id", existingEntity.id).select("id").single()
-    : await supabase.from("legal_entities").insert({ organization_id: organizationId, ...entityPayload, created_by: userId }).select("id").single();
-  if (entityResult.error || !entityResult.data) redirect(`/org/${organizationId}/onboarding?status=error`);
-  const { error: siteError } = await supabase.from("sites").upsert({ organization_id: organizationId, legal_entity_id: entityResult.data.id, name: parsed.data.site_name, code: parsed.data.site_code, city: parsed.data.city, department: parsed.data.department, risk_class: parsed.data.risk_class, created_by: userId, updated_by: userId }, { onConflict: "organization_id,code" });
-  const characteristics = {
-    work_at_height: parsed.data.work_at_height,
-    confined_spaces: parsed.data.confined_spaces,
-    chemical_exposure: parsed.data.chemical_exposure,
-    electrical_work: parsed.data.electrical_work,
-    transport_operations: parsed.data.transport_operations,
-    heavy_machinery: parsed.data.heavy_machinery,
-    night_work: parsed.data.night_work,
-    remote_work: parsed.data.remote_work,
-    manual_load_handling: parsed.data.manual_load_handling,
-  };
-  const { error: characteristicsError } = await supabase.from("organization_characteristics").upsert({ organization_id: organizationId, ...characteristics, created_by: userId, updated_by: userId }, { onConflict: "organization_id" });
-  if (siteError || characteristicsError) redirect(`/org/${organizationId}/onboarding?status=error`);
+  const { data, error } = await supabase.rpc("save_organization_onboarding_step", {
+    p_organization_id: parsed.data.organizationId,
+    p_step: parsed.data.step,
+    p_data: parsed.data.data,
+  });
+
+  if (error || !data || typeof data !== "object" || Array.isArray(data)) {
+    return { ok: false, message: "No fue posible guardar el avance. Intenta nuevamente." };
+  }
+
+  const currentStep = Number((data as { current_step?: unknown }).current_step);
+  return { ok: true, currentStep: Number.isInteger(currentStep) ? currentStep : Math.min(parsed.data.step + 1, 9) };
+}
+
+export async function completeOnboarding(organizationIdInput: string, idempotencyKeyInput: string) {
+  const organizationId = tenantIdSchema.parse(organizationIdInput);
+  const idempotencyKey = z.uuid().parse(idempotencyKeyInput);
+  await requirePermission(organizationId, "onboarding.manage");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("complete_organization_onboarding", {
+    p_organization_id: organizationId,
+    p_idempotency_key: idempotencyKey,
+  });
+
+  if (error) redirect(`/org/${organizationId}/onboarding?status=error`);
   revalidatePath(`/org/${organizationId}`, "layout");
   redirect(`/org/${organizationId}/dashboard?onboarding=complete`);
 }

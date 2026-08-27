@@ -23,9 +23,17 @@ La suite `src/tests/data-api-rls.test.ts` inicia sesión con dos usuarios median
 
 La ruta `/org/[organizationId]` es canónica. La cookie activa no autoriza. El cambio de tenant limpia TanStack Query y todas las claves de caché incluyen `organizationId`.
 
+## Acciones de configuración empresarial
+
+Las acciones de organización, razón social, sede y área validan la entrada con Zod, exigen el permiso RBAC correspondiente y vuelven a limitar cada consulta por `organization_id`. Ocultar una acción sin permiso en la interfaz mejora la experiencia, pero la autorización efectiva permanece en la acción del servidor y en RLS. Las eliminaciones requieren confirmación textual y comunican si se bloquean por dependencias, propagan una eliminación o desvinculan áreas hijas.
+
 ## Privilegios
 
 Las migraciones revocan por defecto todos los privilegios de futuros objetos creados por `postgres`. Cada tabla o RPC expuesto debe recibir grants mínimos explícitos y RLS cuando corresponda.
+
+El onboarding expone únicamente wrappers `SECURITY INVOKER`. Sus implementaciones transaccionales viven en `private`, usan `search_path` vacío, comprueban `auth.uid()` y `onboarding.manage`, y no son accesibles desde un esquema del Data API. `domain_events` tiene RLS y una política de denegación explícita; solo la operación transaccional interna puede insertar el evento.
+
+La prueba `verify_transactional_onboarding` confirma que un administrador puede guardar y completar su organización, mientras un intento de guardar el mismo flujo sobre otro tenant falla con `42501`. También comprueba que repetir la finalización no duplica razón social, sedes, roles ni evento.
 
 La migración `verify_core_tenant_isolation` crea fixtures temporales con integridad controlada, evalúa las políticas como dos identidades autenticadas y falla el despliegue si:
 

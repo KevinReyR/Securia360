@@ -21,6 +21,10 @@ export const permissionCodes = [
   "areas.delete",
   "onboarding.manage",
   "audit.read",
+  "documents.read",
+  "documents.create",
+  "documents.update",
+  "documents.delete",
 ] as const;
 
 export type PermissionCode = (typeof permissionCodes)[number];
