@@ -1,0 +1,1 @@
+{"expo":{"name":"Securia360","slug":"securia360","scheme":"securia360","plugins":["expo-router","expo-secure-store"],"experiments":{"typedRoutes":true},"ios":{"bundleIdentifier":"com.reinovalabs.securia360"},"android":{"package":"com.reinovalabs.securia360"}}}

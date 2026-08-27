@@ -1,0 +1,1 @@
+{"extends":"expo/tsconfig.base","compilerOptions":{"strict":true,"paths":{"@securia360/*":["../../packages/*/src"]}},"include":["**/*.ts","**/*.tsx"]}

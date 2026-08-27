@@ -21,6 +21,9 @@
 | Incidentes | `incidents`, investigación, causas, acciones, evidencia y detalles sensibles separados | Privacidad reforzada y trazabilidad sin conclusiones automáticas. |
 | Salud ocupacional | conceptos de aptitud, restricciones, programas y decisiones confirmadas | Datos mínimos, sin historias clínicas ni diagnósticos. |
 | Emergencias | escenarios, recursos, brigadas, planes, simulacros, resultados, hallazgos y acciones | Preparación y simulacros trazables por sede, con planes versionados y acciones verificables. |
+| Gobierno y analítica | comités, auditorías, revisión por la dirección e indicadores versionados | Históricos, segregación de aprobación y resultados reproducibles por período. |
+| Notificaciones | preferencias, plantillas, bandeja y cola de entrega | Bandeja privada e idempotencia por evento lógico. |
+| Automatizaciones | reglas, versiones y ejecuciones | Motor declarativo limitado, observable e idempotente. |
 
 ## Convenciones
 

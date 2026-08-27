@@ -1,0 +1,2 @@
+export const testIds = { organizationA:"00000000-0000-4000-8000-0000000000a1",organizationB:"00000000-0000-4000-8000-0000000000b1",userA:"00000000-0000-4000-8000-0000000000c1",userB:"00000000-0000-4000-8000-0000000000d1" } as const;
+export function taskFactory(overrides:Partial<{id:string;organization_id:string;title:string;status:string}>={}){return {id:"00000000-0000-4000-8000-0000000000e1",organization_id:testIds.organizationA,title:"Tarea determinista",status:"todo",...overrides}}
