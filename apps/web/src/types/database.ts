@@ -735,6 +735,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_request_auth_context: {
+        Args: never
+        Returns: { role: string; user_id: string | null }[]
+      }
       complete_organization_onboarding: {
         Args: { p_idempotency_key: string; p_organization_id: string }
         Returns: Json
