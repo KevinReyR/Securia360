@@ -24,12 +24,13 @@ export async function requireAuthenticatedUser() {
 
   if (error || !user || !accessToken) redirect("/auth/login");
 
-  // Server Actions must forward the verified user JWT to PostgREST. This is
-  // a user-scoped client, so every query still runs through RLS.
+  // Server Actions must forward the verified user JWT to PostgREST. The
+  // accessToken callback is Supabase's supported way to prevent the client
+  // from falling back to the public key for a database request.
   const { url, publishableKey } = getSupabaseConfig();
   const supabase = createSupabaseClient<Database>(url, publishableKey, {
+    accessToken: async () => accessToken,
     auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
-    global: { headers: { Authorization: `Bearer ${accessToken}` } },
   });
 
   return { userId: user.id, email: user.email ?? "", supabase };
