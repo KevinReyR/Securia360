@@ -72,12 +72,19 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
     const adminRole = roleResult.data!.find((role) => role.code === "organization_admin")!.id;
     const siteManagerRole = roleResult.data!.find((role) => role.code === "site_manager")!.id;
 
-    const memberships = await admin.from("organization_members").insert([
-      { organization_id: organizationA, user_id: userA.id, status: "active", joined_at: new Date().toISOString() },
-      { organization_id: organizationA, user_id: userC.id, status: "active", joined_at: new Date().toISOString() },
-      { organization_id: organizationB, user_id: userB.id, status: "active", joined_at: new Date().toISOString() },
-    ]).select("id, organization_id, user_id");
-    await assertNoError(memberships, "create memberships");
+    // The organization bootstrap trigger creates an active administrator membership
+    // for each creator. Only User C needs an explicit membership in Org A.
+    const createMemberC = await admin.from("organization_members").insert({
+      organization_id: organizationA,
+      user_id: userC.id,
+      status: "active",
+      joined_at: new Date().toISOString(),
+    });
+    await assertNoError(createMemberC, "create User C membership");
+    const memberships = await admin.from("organization_members")
+      .select("id, organization_id, user_id")
+      .in("organization_id", [organizationA, organizationB]);
+    await assertNoError(memberships, "read memberships");
     const memberA = memberships.data!.find((member) => member.organization_id === organizationA && member.user_id === userA.id)!;
     const memberC = memberships.data!.find((member) => member.organization_id === organizationA && member.user_id === userC.id)!;
     const memberB = memberships.data!.find((member) => member.organization_id === organizationB && member.user_id === userB.id)!;
