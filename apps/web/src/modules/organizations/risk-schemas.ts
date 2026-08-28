@@ -1,0 +1,8 @@
+import { z } from "zod";
+const id=z.uuid(), optional=z.preprocess(v=>v===""?null:v,z.string().trim().max(2000).nullable());
+export const processSchema=z.object({name:z.string().trim().min(2).max(180),code:z.string().trim().min(2).max(80),description:optional});
+export const activitySchema=z.object({process_id:id,name:z.string().trim().min(2).max(180),description:optional});
+export const taskSchema=z.object({activity_id:id,name:z.string().trim().min(2).max(180),zone_or_location:z.string().trim().min(2).max(180),is_routine:z.coerce.boolean().default(false),description:optional});
+export const identificationSchema=z.object({risk_task_id:id,hazard_id:id,description:z.string().trim().min(3).max(2000),possible_effects:optional,exposed_count:z.preprocess(v=>v===""?null:v,z.coerce.number().int().nonnegative().nullable()),worst_consequence:optional,legal_requirement:z.coerce.boolean().default(false)});
+export const controlSchema=z.object({risk_identification_id:id,control_type:z.enum(["ELIMINATION","SUBSTITUTION","ENGINEERING","ADMINISTRATIVE","PPE"]),description:z.string().trim().min(3).max(2000),responsible_user_id:z.preprocess(v=>v===""?null:v,z.uuid().nullable()),target_date:z.preprocess(v=>v===""?null:v,z.string().date().nullable()),task_id:z.preprocess(v=>v===""?null:v,z.uuid().nullable()),improvement_action_id:z.preprocess(v=>v===""?null:v,z.uuid().nullable()),evidence_document_version_id:z.preprocess(v=>v===""?null:v,z.uuid().nullable())});
+export const assessmentSchema=z.object({risk_identification_id:id,risk_methodology_version_id:id,parent_risk_assessment_id:z.preprocess(v=>v===""?null:v,z.uuid().nullable()),input_data:z.string().trim().min(2).max(10000)});
