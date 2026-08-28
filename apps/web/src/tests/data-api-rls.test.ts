@@ -270,4 +270,20 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
     expect((await userB.rpc("record_ppe_inventory_movement", { p_inventory_id: inventory.data!, p_movement_type: "purchase", p_quantity: 1, p_note: "cross tenant", p_evidence_document_version_id: undefined })).error).not.toBeNull();
     await Promise.all([userA.auth.signOut(), userB.auth.signOut()]);
   }, 30_000);
+
+  it("denies incident and occupational-health sensitive data across tenants", async () => {
+    const userA = newPublicClient(); const userB = newPublicClient();
+    await assertNoError(await userA.auth.signInWithPassword({ email: fixture.userAEmail, password }), "sign in sensitive User A");
+    await assertNoError(await userB.auth.signInWithPassword({ email: fixture.userBEmail, password }), "sign in sensitive User B");
+    const incident = await userA.from("incidents").insert({ organization_id: fixture.organizationA, reference_code: `CI-INC-${runId.slice(0, 8)}`, classification: "incident", summary: "Integration fixture" }).select("id").single();
+    expect(incident.error).toBeNull();
+    expect((await userA.from("incident_sensitive_details").insert({ incident_id: incident.data!.id, organization_id: fixture.organizationA, affected_person_reference: "fixture" })).error).toBeNull();
+    expect((await userB.from("incidents").select("id").eq("id", incident.data!.id)).data).toEqual([]);
+    expect((await userB.from("incident_sensitive_details").select("incident_id").eq("incident_id", incident.data!.id)).data).toEqual([]);
+    const fitness = await userA.from("occupational_fitness_concepts").insert({ organization_id: fixture.organizationA, organization_member_id: fixture.memberA, concept: "fit", issued_at: "2026-08-28", issued_by_user_id: fixture.userAId }).select("id").single();
+    expect(fitness.error).toBeNull();
+    expect((await userB.from("occupational_fitness_concepts").select("id").eq("id", fitness.data!.id)).data).toEqual([]);
+    expect((await userB.from("work_restrictions").insert({ organization_id: fixture.organizationB, occupational_fitness_concept_id: fitness.data!.id, restriction_summary: "cross tenant", effective_from: "2026-08-28" })).error).not.toBeNull();
+    await Promise.all([userA.auth.signOut(), userB.auth.signOut()]);
+  }, 30_000);
 });

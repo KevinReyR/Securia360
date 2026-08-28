@@ -6,7 +6,7 @@ Los planes se conservan como versiones. Solo una versión aprobada sin fecha de 
 
 ## Directorio operativo y resiliencia
 
-\`emergency_directory_entries\` almacena únicamente nombre operativo, rol y canal de contacto. La consulta requiere \`emergencies.directory_read\`. La vista \`emergency_resilient_directory\`, con \`security_invoker\`, devuelve solo contactos activos y queda pensada para que el cliente autorizado pueda mantener una copia temporal cifrada para consulta durante una contingencia. No contiene automatización de comunicaciones masivas, datos clínicos ni instrucciones de respuesta.
+\`emergency_directory_entries\` almacena únicamente nombre operativo, rol y canal de contacto. La consulta requiere \`emergencies.directory_read\` y el scope de sede correspondiente. La vista \`emergency_resilient_directory\`, con \`security_invoker\`, devuelve solo contactos activos. El usuario autorizado puede guardar una copia cifrada en IndexedDB; su clave solo vive en la sesión del navegador y se pierde al cerrarla. No contiene automatización de comunicaciones masivas, datos clínicos ni instrucciones de respuesta.
 
 ## Integraciones futuras
 

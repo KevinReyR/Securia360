@@ -1,0 +1,3 @@
+import { describe, expect, it } from "vitest";
+import { healthDecisionSchema, restrictionSchema } from "./schemas";
+describe("occupational-health schemas",()=>{it("requires a functional decision reason",()=>expect(healthDecisionSchema.safeParse({organization_member_id:"00000000-0000-4000-8000-000000000001",decision_type:"accommodation",reason_summary:""}).success).toBe(false));it("accepts a bounded restriction",()=>expect(restrictionSchema.safeParse({occupational_fitness_concept_id:"00000000-0000-4000-8000-000000000001",restriction_summary:"Evitar carga manual superior al límite definido.",effective_from:"2026-08-28",effective_to:null}).success).toBe(true));});

@@ -67,6 +67,8 @@ Las entidades normativas (`normative_sources`, `requirements`, `minimum_standard
 - `20260828130856_harden_contractor_portal_and_document_scope.sql`: limita envíos a su contacto, habilita evidencia privada acotada por requisito y protege transiciones de aprobación.
 - `20260827060000_add_incidents_and_health_sensitive_domain.sql`: agrega reporte, investigación, evidencia y detalle sensible protegido.
 - `20260827070000_add_minimal_occupational_health.sql`: agrega salud ocupacional mínima y controles de privacidad por rol.
+- `20260828132709_harden_incident_and_occupational_health_workflows.sql`: protege documentos sensibles, transiciones, cierre trazable y confirmación humana separada.
+- `20260828134357_harden_emergency_site_scope_and_evidence.sql`: aplica RLS por sede, evidencia privada y eventos de ciclo de vida para emergencias.
 - `20260826131521_allow_tenant_cascade_cleanup.sql`: conserva esa protección en operaciones directas sin bloquear cascadas del tenant.
 - `20260826131659_skip_audit_during_tenant_cascade.sql`: evita recrear auditoría hija durante el borrado explícito de una organización.
 - `20260826132501_preserve_existing_membership_status.sql`: una reinvitación no degrada membresías activas o suspendidas.

@@ -1,0 +1,13 @@
+import { z } from "zod";
+const id=z.uuid(); const optionalId=z.preprocess(v=>v===""?null:v,z.uuid().nullable()); const optionalDate=z.preprocess(v=>v===""?null:v,z.string().date().nullable()); const optionalText=z.preprocess(v=>v===""?null:v,z.string().trim().max(2000).nullable());
+export const scenarioSchema=z.object({site_id:id,code:z.string().trim().min(2).max(80),name:z.string().trim().min(3).max(180),description:optionalText});
+export const resourceSchema=z.object({site_id:id,resource_type:z.enum(["first_aid","firefighting","evacuation","communication","rescue","other"]),name:z.string().trim().min(3).max(180),quantity:z.coerce.number().int().nonnegative(),location_description:optionalText,inspection_due_at:optionalDate,expires_at:optionalDate});
+export const brigadeSchema=z.object({site_id:id,name:z.string().trim().min(3).max(180),specialty:z.enum(["evacuation","first_aid","firefighting","rescue","mixed"])});
+export const brigadeMemberSchema=z.object({emergency_brigade_id:id,organization_member_id:id,responsibility:z.enum(["leader","alternate","member"])});
+export const directorySchema=z.object({site_id:id,display_name:z.string().trim().min(3).max(160),operational_role:z.string().trim().min(3).max(160),contact_phone:optionalText,contact_email:z.preprocess(v=>v===""?null:v,z.email().nullable()),visibility:z.enum(["emergency_team","site_staff"])});
+export const planSchema=z.object({site_id:id,version_number:z.coerce.number().int().positive(),summary:z.string().trim().min(5).max(2000),effective_from:optionalDate,effective_to:optionalDate});
+export const drillSchema=z.object({site_id:id,emergency_scenario_id:optionalId,emergency_plan_version_id:optionalId,title:z.string().trim().min(3).max(220),scheduled_at:z.preprocess(v=>v===""?null:v,z.string().datetime({offset:true}).nullable())});
+export const resultSchema=z.object({emergency_drill_id:id,participant_count:z.preprocess(v=>v===""?null:v,z.coerce.number().int().nonnegative().nullable()),duration_seconds:z.preprocess(v=>v===""?null:v,z.coerce.number().int().nonnegative().nullable()),outcome:z.enum(["satisfactory","needs_improvement","unsatisfactory"]),summary:z.string().trim().min(5).max(2000)});
+export const findingSchema=z.object({emergency_drill_id:id,title:z.string().trim().min(3).max(220),description:optionalText,severity:z.enum(["critical","high","medium","low"])});
+export const actionSchema=z.object({emergency_finding_id:id,title:z.string().trim().min(3).max(220),responsible_user_id:optionalId,due_at:optionalDate,improvement_action_id:optionalId});
+export const stateSchema=z.object({id,status:z.string().trim().min(3).max(40)});

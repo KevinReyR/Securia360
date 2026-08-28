@@ -6336,6 +6336,7 @@ export type Database = {
           confirmed_at: string | null
           confirmed_by: string | null
           created_at: string
+          created_by: string | null
           decision_type: string
           id: string
           organization_id: string
@@ -6347,6 +6348,7 @@ export type Database = {
           confirmed_at?: string | null
           confirmed_by?: string | null
           created_at?: string
+          created_by?: string | null
           decision_type: string
           id?: string
           organization_id: string
@@ -6358,6 +6360,7 @@ export type Database = {
           confirmed_at?: string | null
           confirmed_by?: string | null
           created_at?: string
+          created_by?: string | null
           decision_type?: string
           id?: string
           organization_id?: string
