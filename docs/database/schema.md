@@ -17,7 +17,7 @@
 | Matriz de riesgos | `processes`, `activities`, `risk_tasks`, `risk_identifications`, `risk_controls`, `risk_control_verifications`, `risk_control_alerts` | Cadena auditable de peligro, valoración, control, eficacia histórica y alertas. |
 | Capacitación | `training_catalog`, `training_plans`, `training_sessions`, `training_enrollments`, `training_attendances`, `training_evaluations`, `training_certificates` | Trazabilidad de capacitación con mínima información personal y evidencia privada. |
 | EPP | `ppe_catalog`, `ppe_inventory`, `ppe_inventory_movements`, `ppe_assignments`, `ppe_deliveries`, `ppe_inspections`, `ppe_retirements` | Inventario transaccional e historial por miembro y elemento. |
-| Contratistas | `contractor_organizations`, `contracts`, requisitos, documentos, evaluaciones y accesos portal | Portal limitado por contrato/sede y documentos verificables. |
+| Contratistas | `contractor_organizations`, contactos, contratos, requisitos, documentos, evaluaciones y accesos portal | Portal limitado por contrato/sede y documentos verificables. |
 | Incidentes | `incidents`, investigación, causas, acciones, evidencia y detalles sensibles separados | Privacidad reforzada y trazabilidad sin conclusiones automáticas. |
 | Salud ocupacional | conceptos de aptitud, restricciones, programas y decisiones confirmadas | Datos mínimos, sin historias clínicas ni diagnósticos. |
 | Emergencias | escenarios, recursos, brigadas, planes, simulacros, resultados, hallazgos y acciones | Preparación y simulacros trazables por sede, con planes versionados y acciones verificables. |
@@ -64,6 +64,7 @@ Las entidades normativas (`normative_sources`, `requirements`, `minimum_standard
 - `20260827040000_add_ppe_domain.sql`: agrega catálogo, inventario, asignación, entrega transaccional, inspección y baja de EPP.
 - `20260828124544_harden_ppe_inventory_and_workflows.sql`: registra movimientos inmutables, protege entrega/aceptación/inspección/baja mediante RPC transaccionales y añade historial de vida útil y reposición.
 - `20260827050000_add_contractors_and_suppliers.sql`: agrega contratistas, contratos, requisitos, portal restringido y aprobaciones auditables.
+- `20260828130856_harden_contractor_portal_and_document_scope.sql`: limita envíos a su contacto, habilita evidencia privada acotada por requisito y protege transiciones de aprobación.
 - `20260827060000_add_incidents_and_health_sensitive_domain.sql`: agrega reporte, investigación, evidencia y detalle sensible protegido.
 - `20260827070000_add_minimal_occupational_health.sql`: agrega salud ocupacional mínima y controles de privacidad por rol.
 - `20260826131521_allow_tenant_cascade_cleanup.sql`: conserva esa protección en operaciones directas sin bloquear cascadas del tenant.

@@ -51,6 +51,9 @@ export const permissionCodes = [
   "ppe.read",
   "ppe.manage",
   "ppe.validate",
+  "contractors.read",
+  "contractors.manage",
+  "contractors.approve",
 ] as const;
 
 export type PermissionCode = (typeof permissionCodes)[number];

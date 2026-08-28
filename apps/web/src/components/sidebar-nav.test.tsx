@@ -13,6 +13,7 @@ describe("SidebarNav", () => {
     expect(screen.getByRole("link", { name: "Planificación" })).toHaveAttribute("href", "/org/11111111-1111-4111-8111-111111111111/planning");
     expect(screen.getByRole("link", { name: "Riesgos" })).toHaveAttribute("href", "/org/11111111-1111-4111-8111-111111111111/risks");
     expect(screen.getByRole("link", { name: "EPP" })).toHaveAttribute("href", "/org/11111111-1111-4111-8111-111111111111/ppe");
+    expect(screen.getByRole("link", { name: "Contratistas" })).toHaveAttribute("href", "/org/11111111-1111-4111-8111-111111111111/contractors");
     expect(screen.getByRole("link", { name: "Documentos" })).toHaveAttribute("href", "/org/11111111-1111-4111-8111-111111111111/documents");
     expect(screen.getAllByText("Próximamente")).toHaveLength(3);
   });

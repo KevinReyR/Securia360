@@ -1,0 +1,2 @@
+import { describe,expect,it } from "vitest"; import {contractSchema,contractorSchema} from "./schemas";
+describe("contractor schemas",()=>{it("rejects invalid contract dates",()=>expect(contractSchema.safeParse({contractor_organization_id:"10000000-0000-4000-8000-000000000001",code:"C-1",title:"Contrato",starts_at:"2026-02-02",ends_at:"2026-02-01",requirement_id:""}).success).toBe(false));it("accepts minimal contractor",()=>expect(contractorSchema.safeParse({legal_name:"Proveedor SAS",tax_id:"",kind:"supplier"}).success).toBe(true));});

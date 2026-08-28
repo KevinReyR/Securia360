@@ -22,6 +22,7 @@ export const navigationItems = [
   { label: "Capacitaciones", suffix: "training", icon: CalendarCheck, available: true, keywords: ["competencias", "asistencia", "certificados"] },
   { label: "Riesgos", suffix: "risks", icon: WarningDiamond, available: true, keywords: ["gtc 45", "peligros", "controles"] },
   { label: "EPP", suffix: "ppe", icon: HardHat, available: true, keywords: ["elementos de protección personal", "inventario", "entrega"] },
+  { label: "Contratistas", suffix: "contractors", icon: UsersThree, available: true, keywords: ["proveedores", "contratos", "portal"] },
   { label: "Documentos", suffix: "documents", icon: Files, available: true, keywords: ["evidencias", "archivos"] },
   { label: "Analítica", icon: ChartLineUp, available: false, keywords: ["indicadores", "reportes"] },
   { label: "Automatizaciones", icon: Lightning, available: false, keywords: ["flujos", "alertas"] },

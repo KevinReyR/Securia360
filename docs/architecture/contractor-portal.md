@@ -1,5 +1,7 @@
-# Contratistas y proveedores
+# Portal de contratistas
 
-El acceso externo se representa por `contractor_portal_accesses`, vinculado a un contacto autenticado, un contrato y, opcionalmente, una sede aprobada. No crea una membresía de la organización anfitriona ni concede permisos internos. Un usuario del portal solo puede consultar su contrato y requisitos documentales, y cargar documentos para ese alcance.
+Los contactos se registran mediante el flujo normal de Securia360. Un aprobador interno los vincula por correo con la función `provision-contractor-portal`, que solo usa credenciales administrativas dentro de la función; nunca se exponen al navegador.
 
-Los requisitos contractuales pueden enlazarse a `requirements` como referencia trazable; no codifican ni declaran una interpretación automática del Decreto 1072. La aprobación se mantiene como decisión humana auditada.
+El portal `/contractor-portal` no usa membresías de organización. Solo muestra contratos, sedes aprobadas, requisitos y envíos del contacto autenticado. Los documentos se almacenan de forma privada bajo `organization_id/contract_document_requirement/requirement_id/document_id/archivo` y las políticas RLS limitan lectura y carga al contrato activo.
+
+El contacto no puede consultar trabajadores internos, otros contactos, otros contratos, evaluaciones ni aprobar documentos. Las aprobaciones, activaciones de contrato y accesos por sede requieren `contractors.approve`; cada cambio queda auditado. Este flujo no declara cumplimiento legal automático.

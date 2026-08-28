@@ -1996,6 +1996,7 @@ export type Database = {
           reviewed_by: string | null
           status: string
           submitted_at: string
+          submitted_by: string | null
         }
         Insert: {
           contract_document_requirement_id: string
@@ -2007,6 +2008,7 @@ export type Database = {
           reviewed_by?: string | null
           status?: string
           submitted_at?: string
+          submitted_by?: string | null
         }
         Update: {
           contract_document_requirement_id?: string
@@ -2018,6 +2020,7 @@ export type Database = {
           reviewed_by?: string | null
           status?: string
           submitted_at?: string
+          submitted_by?: string | null
         }
         Relationships: [
           {
