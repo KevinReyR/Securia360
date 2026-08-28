@@ -10,5 +10,8 @@ export default defineConfig({
   test: {
     environment: "node",
     setupFiles: ["./src/tests/setup.ts"],
+    // Browser E2E tests are executed by Playwright through `test:e2e`.
+    // Keep Vitest limited to unit and component tests under the application source.
+    include: ["src/**/*.test.{ts,tsx}"],
   },
 });
