@@ -10,6 +10,8 @@ export type E2EFixture = {
   organizationAName: string;
   organizationBName: string;
   siteA: string;
+  improvementGapA: string;
+  improvementGapTitle: string;
   siteManagerRole: string;
   userA: TestUser;
   userB: TestUser;
@@ -120,6 +122,27 @@ export async function createE2EFixture(): Promise<E2EFixture> {
   assertNoError(sites, "create site A");
   const siteA = sites.data!.id;
 
+  const finding = await admin.from("improvement_findings").insert({
+    organization_id: organizationA,
+    title: `E2E Hallazgo ${prefix}`,
+    description: "Hallazgo efímero para el flujo E2E.",
+    created_by: userA.id,
+  }).select("id").single();
+  assertNoError(finding, "create E2E improvement finding");
+  const improvementGapTitle = `E2E Brecha ${prefix}`;
+  const gap = await admin.from("improvement_gaps").insert({
+    organization_id: organizationA,
+    origin_type: "finding",
+    finding_id: finding.data!.id,
+    deduplication_key: `e2e-gap:${prefix}`,
+    title: improvementGapTitle,
+    description: "Brecha efímera para validar el flujo completo.",
+    priority: "high",
+    created_by: userA.id,
+  }).select("id").single();
+  assertNoError(gap, "create E2E improvement gap");
+  const improvementGapA = gap.data!.id;
+
   const deleteUserByEmail = async (email: string) => {
     for (let page = 1; page <= 20; page += 1) {
       const users = await admin.auth.admin.listUsers({ page, perPage: 1_000 });
@@ -161,5 +184,5 @@ export async function createE2EFixture(): Promise<E2EFixture> {
     }));
   };
 
-  return { runId, organizationA, organizationB, organizationAName, organizationBName, siteA, siteManagerRole, userA, userB, switcher, member, deleteUserByEmail, cleanup };
+  return { runId, organizationA, organizationB, organizationAName, organizationBName, siteA, improvementGapA, improvementGapTitle, siteManagerRole, userA, userB, switcher, member, deleteUserByEmail, cleanup };
 }

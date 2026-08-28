@@ -192,6 +192,44 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
     await userA.auth.signOut();
   }, 30_000);
 
+  it("keeps improvement actions, evidence, validation, and gap closure inside the tenant", async () => {
+    const userA = newPublicClient();
+    const userB = newPublicClient();
+    await assertNoError(await userA.auth.signInWithPassword({ email: fixture.userAEmail, password }), "sign in User A");
+    await assertNoError(await userB.auth.signInWithPassword({ email: fixture.userBEmail, password }), "sign in User B");
+
+    const finding = await userA.from("improvement_findings").insert({ organization_id: fixture.organizationA, title: `CI Finding ${runId}` }).select("id").single();
+    expect(finding.error).toBeNull();
+    const gap = await userA.from("improvement_gaps").insert({ organization_id: fixture.organizationA, origin_type: "finding", finding_id: finding.data!.id, deduplication_key: `ci-gap:${runId}`, title: `CI Gap ${runId}`, priority: "high" }).select("id").single();
+    expect(gap.error).toBeNull();
+    const action = await userA.from("improvement_actions").insert({ organization_id: fixture.organizationA, gap_id: gap.data!.id, title: `CI Action ${runId}`, priority: "high" }).select("id").single();
+    expect(action.error).toBeNull();
+    expect((await userB.from("improvement_actions").select("id").eq("id", action.data!.id)).data).toEqual([]);
+    expect((await userB.from("improvement_actions").update({ title: "cross-tenant" }).eq("id", action.data!.id).select("id")).data ?? []).toEqual([]);
+
+    const documentA = await userA.from("documents").insert({ organization_id: fixture.organizationA, entity_type: "improvement_action", entity_id: action.data!.id, title: `CI Evidence A ${runId}` }).select("id").single();
+    expect(documentA.error).toBeNull();
+    const versionA = await userA.from("document_versions").insert({ organization_id: fixture.organizationA, document_id: documentA.data!.id, version_number: 1, bucket_id: "evidences", storage_path: `${fixture.organizationA}/improvement_action/${action.data!.id}/${documentA.data!.id}/fixture.pdf`, original_name: "fixture.pdf", mime_type: "application/pdf", size_bytes: 1, uploaded_by: fixture.userAId }).select("id").single();
+    expect(versionA.error).toBeNull();
+    expect((await userA.from("improvement_actions").update({ evidence_document_version_id: versionA.data!.id, status: "evidence_submitted" }).eq("id", action.data!.id).select("id,status")).data).toEqual([{ id: action.data!.id, status: "evidence_submitted" }]);
+
+    const documentB = await admin.from("documents").insert({ organization_id: fixture.organizationB, entity_type: "organization", entity_id: fixture.organizationB, title: `CI Evidence B ${runId}` }).select("id").single();
+    await assertNoError(documentB, "create foreign evidence document");
+    const versionB = await admin.from("document_versions").insert({ organization_id: fixture.organizationB, document_id: documentB.data!.id, version_number: 1, bucket_id: "evidences", storage_path: `${fixture.organizationB}/organization/${fixture.organizationB}/${documentB.data!.id}/foreign.pdf`, original_name: "foreign.pdf", mime_type: "application/pdf", size_bytes: 1, uploaded_by: fixture.userBId }).select("id").single();
+    await assertNoError(versionB, "create foreign evidence version");
+    expect((await userA.from("improvement_actions").update({ evidence_document_version_id: versionB.data!.id }).eq("id", action.data!.id)).error).not.toBeNull();
+
+    await assertNoError(await admin.from("member_roles").delete().eq("organization_member_id", fixture.memberA), "remove improvement validator role");
+    await assertNoError(await admin.from("member_roles").insert({ organization_id: fixture.organizationA, organization_member_id: fixture.memberA, role_id: fixture.siteManagerRole, site_id: fixture.siteA, created_by: fixture.userAId }), "assign non-validator site role");
+    expect((await userA.from("improvement_actions").update({ status: "verified", validation_note: "not allowed" }).eq("id", action.data!.id)).error).not.toBeNull();
+    await assertNoError(await admin.from("member_roles").delete().eq("organization_member_id", fixture.memberA), "remove non-validator role");
+    await assertNoError(await admin.from("member_roles").insert({ organization_id: fixture.organizationA, organization_member_id: fixture.memberA, role_id: fixture.adminRole, created_by: fixture.userAId }), "restore improvement validator role");
+    expect((await userA.from("improvement_actions").update({ status: "verified", validation_note: "Evidence is sufficient" }).eq("id", action.data!.id).select("id,status")).data).toEqual([{ id: action.data!.id, status: "verified" }]);
+    expect((await userA.from("improvement_gaps").update({ status: "resolved", resolved_at: new Date().toISOString(), resolved_by: fixture.userAId }).eq("id", gap.data!.id).select("id,status")).data).toEqual([{ id: gap.data!.id, status: "resolved" }]);
+
+    await Promise.all([userA.auth.signOut(), userB.auth.signOut()]);
+  }, 30_000);
+
   it("keeps private Storage and signed downloads inside the tenant", async () => {
     const userA = newPublicClient();
     const userB = newPublicClient();

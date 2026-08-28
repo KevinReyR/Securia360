@@ -215,6 +215,28 @@ test.describe("critical isolated SaaS flows", () => {
     await logout(page);
   });
 
+  test("creates an action from a gap, attaches evidence, validates it, and closes the gap", async ({ page }) => {
+    const title = `E2E Acción ${fixture.runId.slice(0, 8)}`;
+    await login(page, fixture.userA.email, fixture.userA.password);
+    await page.goto(`/org/${fixture.organizationA}/improvement-plan`);
+    const gapCard = page.getByRole("heading", { name: fixture.improvementGapTitle }).locator("xpath=ancestor::div[contains(@class, 'border')][1]");
+    await gapCard.getByLabel("Nueva acción").fill(title);
+    await gapCard.getByLabel("Descripción").first().fill("Completar evidencia verificable.");
+    await gapCard.getByRole("button", { name: "Crear acción" }).click();
+    await expect(page.getByText(title, { exact: true })).toBeVisible();
+
+    const actionCard = page.getByText(title, { exact: true }).locator("xpath=ancestor::article[1]");
+    await actionCard.getByLabel("Cargar evidencia privada").setInputFiles({ name: "evidencia.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\nE2E improvement evidence") });
+    await actionCard.getByRole("button", { name: "Vincular evidencia" }).click();
+    await expect(actionCard.getByText("evidence_submitted", { exact: true })).toBeVisible();
+    await actionCard.getByLabel("Nota de validación").fill("Evidencia revisada y suficiente.");
+    await actionCard.getByRole("button", { name: "Validar y cerrar acción" }).click();
+    await expect(actionCard.getByText("verified", { exact: true })).toBeVisible();
+    await gapCard.getByRole("button", { name: "Cerrar brecha validada" }).click();
+    await expect(gapCard.getByText("resolved", { exact: true })).toBeVisible();
+    await logout(page);
+  });
+
   test("denies direct tenant B navigation to a user that only belongs to tenant A", async ({ page }) => {
     await login(page, fixture.userA.email, fixture.userA.password);
     await page.goto(`/org/${fixture.organizationB}/dashboard`);
