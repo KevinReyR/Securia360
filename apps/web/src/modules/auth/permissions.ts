@@ -40,6 +40,10 @@ export const permissionCodes = [
   "risks.read",
   "risks.manage",
   "risks.validate",
+  "planning.read",
+  "planning.manage",
+  "tasks.update_status",
+  "tasks.approve",
 ] as const;
 
 export type PermissionCode = (typeof permissionCodes)[number];
