@@ -9,7 +9,9 @@ import { can, type PermissionCode } from "@/modules/auth/permissions";
 import { ACTIVE_ORGANIZATION_COOKIE, requireAuthenticatedUser } from "./tenant";
 import {
   areaSchema,
+  documentMutationSchema,
   documentUploadSchema,
+  documentVersionUploadSchema,
   inviteMemberSchema,
   improvementActionSchema,
   legalEntitySchema,
@@ -155,6 +157,75 @@ export async function uploadDocument(formData: FormData) {
   });
   if (error) { await supabase.storage.from(bucket).remove([path]); redirect(`/org/${organizationId}/documents?status=error`); }
   revalidatePath(`/org/${organizationId}/documents`); redirect(`/org/${organizationId}/documents?status=saved`);
+}
+
+function documentPath(organizationId: string, entityType: string, entityId: string, documentId: string, fileName: string) {
+  const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-180) || "archivo";
+  return `${organizationId}/${entityType}/${entityId}/${documentId}/${safeName}`;
+}
+
+function validDocumentFile(file: FormDataEntryValue | null): file is File {
+  return file instanceof File && file.size > 0 && file.size <= 26_214_400 && ["application/pdf", "image/jpeg", "image/png", "image/webp"].includes(file.type);
+}
+
+export async function replaceDocumentVersion(formData: FormData) {
+  const parsed = documentVersionUploadSchema.safeParse(Object.fromEntries(formData));
+  const file = formData.get("file");
+  if (!parsed.success || !validDocumentFile(file)) redirect("/organizations");
+  const { organizationId, documentId } = parsed.data;
+  await requirePermission(organizationId, "documents.update");
+  const { userId } = await requireAuthenticatedUser();
+  const supabase = await createClient();
+  const { data: document } = await supabase.from("documents").select("id,entity_type,entity_id,status").eq("organization_id", organizationId).eq("id", documentId).maybeSingle();
+  if (!document || document.status === "deleted") redirect(`/org/${organizationId}/documents?status=notfound`);
+  const { data: latest } = await supabase.from("document_versions").select("version_number").eq("organization_id", organizationId).eq("document_id", documentId).order("version_number", { ascending: false }).limit(1).maybeSingle();
+  const versionNumber = (latest?.version_number ?? 0) + 1;
+  const bucket = document.entity_type === "evidence" ? "evidences" : "organization-documents";
+  const path = documentPath(organizationId, document.entity_type, document.entity_id, documentId, `v${versionNumber}-${file.name}`);
+  const { error: storageError } = await supabase.storage.from(bucket).upload(path, file, { contentType: file.type, upsert: false });
+  if (storageError) redirect(`/org/${organizationId}/documents/${documentId}?status=error`);
+  const { error } = await supabase.from("document_versions").insert({ organization_id: organizationId, document_id: documentId, version_number: versionNumber, bucket_id: bucket, storage_path: path, original_name: file.name, mime_type: file.type, size_bytes: file.size, uploaded_by: userId });
+  if (error) { await supabase.storage.from(bucket).remove([path]); redirect(`/org/${organizationId}/documents/${documentId}?status=error`); }
+  await supabase.from("documents").update({ status: "active", updated_by: userId }).eq("organization_id", organizationId).eq("id", documentId);
+  revalidatePath(`/org/${organizationId}/documents`);
+  revalidatePath(`/org/${organizationId}/documents/${documentId}`);
+  redirect(`/org/${organizationId}/documents/${documentId}?status=versioned`);
+}
+
+export async function archiveDocument(formData: FormData) {
+  const parsed = documentMutationSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) redirect("/organizations");
+  await requirePermission(parsed.data.organizationId, "documents.update");
+  const { userId } = await requireAuthenticatedUser();
+  const supabase = await createClient();
+  const { error } = await supabase.from("documents").update({ status: "archived", updated_by: userId }).eq("organization_id", parsed.data.organizationId).eq("id", parsed.data.documentId).neq("status", "deleted");
+  revalidatePath(`/org/${parsed.data.organizationId}/documents`);
+  redirect(`/org/${parsed.data.organizationId}/documents/${parsed.data.documentId}?status=${error ? "error" : "archived"}`);
+}
+
+export async function deleteDocument(formData: FormData) {
+  const parsed = documentMutationSchema.extend({ confirmation: z.string().trim().min(1).max(180) }).safeParse(Object.fromEntries(formData));
+  if (!parsed.success) redirect("/organizations");
+  await requirePermission(parsed.data.organizationId, "documents.delete");
+  const { userId } = await requireAuthenticatedUser();
+  const supabase = await createClient();
+  const { data: document } = await supabase.from("documents").select("title").eq("organization_id", parsed.data.organizationId).eq("id", parsed.data.documentId).maybeSingle();
+  if (!document || document.title !== parsed.data.confirmation) redirect(`/org/${parsed.data.organizationId}/documents/${parsed.data.documentId}?status=confirmation`);
+  const { error } = await supabase.from("documents").update({ status: "deleted", deleted_at: new Date().toISOString(), deleted_by: userId, updated_by: userId }).eq("organization_id", parsed.data.organizationId).eq("id", parsed.data.documentId);
+  revalidatePath(`/org/${parsed.data.organizationId}/documents`);
+  redirect(`/org/${parsed.data.organizationId}/documents?status=${error ? "error" : "deleted"}`);
+}
+
+export async function downloadDocumentVersion(formData: FormData) {
+  const parsed = documentMutationSchema.extend({ versionId: z.uuid() }).safeParse(Object.fromEntries(formData));
+  if (!parsed.success) redirect("/organizations");
+  await requirePermission(parsed.data.organizationId, "documents.read");
+  const supabase = await createClient();
+  const { data: version } = await supabase.from("document_versions").select("bucket_id,storage_path").eq("organization_id", parsed.data.organizationId).eq("document_id", parsed.data.documentId).eq("id", parsed.data.versionId).maybeSingle();
+  if (!version) redirect(`/org/${parsed.data.organizationId}/documents/${parsed.data.documentId}?status=notfound`);
+  const { data, error } = await supabase.storage.from(version.bucket_id).createSignedUrl(version.storage_path, 60);
+  if (error || !data?.signedUrl) redirect(`/org/${parsed.data.organizationId}/documents/${parsed.data.documentId}?status=error`);
+  redirect(data.signedUrl);
 }
 
 export async function updateArea(formData: FormData) {

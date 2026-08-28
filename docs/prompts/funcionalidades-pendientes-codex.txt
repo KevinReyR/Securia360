@@ -1,0 +1,414 @@
+SECURIA360 — FUNCIONALIDADES PENDIENTES Y PROMPTS PARA CODEX
+Versión: 2026-08-27
+
+PROPÓSITO
+
+Este documento es el inventario operativo de trabajo pendiente de Securia360. Cada entrada
+indica el estado de datos real y contiene un prompt autónomo para implementar un vertical
+slice. Ejecutar un prompt por tarea/PR; no combinar varios módulos.
+
+ESTADOS DE MIGRACIÓN
+
+- EXISTENTE: la base de datos, RLS y permisos principales ya existen; falta interfaz,
+  integración, pruebas o configuración.
+- PARCIAL: existen tablas relacionadas, pero falta una entidad, contrato o capacidad
+  necesaria para completar el flujo.
+- NO REQUERIDA: es trabajo de interfaz, calidad, configuración externa u operación.
+- NO EXISTENTE: se debe diseñar y crear una migración versionada antes de implementar.
+
+PROMPT BASE — INCLUIR AL INICIO DE CADA TAREA
+
+Lee completamente AGENTS.md y respétalo como especificación del producto. Inspecciona
+primero el repositorio, el estado de Git, las dependencias, las migraciones locales y
+remotas, el esquema Supabase, RLS, patrones y documentación existente. Preserva cambios
+ajenos y reutiliza componentes existentes. Resume estado, archivos afectados, migraciones,
+riesgos y plan antes de implementar. Trabaja solo en el alcance solicitado. Para cambios de
+base de datos usa migraciones versionadas, claves foráneas, constraints, índices y RLS. No
+expongas service_role. Verifica typecheck, lint, tests y build; prueba RLS, aislamiento
+multiempresa y asesores de Supabase cuando corresponda. Actualiza documentación y tipos
+generados. Corrige problemas críticos de seguridad dentro del alcance. No declares
+cumplimiento legal automático ni publiques o migres datos reales sin autorización explícita.
+
+======================================================================
+P0 — NÚCLEO, SEGURIDAD Y CALIDAD
+======================================================================
+
+P0-01 — Pruebas reales de RLS/Data API y Storage
+Estado: parcial. Hay una prueba parametrizable, pero se omite sin cuentas de prueba.
+Migración: EXISTENTE — 20260826005557_verify_core_tenant_isolation.sql,
+20260826170000_add_private_documents_domain.sql y políticas posteriores.
+Dependencias: usuarios efímeros A/B y organizaciones A/B configurados como secretos de CI.
+
+PROMPT PARA CODEX
+PROMPT BASE. Completa las pruebas de integración reales de Supabase para Usuario A/Org A
+permitido y Usuario A/Org B denegado. Incluye lectura, inserción, actualización, membresía
+suspendida, scope por sede, Storage privado y descarga firmada. Configura solo variables
+protegidas de CI; nunca service_role en navegador. Reutiliza las migraciones existentes, no
+crees tablas salvo inconsistencia crítica. Deja la suite ejecutándose en CI y documenta los
+datos efímeros, limpieza e idempotencia.
+
+P0-02 — E2E de flujos críticos
+Estado: ausente.
+Migración: NO REQUERIDA.
+Dependencias: P0-01 y un entorno de staging sin datos productivos.
+
+PROMPT PARA CODEX
+PROMPT BASE. Añade E2E deterministas para login, signup/confirmación cuando aplique,
+onboarding, cambio de organización, CRUD de estructura, carga/descarga de documento,
+asignación de rol, logout y denegación entre tenants. Usa factories y credenciales efímeras
+protegidas. No automatices producción ni uses datos reales. Incorpora los escenarios al CI
+de staging y documenta cómo ejecutarlos localmente.
+
+P0-03 — Accesibilidad WCAG 2.2 AA
+Estado: parcial; existen componentes accesibles, no auditoría de flujos.
+Migración: NO REQUERIDA.
+Dependencias: P0-02.
+
+PROMPT PARA CODEX
+PROMPT BASE. Audita y corrige accesibilidad WCAG 2.2 AA en login, organizaciones,
+onboarding, estructura, miembros y documentos. Cubre teclado, foco visible, orden de foco,
+diálogos, etiquetas, errores anunciables, contraste, reduced motion y lector de pantalla.
+Añade pruebas automatizadas donde aporten valor y una lista de verificación manual
+NVDA/Chrome y VoiceOver/Safari. No cambies modelos de datos.
+
+P0-04 — Brechas y acciones de mejoramiento operables
+Estado: solo lectura.
+Migración: EXISTENTE — 20260826250000_add_improvement_plan.sql.
+Dependencias: documentos/evidencias y permisos improvements.*.
+
+PROMPT PARA CODEX
+PROMPT BASE. Convierte Planificación en un flujo usable de brecha a acción: listar, filtrar,
+crear cuando el modelo lo permita, asignar responsable, cambiar estado, adjuntar evidencia,
+validar y cerrar. Reutiliza improvement_findings, improvement_gaps e improvement_actions,
+can(permission, context), RLS y auditoría existentes. No dupliques acciones al recalcular.
+Añade Zod cliente/servidor, mensajes de dominio y pruebas de permisos/tenant.
+
+P0-05 — Plan anual, actividades y tareas
+Estado: solo backend.
+Migración: EXISTENTE — 20260826260000_add_planning_and_tasks.sql.
+Dependencias: P0-04.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa el flujo vertical de plan anual, actividades y tareas usando las
+tablas existentes. Incluye responsables, presupuesto opcional, UTC, estados, comentarios,
+evidencias, dependencias, recurrencia idempotente, aprobación, filtros, tablero y calendario.
+Una acción puede originar tareas sin convertirse en la misma entidad. Protege cambios con
+planning.* y tasks.*; prueba dependencias, recurrencias y aislamiento entre organizaciones.
+
+P0-06 — Matriz de peligros y reevaluación completa
+Estado: parcial; solo se consultan controles y se registran verificaciones.
+Migración: EXISTENTE — 20260826270000_add_versioned_risk_methodologies.sql,
+20260827010000_add_risk_matrix.sql y 20260827020000_add_risk_control_follow_up.sql.
+Dependencias: metodologías revisadas por experto y P0-05 para vínculos a tareas.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa Proceso → Actividad → Tarea → Peligro → Identificación →
+Evaluación → Control → Reevaluación. Reutiliza la metodología aprobada y sus fórmulas; no
+inventes reglas GTC 45. Incluye CRUD, controles jerarquizados, evidencia, responsable,
+eficacia, alertas, historial y vínculos con acciones/tareas. Usa risks.* con RLS, auditoría,
+Zod y pruebas de cálculo, permisos y tenant. Mantén visible que la decisión requiere criterio
+profesional.
+
+P0-07 — Actualización segura de dependencias vulnerables
+Estado: ausente; npm audit reporta vulnerabilidades altas en Expo/Metro.
+Migración: NO REQUERIDA.
+Dependencias: entorno móvil de staging.
+
+PROMPT PARA CODEX
+PROMPT BASE. Resuelve las vulnerabilidades altas y moderadas reportadas por npm audit,
+priorizando la cadena Expo/Metro. Revisa changelogs oficiales, no ejecutes npm audit fix
+--force sin análisis y conserva lockfile. Si se requiere actualización mayor, migra web y
+móvil de forma compatible. Ejecuta typecheck web/móvil, lint, tests, build y npm audit;
+documenta riesgos y cambios incompatibles.
+
+P0-08 — Cabeceras de seguridad y endurecimiento de Auth
+Estado: parcial; HSTS activo en hosting, sin CSP ni otras cabeceras verificadas.
+Migración: NO REQUERIDA.
+Dependencias: inventario de dominios, Supabase Auth y recursos externos.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa cabeceras CSP restrictiva, X-Content-Type-Options,
+frame-ancestors/anti-framing, Referrer-Policy y Permissions-Policy en Next/Vercel. Revisa
+cookies SSR, validación de redirects, callback, XSS, CSRF y carga de archivos. Prueba login,
+signup, callback, Storage y scripts permitidos bajo la CSP. No cambies configuración de Auth
+remota ni despliegues sin autorización.
+
+======================================================================
+P1 — CUMPLIMIENTO Y MÓDULOS OPERATIVOS
+======================================================================
+
+P1-01 — Interfaz de cumplimiento normativo
+Estado: solo backend.
+Migración: EXISTENTE — 20260826190000, 20260826200000, 20260826210000,
+20260826220000, 20260826230000, 20260826240000 y 20260826241000.
+Dependencias: P0-01 y revisión humana SST/jurídica.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa una interfaz protegida y explicable para fuentes/versiones,
+requirements, estándares 0312, perfiles/versiones, clasificación, aplicabilidad, snapshots y
+evaluaciones. Cada vista requiere búsqueda, filtros, paginación, detalle, estados, auditoría y
+empty states. Reutiliza tablas y permisos existentes; solo crea una migración si hay una
+inconsistencia demostrable. No declares validez jurídica automática; los contenidos pendientes
+de experto deben mostrarse como tales. Habilita navegación solo cuando exista flujo vertical
+probado.
+
+P1-02 — Revisión experta SST/jurídica versionada
+Estado: ausente.
+Migración: NO EXISTENTE; se prevé un paquete de revisión y decisiones inmutables.
+Dependencias: P1-01.
+
+PROMPT PARA CODEX
+PROMPT BASE. Diseña e implementa el paquete de revisión humana para fuentes, versiones,
+requirements, estándares, perfiles, reglas de aplicabilidad, fórmulas, textos UI, supuestos y
+casos de prueba. Crea migraciones versionadas únicamente para el paquete de revisión,
+correcciones y decisiones append-only; usa RLS, responsables humanos, auditoría y FKs.
+Permite aprobar, rechazar y proponer una nueva versión sin editar históricos. No afirmes
+cumplimiento legal ni permitas cambios automáticos críticos.
+
+P1-03 — Capacitaciones y competencias
+Estado: solo backend.
+Migración: EXISTENTE — 20260827030000_add_training_and_competencies.sql.
+Dependencias: documentos privados y membresías.
+
+PROMPT PARA CODEX
+PROMPT BASE. Construye el flujo catálogo → plan → sesión → convocatoria → asistencia →
+evaluación → certificado → evidencia. Aplica privacidad de datos personales, permisos
+centralizados, vencimientos e indicadores calculados fuera de UI. Añade filtros, paginación,
+estados, auditoría y pruebas de tenant/rol.
+
+P1-04 — EPP
+Estado: solo backend.
+Migración: EXISTENTE — 20260827040000_add_ppe_domain.sql.
+Dependencias: riesgos, miembros, sedes y documentos.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa catálogo, inventario, asignación, entrega, aceptación, reposición,
+inspección, vida útil y baja de EPP. Vincula EPP con peligros, controles, trabajador y sede.
+Usa transacciones y constraints existentes para impedir stock negativo; conserva historial y
+evidencia privada. Añade RBAC, validación Zod y pruebas de concurrencia/tenant.
+
+P1-05 — Contratistas y portal limitado
+Estado: solo backend.
+Migración: EXISTENTE — 20260827050000_add_contractors_and_suppliers.sql.
+Dependencias: documentos, membresías, sedes y RBAC contractor.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa organizaciones contratistas, contactos, contratos, requisitos,
+documentos, trabajadores, acceso por sede, vencimientos, evaluación y aprobación. Crea el
+portal contractor mínimo con rutas y permisos estrictamente limitados a contrato/sede. Prueba
+que un contractor no accede a otro tenant ni a datos internos fuera de alcance.
+
+P1-06 — Incidentes y salud ocupacional mínima
+Estado: solo backend.
+Migración: EXISTENTE — 20260827060000_add_incidents_and_health_sensitive_domain.sql y
+20260827070000_add_minimal_occupational_health.sql.
+Dependencias: clasificación de datos, documentos privados y roles SST/HR/médico.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa reportes e investigación de incidentes, acciones, evidencias y
+cierre, más aptitud, restricciones, programas y vencimientos mínimos. Separa datos sensibles,
+usa mínimo privilegio y auditoría reforzada; no guardes historias clínicas ni diagnósticos
+innecesarios. Prueba denegación por rol/tenant y confirma intervención humana en decisiones
+que afecten personas.
+
+P1-07 — Emergencias
+Estado: solo backend.
+Migración: EXISTENTE — 20260827080000_add_emergency_management.sql.
+Dependencias: sedes, documentos y tareas.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa escenarios, recursos, brigadas, directorio controlado, planes
+versionados, simulacros, resultados, hallazgos y acciones por sede. Incluye modo de consulta
+resiliente, permisos por sede, evidencia privada y emisión de eventos; no construyas
+comunicaciones masivas todavía.
+
+P1-08 — Comités, auditorías y revisión por dirección
+Estado: solo backend.
+Migración: EXISTENTE — 20260827090000_add_governance_audits_and_indicators.sql.
+Dependencias: tareas, documentos y roles auditor.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa comités configurables, periodos, reuniones, agenda, asistencia,
+actas inmutables, firmas, compromisos y seguimiento. Incluye auditorías, hallazgos, informes,
+acciones, cierres y revisión por dirección. Respeta segregación: quien audita no puede
+autoaprobar cuando la configuración lo prohíba. Añade pruebas de independencia, tenant y
+aprobación inmutable.
+
+P1-09 — Indicadores y dashboard gerencial
+Estado: solo backend.
+Migración: EXISTENTE — 20260827090000_add_governance_audits_and_indicators.sql.
+Dependencias: P1-01, P0-05 y datos operativos.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa catálogo/versiones de indicadores, resultados históricos y dashboard
+gerencial con filtros por organización, razón social, sede y periodo. Calcula únicamente del
+lado servidor con jobs idempotentes; separa snapshots de estado vivo. Muestra fórmula,
+fuente, versión, meta y explicación, con RLS y pruebas contra fuga entre tenants.
+
+P1-10 — Bandeja de notificaciones
+Estado: solo backend; el header es placeholder.
+Migración: EXISTENTE — 20260827100000_add_notifications.sql.
+Dependencias: outbox y preferencias.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa bandeja in-app, preferencias, estados leído/no leído, prioridad,
+quiet hours, enlaces seguros y actualización en tiempo real solo si aporta valor. Consume
+eventos con deduplicación/idempotencia, sin incluir datos sensibles completos en mensajes.
+Reutiliza las tablas y RLS existentes; prueba preferencias, tenant y reintentos.
+
+P1-11 — Automatizaciones declarativas
+Estado: solo backend.
+Migración: EXISTENTE — 20260827110000_add_automations.sql.
+Dependencias: P1-10 y operación de outbox.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa interfaz para reglas evento → condiciones → acciones, versiones,
+dry-run, límites, auditoría de ejecución y apagado de emergencia. No expongas SQL ni código
+arbitrario. Mantén idempotencia, evita tormentas de eventos e incorpora vistas de errores,
+reintentos y permisos.
+
+P1-12 — Importaciones de trabajadores y estructura
+Estado: parcial; existe framework de importación, falta flujo completo y entidad laboral
+verificable cuando sea necesaria.
+Migración: PARCIAL — 20260827130000_add_imports_and_integrations.sql.
+Dependencias: decisión explícita sobre modelo de trabajadores y P0-01.
+
+PROMPT PARA CODEX
+PROMPT BASE. Completa importación CSV/XLSX con staging, mapeo, preview, validación por fila,
+errores descargables, idempotencia y rollback lógico para estructura y trabajadores. Inspecciona
+si el modelo actual de trabajadores es suficiente; si no, propone y crea una migración
+versionada con RLS, permisos, auditoría e índices. Una importación masiva debe emitir un único
+workforce.import.completed y un único recálculo.
+
+P1-13 — Securia Copilot autorizado
+Estado: solo backend.
+Migración: EXISTENTE — 20260827120000_add_securia_copilot.sql.
+Dependencias: P1-01, revisión experta, documentos y permisos.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa UI de Copilot con recuperación solo de datos que el actor ya puede
+leer. Registra fuentes, versión normativa, tenant, actor, propuesta y aceptación/rechazo.
+Protege prompt injection documental y limita herramientas por permiso. No permitas cambios de
+clasificación, aprobaciones, cierres ni decisiones legales/médicas sin confirmación humana.
+
+P1-14 — Administración SaaS y facturación
+Estado: solo backend.
+Migración: EXISTENTE — 20260827140000_add_billing_and_saas_admin.sql.
+Dependencias: proveedor de pagos autorizado y separación Reinova/tenant.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa administración interna aislada, planes, suscripciones, límites,
+trials, feature flags y soporte auditado. Integra pagos solamente si el proveedor está
+autorizado; valida webhooks firmados, idempotencia y reconciliación. Una suspensión comercial
+no borra datos ni modifica permisos de seguridad.
+
+P1-15 — Aplicación móvil
+Estado: parcial; existe apps/mobile mínimo.
+Migración: NO REQUERIDA; reutiliza backend y tipos compartidos.
+Dependencias: P0-01, P0-02 y Storage.
+
+PROMPT PARA CODEX
+PROMPT BASE. Completa la app Expo con Auth seguro, selector de organización, tareas,
+inspecciones/captura de evidencia cuando el backend exista, cola offline idempotente,
+resolución explícita de conflictos, cifrado local y borrado de sesión. No almacenes
+service_role ni secretos. Añade typecheck móvil, pruebas de sincronización y matriz de
+aislamiento tenant.
+
+======================================================================
+P2 — HABILITADORES DE PRODUCCIÓN
+======================================================================
+
+P2-01 — Observabilidad, alertas y outbox
+Estado: documentos/runbooks sin instrumentación observable; hay eventos pendientes.
+Migración: PARCIAL — 20260826180000_add_transactional_outbox.sql.
+Dependencias: proveedor de monitoreo aprobado.
+
+PROMPT PARA CODEX
+PROMPT BASE. Implementa logging estructurado sin PII/secretos, correlation IDs, captura de
+errores, métricas de outbox/jobs, alertas y health checks. Añade consumidor controlado,
+idempotente y observable para outbox; explica o procesa eventos pendientes sin duplicarlos.
+Documenta dashboards, umbrales y runbooks. No conectes un proveedor externo sin autorización.
+
+P2-02 — Rendimiento y escalabilidad
+Estado: ausente; el asesor registra FKs sin índice, índices sin uso y políticas permisivas
+múltiples.
+Migración: PARCIAL — 20260826005431 y 20260827020500 cubren parte de índices.
+Dependencias: datos de staging representativos.
+
+PROMPT PARA CODEX
+PROMPT BASE. Perfila consultas y páginas con datos representativos. Revisa N+1, RLS, índices,
+paginación, cache por tenant y tamaño de bundle. Usa EXPLAIN ANALYZE con cuidado y crea
+migraciones forward-only solo para índices o políticas justificados por métricas. Ejecuta carga
+en staging y documenta p50/p95 antes/después; no optimices por suposición.
+
+P2-03 — Backups, PITR y recuperación
+Estado: documentación parcial, sin evidencia de simulacro.
+Migración: NO REQUERIDA.
+Dependencias: plan contratado de Supabase y entorno aislado de restauración.
+
+PROMPT PARA CODEX
+PROMPT BASE. Verifica y documenta backup, retención, PITR, RPO/RTO y responsables. Ejecuta
+un simulacro de restauración solo en entorno aislado, valida migraciones, RLS, Storage y
+aislamiento, y registra duración/pérdida estimada. No restaures ni alteres producción sin
+autorización explícita.
+
+P2-04 — CI/CD y promoción por ambientes
+Estado: parcial; existe CI, no evidencia de staging/previews aislados ni promoción validada.
+Migración: NO REQUERIDA.
+Dependencias: proyectos/variables de desarrollo, staging y producción.
+
+PROMPT PARA CODEX
+PROMPT BASE. Completa CI/CD reproducible: install bloqueado por lockfile, typecheck, lint,
+unitarias, integración, E2E staging, build, auditoría de dependencias y migraciones
+forward-only. Define desarrollo → staging → producción, previews sin datos productivos,
+validación de SHA desplegado y rollback compatible con schema. No habilites despliegue a
+producción ni configures secretos sin autorización explícita.
+
+P2-05 — Dominio, Auth y correo transaccional
+Estado: ausente/no verificable.
+Migración: NO REQUERIDA; es configuración externa.
+Dependencias: dominio definitivo, DNS y proveedor SMTP.
+
+PROMPT PARA CODEX
+PROMPT BASE. Prepara checklist y validación de dominio canónico, DNS, TLS, Site URL,
+Redirect URLs de Supabase Auth, NEXT_PUBLIC_SITE_URL por entorno, confirmación de correo,
+OTP, SMTP con remitente confiable, MFA y protección de contraseñas filtradas. Documenta
+pasos manuales, pruebas y rollback. No modifiques Auth remoto, DNS, SMTP ni producción sin
+autorización explícita.
+
+P2-06 — Privacidad, consentimiento, retención y soporte
+Estado: ausente.
+Migración: PARCIAL; puede requerir modelos versionados de consentimiento/retención si el
+asesor legal lo aprueba.
+Dependencias: decisión jurídica, DPO/responsable y contactos oficiales.
+
+PROMPT PARA CODEX
+PROMPT BASE. Prepara términos, política de privacidad, clasificación de datos, consentimiento
+cuando aplique, retención/eliminación, soporte e incidentes. No inventes obligaciones legales:
+marca contenido pendiente de revisión humana. Si se necesita conservar consentimiento
+versionado, propone primero un modelo y migración con RLS/auditoría para aprobación. Incluye
+contactos, SLA, escalamiento y proceso de respuesta a incidentes.
+
+P2-07 — Auditoría final de arquitectura
+Estado: parcial; existen ADR y auditorías puntuales.
+Migración: NO REQUERIDA.
+Dependencias: cierre de P0 y P1.
+
+PROMPT PARA CODEX
+PROMPT BASE. Audita Securia360 contra AGENTS.md y ADRs: monolito modular, PostgreSQL como
+fuente de verdad, multi-tenancy, RBAC, RLS, separación requirement/standard/methodology,
+clasificación temporal, snapshots e integridad histórica. Corrige solo vulnerabilidades
+críticas seguras; convierte el resto en roadmap con prioridad, esfuerzo, riesgo, dependencia
+y evidencia. No declares producción ni cumplimiento legal.
+
+ORDEN RECOMENDADO
+
+1. P0-01 a P0-08.
+2. P1-01 y P1-02; luego P1-03 a P1-15 según necesidad comercial.
+3. P2-01 a P2-07 antes de cualquier Go-Live.
+
+REGLA DE CIERRE
+
+Una funcionalidad pasa a “completa” solo cuando cuenta con flujo usable, permisos
+can(permission, context), RLS, auditoría, validación Zod, pruebas y documentación. Una
+migración existente por sí sola nunca equivale a funcionalidad terminada.

@@ -1049,6 +1049,374 @@ export type Database = {
           },
         ]
       }
+      automation_executions: {
+        Row: {
+          automation_rule_version_id: string
+          completed_at: string | null
+          created_at: string
+          domain_event_id: string
+          dry_run: boolean
+          id: string
+          idempotency_key: string
+          organization_id: string
+          result: Json
+          started_at: string
+          status: string
+        }
+        Insert: {
+          automation_rule_version_id: string
+          completed_at?: string | null
+          created_at?: string
+          domain_event_id: string
+          dry_run?: boolean
+          id?: string
+          idempotency_key: string
+          organization_id: string
+          result?: Json
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          automation_rule_version_id?: string
+          completed_at?: string | null
+          created_at?: string
+          domain_event_id?: string
+          dry_run?: boolean
+          id?: string
+          idempotency_key?: string
+          organization_id?: string
+          result?: Json
+          started_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_executions_automation_rule_version_id_fkey"
+            columns: ["automation_rule_version_id"]
+            isOneToOne: false
+            referencedRelation: "automation_rule_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_executions_domain_event_id_fkey"
+            columns: ["domain_event_id"]
+            isOneToOne: false
+            referencedRelation: "domain_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_executions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "automation_executions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_rule_versions: {
+        Row: {
+          action: Json
+          approved_at: string | null
+          approved_by: string | null
+          automation_rule_id: string
+          conditions: Json
+          created_at: string
+          event_type: string
+          id: string
+          organization_id: string
+          status: string
+          version_number: number
+        }
+        Insert: {
+          action: Json
+          approved_at?: string | null
+          approved_by?: string | null
+          automation_rule_id: string
+          conditions?: Json
+          created_at?: string
+          event_type: string
+          id?: string
+          organization_id: string
+          status?: string
+          version_number: number
+        }
+        Update: {
+          action?: Json
+          approved_at?: string | null
+          approved_by?: string | null
+          automation_rule_id?: string
+          conditions?: Json
+          created_at?: string
+          event_type?: string
+          id?: string
+          organization_id?: string
+          status?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_rule_versions_automation_rule_id_fkey"
+            columns: ["automation_rule_id"]
+            isOneToOne: false
+            referencedRelation: "automation_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_rule_versions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "automation_rule_versions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_rules: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          max_executions_per_hour: number
+          name: string
+          organization_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          max_executions_per_hour?: number
+          name: string
+          organization_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          max_executions_per_hour?: number
+          name?: string
+          organization_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_rules_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "automation_rules_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      billing_plans: {
+        Row: {
+          code: string
+          created_at: string
+          feature_flags: Json
+          id: string
+          limits: Json
+          name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          feature_flags?: Json
+          id?: string
+          limits?: Json
+          name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          feature_flags?: Json
+          id?: string
+          limits?: Json
+          name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      billing_subscriptions: {
+        Row: {
+          billing_plan_id: string
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          organization_id: string
+          provider_customer_reference: string | null
+          provider_subscription_reference: string | null
+          status: string
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_plan_id: string
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          organization_id: string
+          provider_customer_reference?: string | null
+          provider_subscription_reference?: string | null
+          status: string
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_plan_id?: string
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          organization_id?: string
+          provider_customer_reference?: string | null
+          provider_subscription_reference?: string | null
+          status?: string
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_subscriptions_billing_plan_id_fkey"
+            columns: ["billing_plan_id"]
+            isOneToOne: false
+            referencedRelation: "billing_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_subscriptions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "billing_subscriptions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      billing_usage_periods: {
+        Row: {
+          billing_subscription_id: string
+          created_at: string
+          id: string
+          organization_id: string
+          period_end: string
+          period_start: string
+          usage: Json
+        }
+        Insert: {
+          billing_subscription_id: string
+          created_at?: string
+          id?: string
+          organization_id: string
+          period_end: string
+          period_start: string
+          usage?: Json
+        }
+        Update: {
+          billing_subscription_id?: string
+          created_at?: string
+          id?: string
+          organization_id?: string
+          period_end?: string
+          period_start?: string
+          usage?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_usage_periods_billing_subscription_id_fkey"
+            columns: ["billing_subscription_id"]
+            isOneToOne: false
+            referencedRelation: "billing_subscriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_usage_periods_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "billing_usage_periods_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      billing_webhook_events: {
+        Row: {
+          event_reference: string
+          id: string
+          last_error: string | null
+          payload_hash: string
+          processed_at: string | null
+          provider_code: string
+          received_at: string
+          signature_valid: boolean
+          status: string
+        }
+        Insert: {
+          event_reference: string
+          id?: string
+          last_error?: string | null
+          payload_hash: string
+          processed_at?: string | null
+          provider_code: string
+          received_at?: string
+          signature_valid?: boolean
+          status?: string
+        }
+        Update: {
+          event_reference?: string
+          id?: string
+          last_error?: string | null
+          payload_hash?: string
+          processed_at?: string | null
+          provider_code?: string
+          received_at?: string
+          signature_valid?: boolean
+          status?: string
+        }
+        Relationships: []
+      }
       classification_change_proposals: {
         Row: {
           comparison: Json
@@ -2097,6 +2465,219 @@ export type Database = {
             columns: ["requirement_id"]
             isOneToOne: false
             referencedRelation: "requirements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      copilot_action_proposals: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          organization_id: string
+          proposal: Json
+          proposal_type: string
+          proposed_by: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          organization_id: string
+          proposal: Json
+          proposal_type: string
+          proposed_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          organization_id?: string
+          proposal?: Json
+          proposal_type?: string
+          proposed_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copilot_action_proposals_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copilot_action_proposals_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "copilot_action_proposals_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      copilot_conversations: {
+        Row: {
+          actor_user_id: string
+          created_at: string
+          id: string
+          organization_id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          actor_user_id: string
+          created_at?: string
+          id?: string
+          organization_id: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          actor_user_id?: string
+          created_at?: string
+          id?: string
+          organization_id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copilot_conversations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "copilot_conversations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      copilot_messages: {
+        Row: {
+          actor_user_id: string | null
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          organization_id: string
+          prompt_injection_flag: boolean
+          role: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          organization_id: string
+          prompt_injection_flag?: boolean
+          role: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          organization_id?: string
+          prompt_injection_flag?: boolean
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copilot_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copilot_messages_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "copilot_messages_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      copilot_sources: {
+        Row: {
+          assistant_message_id: string
+          created_at: string
+          excerpt: string | null
+          id: string
+          organization_id: string
+          source_id: string
+          source_type: string
+          source_version_id: string | null
+        }
+        Insert: {
+          assistant_message_id: string
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          organization_id: string
+          source_id: string
+          source_type: string
+          source_version_id?: string | null
+        }
+        Update: {
+          assistant_message_id?: string
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          organization_id?: string
+          source_id?: string
+          source_type?: string
+          source_version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copilot_sources_assistant_message_id_fkey"
+            columns: ["assistant_message_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copilot_sources_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "copilot_sources_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -3150,6 +3731,188 @@ export type Database = {
           },
         ]
       }
+      import_job_effects: {
+        Row: {
+          before_data: Json | null
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          import_job_id: string
+          operation: string
+          organization_id: string
+        }
+        Insert: {
+          before_data?: Json | null
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          import_job_id: string
+          operation: string
+          organization_id: string
+        }
+        Update: {
+          before_data?: Json | null
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          import_job_id?: string
+          operation?: string
+          organization_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_job_effects_import_job_id_fkey"
+            columns: ["import_job_id"]
+            isOneToOne: false
+            referencedRelation: "import_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_job_effects_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "import_job_effects_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_jobs: {
+        Row: {
+          completed_at: string | null
+          content_hash: string
+          created_at: string
+          created_by: string | null
+          file_name: string
+          id: string
+          idempotency_key: string
+          import_type: string
+          mapping: Json
+          mode: string
+          organization_id: string
+          status: string
+          summary: Json
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          content_hash: string
+          created_at?: string
+          created_by?: string | null
+          file_name: string
+          id?: string
+          idempotency_key: string
+          import_type: string
+          mapping?: Json
+          mode?: string
+          organization_id: string
+          status?: string
+          summary?: Json
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          content_hash?: string
+          created_at?: string
+          created_by?: string | null
+          file_name?: string
+          id?: string
+          idempotency_key?: string
+          import_type?: string
+          mapping?: Json
+          mode?: string
+          organization_id?: string
+          status?: string
+          summary?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_jobs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "import_jobs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_rows: {
+        Row: {
+          created_at: string
+          id: string
+          import_job_id: string
+          normalized_data: Json | null
+          organization_id: string
+          raw_data: Json
+          row_number: number
+          status: string
+          target_reference: string | null
+          validation_errors: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          import_job_id: string
+          normalized_data?: Json | null
+          organization_id: string
+          raw_data: Json
+          row_number: number
+          status?: string
+          target_reference?: string | null
+          validation_errors?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          import_job_id?: string
+          normalized_data?: Json | null
+          organization_id?: string
+          raw_data?: Json
+          row_number?: number
+          status?: string
+          target_reference?: string | null
+          validation_errors?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_rows_import_job_id_fkey"
+            columns: ["import_job_id"]
+            isOneToOne: false
+            referencedRelation: "import_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_rows_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "import_rows_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       improvement_actions: {
         Row: {
           created_at: string
@@ -4181,6 +4944,54 @@ export type Database = {
           },
         ]
       }
+      integration_connections: {
+        Row: {
+          config: Json
+          created_at: string
+          display_name: string
+          id: string
+          organization_id: string
+          provider_code: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          config?: Json
+          created_at?: string
+          display_name: string
+          id?: string
+          organization_id: string
+          provider_code: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          display_name?: string
+          id?: string
+          organization_id?: string
+          provider_code?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_connections_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "integration_connections_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_entities: {
         Row: {
           ciiu_code: string | null
@@ -4789,6 +5600,321 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      normative_review_artifacts: {
+        Row: {
+          applicability_rule_id: string | null
+          artifact_key: string
+          artifact_type: string
+          assessment_scoring_rule_id: string | null
+          content_snapshot: Json
+          created_at: string
+          created_by: string
+          id: string
+          minimum_standard_id: string | null
+          normative_source_version_id: string | null
+          profile_standard_id: string | null
+          requirement_id: string | null
+          review_status: string
+          risk_methodology_formula_id: string | null
+          risk_methodology_interpretation_rule_id: string | null
+          risk_methodology_version_id: string | null
+          source_path: string | null
+          standard_profile_version_id: string | null
+          supersedes_artifact_id: string | null
+          title: string
+        }
+        Insert: {
+          applicability_rule_id?: string | null
+          artifact_key: string
+          artifact_type: string
+          assessment_scoring_rule_id?: string | null
+          content_snapshot: Json
+          created_at?: string
+          created_by: string
+          id?: string
+          minimum_standard_id?: string | null
+          normative_source_version_id?: string | null
+          profile_standard_id?: string | null
+          requirement_id?: string | null
+          review_status?: string
+          risk_methodology_formula_id?: string | null
+          risk_methodology_interpretation_rule_id?: string | null
+          risk_methodology_version_id?: string | null
+          source_path?: string | null
+          standard_profile_version_id?: string | null
+          supersedes_artifact_id?: string | null
+          title: string
+        }
+        Update: {
+          applicability_rule_id?: string | null
+          artifact_key?: string
+          artifact_type?: string
+          assessment_scoring_rule_id?: string | null
+          content_snapshot?: Json
+          created_at?: string
+          created_by?: string
+          id?: string
+          minimum_standard_id?: string | null
+          normative_source_version_id?: string | null
+          profile_standard_id?: string | null
+          requirement_id?: string | null
+          review_status?: string
+          risk_methodology_formula_id?: string | null
+          risk_methodology_interpretation_rule_id?: string | null
+          risk_methodology_version_id?: string | null
+          source_path?: string | null
+          standard_profile_version_id?: string | null
+          supersedes_artifact_id?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "normative_review_artifacts_applicability_rule_id_fkey"
+            columns: ["applicability_rule_id"]
+            isOneToOne: false
+            referencedRelation: "applicability_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_review_artifacts_assessment_scoring_rule_id_fkey"
+            columns: ["assessment_scoring_rule_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_scoring_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_review_artifacts_minimum_standard_id_fkey"
+            columns: ["minimum_standard_id"]
+            isOneToOne: false
+            referencedRelation: "minimum_standards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_review_artifacts_normative_source_version_id_fkey"
+            columns: ["normative_source_version_id"]
+            isOneToOne: false
+            referencedRelation: "normative_source_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_review_artifacts_profile_standard_id_fkey"
+            columns: ["profile_standard_id"]
+            isOneToOne: false
+            referencedRelation: "profile_standards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_review_artifacts_requirement_id_fkey"
+            columns: ["requirement_id"]
+            isOneToOne: false
+            referencedRelation: "requirements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_review_artifacts_risk_methodology_formula_id_fkey"
+            columns: ["risk_methodology_formula_id"]
+            isOneToOne: false
+            referencedRelation: "risk_methodology_formulas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_review_artifacts_risk_methodology_interpretation_fkey"
+            columns: ["risk_methodology_interpretation_rule_id"]
+            isOneToOne: false
+            referencedRelation: "risk_methodology_interpretation_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_review_artifacts_risk_methodology_version_id_fkey"
+            columns: ["risk_methodology_version_id"]
+            isOneToOne: false
+            referencedRelation: "risk_methodology_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_review_artifacts_standard_profile_version_id_fkey"
+            columns: ["standard_profile_version_id"]
+            isOneToOne: false
+            referencedRelation: "standard_profile_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_review_artifacts_supersedes_artifact_id_fkey"
+            columns: ["supersedes_artifact_id"]
+            isOneToOne: false
+            referencedRelation: "normative_review_artifacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      normative_review_audit: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          after_data: Json | null
+          before_data: Json | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      normative_review_decisions: {
+        Row: {
+          artifact_id: string
+          content_snapshot: Json
+          decided_at: string
+          decided_by: string
+          decision: string
+          id: string
+          note: string
+          proposal_id: string | null
+        }
+        Insert: {
+          artifact_id: string
+          content_snapshot: Json
+          decided_at?: string
+          decided_by: string
+          decision: string
+          id?: string
+          note: string
+          proposal_id?: string | null
+        }
+        Update: {
+          artifact_id?: string
+          content_snapshot?: Json
+          decided_at?: string
+          decided_by?: string
+          decision?: string
+          id?: string
+          note?: string
+          proposal_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "normative_review_decisions_artifact_id_fkey"
+            columns: ["artifact_id"]
+            isOneToOne: false
+            referencedRelation: "normative_review_artifacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_review_decisions_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "normative_review_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      normative_review_proposals: {
+        Row: {
+          artifact_id: string
+          created_at: string
+          id: string
+          proposed_by: string
+          proposed_content: Json
+          rationale: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          successor_artifact_id: string | null
+        }
+        Insert: {
+          artifact_id: string
+          created_at?: string
+          id?: string
+          proposed_by: string
+          proposed_content: Json
+          rationale: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          successor_artifact_id?: string | null
+        }
+        Update: {
+          artifact_id?: string
+          created_at?: string
+          id?: string
+          proposed_by?: string
+          proposed_content?: Json
+          rationale?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          successor_artifact_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "normative_review_proposals_artifact_id_fkey"
+            columns: ["artifact_id"]
+            isOneToOne: false
+            referencedRelation: "normative_review_artifacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_review_proposals_successor_artifact_id_fkey"
+            columns: ["successor_artifact_id"]
+            isOneToOne: false
+            referencedRelation: "normative_review_artifacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      normative_reviewer_roles: {
+        Row: {
+          granted_at: string
+          granted_by: string | null
+          id: string
+          reason: string
+          role: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          reason: string
+          role: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          reason?: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       normative_source_versions: {
         Row: {
@@ -7112,6 +8238,59 @@ export type Database = {
           },
         ]
       }
+      risk_methodology_review_decisions: {
+        Row: {
+          decided_at: string
+          decided_by: string
+          decision: string
+          id: string
+          methodology_version_id: string
+          note: string
+        }
+        Insert: {
+          decided_at?: string
+          decided_by: string
+          decision: string
+          id?: string
+          methodology_version_id: string
+          note: string
+        }
+        Update: {
+          decided_at?: string
+          decided_by?: string
+          decision?: string
+          id?: string
+          methodology_version_id?: string
+          note?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_methodology_review_decisions_methodology_version_id_fkey"
+            columns: ["methodology_version_id"]
+            isOneToOne: false
+            referencedRelation: "risk_methodology_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_methodology_reviewers: {
+        Row: {
+          created_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       risk_methodology_variables: {
         Row: {
           code: string
@@ -7351,6 +8530,54 @@ export type Database = {
           },
           {
             foreignKeyName: "roles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saas_support_sessions: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          id: string
+          organization_id: string
+          reason: string
+          reinova_admin_user_id: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          organization_id: string
+          reason: string
+          reinova_admin_user_id: string
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          organization_id?: string
+          reason?: string
+          reinova_admin_user_id?: string
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saas_support_sessions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "saas_support_sessions_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -8480,6 +9707,10 @@ export type Database = {
         }
         Returns: string
       }
+      approve_classification_change: {
+        Args: { p_proposal_id: string }
+        Returns: string
+      }
       can: {
         Args: {
           p_organization_id: string
@@ -8488,9 +9719,50 @@ export type Database = {
         }
         Returns: boolean
       }
+      complete_assessment: {
+        Args: { p_assessment_id: string }
+        Returns: number
+      }
       complete_organization_onboarding: {
         Args: { p_idempotency_key: string; p_organization_id: string }
         Returns: Json
+      }
+      create_normative_review_artifact: {
+        Args: {
+          p_artifact_key: string
+          p_artifact_type: string
+          p_content: Json
+          p_source_path: string
+          p_title: string
+        }
+        Returns: string
+      }
+      create_normative_review_proposal: {
+        Args: { p_artifact_id: string; p_content: Json; p_rationale: string }
+        Returns: string
+      }
+      create_organization_standard_snapshot: {
+        Args: {
+          p_classification_id?: string
+          p_organization_id: string
+          p_reason?: string
+          p_snapshot_date?: string
+          p_snapshot_type: string
+        }
+        Returns: string
+      }
+      decide_normative_review: {
+        Args: {
+          p_artifact_id: string
+          p_decision: string
+          p_note: string
+          p_proposal_id?: string
+        }
+        Returns: string
+      }
+      evaluate_organization_applicability: {
+        Args: { p_as_of?: string; p_organization_id: string }
+        Returns: number
       }
       get_request_auth_context: {
         Args: never
@@ -8498,6 +9770,19 @@ export type Database = {
           role: string
           user_id: string
         }[]
+      }
+      manage_normative_reviewer: {
+        Args: {
+          p_email: string
+          p_reason: string
+          p_role: string
+          p_status: string
+        }
+        Returns: string
+      }
+      reject_classification_change: {
+        Args: { p_note: string; p_proposal_id: string }
+        Returns: string
       }
       save_organization_onboarding_step: {
         Args: { p_data: Json; p_organization_id: string; p_step: number }
@@ -8635,4 +9920,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

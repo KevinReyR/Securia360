@@ -44,4 +44,4 @@ npm run build
 
 El núcleo SaaS ya está versionado en `supabase/migrations` e incluye perfiles, organizaciones, membresías, RBAC, razones sociales, sedes, áreas, caracterización, auditoría y el bucket privado de avatares. Consulta `docs/database/schema.md` y `docs/security/multi-tenancy.md`.
 
-Los cambios remotos deben aplicarse siempre desde las migraciones versionadas. La prueba `src/tests/data-api-rls.test.ts` usa usuarios efímeros y una clave publicable para comprobar, a través de Auth y PostgREST reales, que A/Org A está permitido, A/Org B está denegado y que un usuario existente puede aceptar una segunda membresía. Solo se ejecuta cuando están definidas sus variables `SUPABASE_TEST_*`; en CI normal queda omitida.
+Los cambios remotos se aplican siempre desde migraciones versionadas y forward-only. Mizpa360 (`khnsudlcrpljlnvtynki`) solo recibe migraciones desde Codex cuando el usuario lo solicita explícitamente, tras revisar historial, drift, backup/PITR y RLS. Las pruebas remotas con usuarios o Storage efímero requieren un entorno aislado autorizado y nunca se ejecutan contra Mizpa360.

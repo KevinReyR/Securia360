@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { areaSchema, onboardingSchema, onboardingSitesSchema, organizationSchema } from "./schemas";
+import { areaSchema, documentMutationSchema, documentVersionUploadSchema, onboardingSchema, onboardingSitesSchema, organizationSchema } from "./schemas";
 
 describe("organizationSchema", () => {
   it("accepts a normalized tenant identifier", () => {
@@ -8,6 +8,20 @@ describe("organizationSchema", () => {
 
   it("rejects identifiers that cannot be used in routes", () => {
     expect(organizationSchema.safeParse({ name: "Empresa", slug: "Empresa Colombia", nit: "" }).success).toBe(false);
+  });
+});
+
+describe("document mutation schemas", () => {
+  const ids = { organizationId: "10000000-0000-4000-8000-000000000001", documentId: "10000000-0000-4000-8000-000000000002" };
+
+  it("only accepts UUID identifiers for versioning", () => {
+    expect(documentVersionUploadSchema.safeParse(ids).success).toBe(true);
+    expect(documentVersionUploadSchema.safeParse({ ...ids, documentId: "foreign-document" }).success).toBe(false);
+  });
+
+  it("requires the tenant and document identity for a mutation", () => {
+    expect(documentMutationSchema.safeParse(ids).success).toBe(true);
+    expect(documentMutationSchema.safeParse({ documentId: ids.documentId }).success).toBe(false);
   });
 });
 

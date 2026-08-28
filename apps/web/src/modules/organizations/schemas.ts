@@ -63,6 +63,16 @@ export const documentUploadSchema = z.object({
   title: z.string().trim().min(2).max(180), entity_type: z.string().trim().regex(/^[a-z][a-z0-9_]{0,63}$/), entity_id: z.uuid(), expires_at: z.preprocess((value) => value === "" ? null : value, z.string().datetime().nullable()),
 });
 
+export const documentVersionUploadSchema = z.object({
+  organizationId: z.uuid(),
+  documentId: z.uuid(),
+});
+
+export const documentMutationSchema = z.object({
+  organizationId: z.uuid(),
+  documentId: z.uuid(),
+});
+
 export const improvementActionSchema = z.object({
   action_id: z.uuid(),
   title: z.string().trim().min(2).max(240),
