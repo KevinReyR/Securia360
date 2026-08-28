@@ -44,6 +44,13 @@ export const permissionCodes = [
   "planning.manage",
   "tasks.update_status",
   "tasks.approve",
+  "training.read",
+  "training.manage",
+  "training.validate",
+  "training.participants",
+  "ppe.read",
+  "ppe.manage",
+  "ppe.validate",
 ] as const;
 
 export type PermissionCode = (typeof permissionCodes)[number];

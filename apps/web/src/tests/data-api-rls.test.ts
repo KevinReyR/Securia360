@@ -245,4 +245,29 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
     expect((await userB.storage.from("organization-documents").upload(fixture.documentPath, new Blob(["forbidden"], { type: "application/pdf" }), { contentType: "application/pdf", upsert: false })).error).not.toBeNull();
     await Promise.all([userA.auth.signOut(), userB.auth.signOut()]);
   }, 30_000);
+
+  it("keeps PPE stock atomic and denies PPE records across tenants", async () => {
+    const userA = newPublicClient(); const userB = newPublicClient();
+    await assertNoError(await userA.auth.signInWithPassword({ email: fixture.userAEmail, password }), "sign in PPE User A");
+    await assertNoError(await userB.auth.signInWithPassword({ email: fixture.userBEmail, password }), "sign in PPE User B");
+    const catalog = await userA.from("ppe_catalog").insert({ organization_id: fixture.organizationA, code: `CI-PPE-${runId.slice(0, 8)}`, name: "CI helmet", category: "head", useful_life_days: 30 }).select("id").single();
+    expect(catalog.error).toBeNull();
+    const inventory = await userA.rpc("create_ppe_inventory", { p_organization_id: fixture.organizationA, p_site_id: fixture.siteA, p_ppe_catalog_id: catalog.data!.id, p_size_label: "M", p_reorder_point: 1 });
+    expect(inventory.error).toBeNull();
+    expect((await userA.rpc("record_ppe_inventory_movement", { p_inventory_id: inventory.data!, p_movement_type: "purchase", p_quantity: 1, p_note: "fixture", p_evidence_document_version_id: undefined })).error).toBeNull();
+    const assignment = await userA.from("ppe_assignments").insert({ organization_id: fixture.organizationA, organization_member_id: fixture.memberA, site_id: fixture.siteA, ppe_catalog_id: catalog.data!.id, size_label: "M", created_by: fixture.userAId }).select("id").single();
+    expect(assignment.error).toBeNull();
+    const [first, second] = await Promise.all([
+      userA.rpc("deliver_ppe", { p_assignment_id: assignment.data!.id, p_inventory_id: inventory.data!, p_quantity: 1, p_evidence_document_version_id: undefined, p_delivery_kind: "initial" }),
+      userA.rpc("deliver_ppe", { p_assignment_id: assignment.data!.id, p_inventory_id: inventory.data!, p_quantity: 1, p_evidence_document_version_id: undefined, p_delivery_kind: "replacement" }),
+    ]);
+    expect([first.error, second.error].filter(Boolean)).toHaveLength(1);
+    const deliveryId = (first.data ?? second.data)!;
+    expect((await userA.from("ppe_inventory").select("quantity_on_hand").eq("id", inventory.data!).single()).data?.quantity_on_hand).toBe(0);
+    expect((await userA.rpc("accept_ppe_delivery", { p_delivery_id: deliveryId })).error).toBeNull();
+    expect((await userB.from("ppe_inventory").select("id").eq("id", inventory.data!)).data).toEqual([]);
+    expect((await userB.from("ppe_assignments").select("id").eq("id", assignment.data!.id)).data).toEqual([]);
+    expect((await userB.rpc("record_ppe_inventory_movement", { p_inventory_id: inventory.data!, p_movement_type: "purchase", p_quantity: 1, p_note: "cross tenant", p_evidence_document_version_id: undefined })).error).not.toBeNull();
+    await Promise.all([userA.auth.signOut(), userB.auth.signOut()]);
+  }, 30_000);
 });

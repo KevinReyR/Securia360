@@ -3,7 +3,7 @@
 ## Pirámide
 
 - Unitarias: esquemas Zod, permisos, claves de consulta, navegación segura, fórmulas y helpers puros.
-- Integración: membresías, RLS/Data API, Storage, outbox, roles y restricciones entre tenants. `data-api-rls.test.ts` conserva factories efímeras para un entorno aislado configurado explícitamente; no se ejecuta contra Mizpa360 ni desde GitHub Actions.
+- Integración: membresías, RLS/Data API, Storage, outbox, roles y restricciones entre tenants. `data-api-rls.test.ts` conserva factories efímeras para un entorno aislado configurado explícitamente; incluye concurrencia de entrega EPP y denegación cruzada. No se ejecuta contra Mizpa360 ni desde GitHub Actions.
 - E2E: login, logout, onboarding reanudable, cambio de organización, CRUD de estructura, carga/descarga firmada/archivo de documento, asignación de rol por sede, flujo brecha → acción → evidencia → validación → cierre y denegación entre tenants. Playwright se usa localmente o con un entorno aislado autorizado; no crea datos en Mizpa360.
 
 Las factories usan UUID por ejecución, prefijos `ci-rls-` y `e2e-`, y nunca datos reales. Se omiten si no existen variables explícitas de un entorno aislado. Nunca se ejecutan contra Mizpa360 ni contra producción.

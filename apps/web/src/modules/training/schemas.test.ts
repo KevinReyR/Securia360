@@ -1,0 +1,3 @@
+import {describe,expect,it} from "vitest"; import {gradeSchema,sessionSchema} from "./schemas";
+const id="8cd058fb-6a76-4af6-8e16-9260442b6b9f";
+describe("training validation",()=>{it("validates UTC sessions and objective answers",()=>{expect(sessionSchema.safeParse({plan_id:id,catalog_id:id,title:"Inducción SST",starts_at:"2026-09-01T12:00:00.000Z",ends_at:"2026-09-01T13:00:00.000Z"}).success).toBe(true);expect(gradeSchema.safeParse({enrollment_id:id,template_id:id,answers:"[]"}).success).toBe(true);expect(gradeSchema.safeParse({enrollment_id:id,template_id:id,answers:"{}"}).success).toBe(false);});});

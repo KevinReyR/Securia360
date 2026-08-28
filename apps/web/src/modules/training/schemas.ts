@@ -1,0 +1,11 @@
+import { z } from "zod";
+export const id=z.uuid(); const text=z.string().trim().min(3).max(2000);
+export const catalogSchema=z.object({code:z.string().trim().regex(/^[A-Z0-9][A-Z0-9_-]{1,80}$/),title:text,duration_minutes:z.coerce.number().int().positive().optional(),validity_days:z.coerce.number().int().positive().optional()});
+export const planSchema=z.object({year:z.coerce.number().int().min(2000).max(2200),title:text,description:z.string().trim().max(2000).optional(),training_catalog_id:id});
+const utcDate=z.string().trim().refine(value=>!Number.isNaN(new Date(value).valueOf()),"Fecha inválida.").transform(value=>new Date(value).toISOString());
+export const sessionSchema=z.object({plan_id:id,catalog_id:id,title:text,starts_at:utcDate,ends_at:utcDate,capacity:z.coerce.number().int().positive().optional()}).refine(x=>x.ends_at>x.starts_at,{message:"La sesión debe terminar después de iniciar."});
+export const enrollmentSchema=z.object({session_id:id,member_id:id});
+export const attendanceSchema=z.object({enrollment_id:id,status:z.enum(["present","absent","excused"])});
+export const templateSchema=z.object({catalog_id:id,title:text,passing_percent:z.coerce.number().min(0).max(100)});
+export const questionSchema=z.object({template_id:id,prompt:text,weight:z.coerce.number().positive(),correct_label:z.string().trim().min(1).max(1000),incorrect_label:z.string().trim().min(1).max(1000)});
+export const gradeSchema=z.object({enrollment_id:id,template_id:id,answers:z.string().min(2).max(20000)}).transform((value,ctx)=>{try{const answers=JSON.parse(value.answers);if(!Array.isArray(answers))throw new Error();return {...value,answers};}catch{ctx.addIssue({code:"custom",message:"Respuestas inválidas."});return z.NEVER;}});

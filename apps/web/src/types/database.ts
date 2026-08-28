@@ -7018,12 +7018,15 @@ export type Database = {
           created_by: string | null
           expected_replacement_at: string | null
           id: string
+          life_expires_at: string | null
           organization_id: string
           organization_member_id: string
           ppe_catalog_id: string
+          replacement_required: boolean
           site_id: string | null
           size_label: string
           status: string
+          updated_at: string
         }
         Insert: {
           assigned_at?: string
@@ -7031,12 +7034,15 @@ export type Database = {
           created_by?: string | null
           expected_replacement_at?: string | null
           id?: string
+          life_expires_at?: string | null
           organization_id: string
           organization_member_id: string
           ppe_catalog_id: string
+          replacement_required?: boolean
           site_id?: string | null
           size_label?: string
           status?: string
+          updated_at?: string
         }
         Update: {
           assigned_at?: string
@@ -7044,12 +7050,15 @@ export type Database = {
           created_by?: string | null
           expected_replacement_at?: string | null
           id?: string
+          life_expires_at?: string | null
           organization_id?: string
           organization_member_id?: string
           ppe_catalog_id?: string
+          replacement_required?: boolean
           site_id?: string | null
           size_label?: string
           status?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -7233,6 +7242,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           delivered_at: string
+          delivery_kind: string
           evidence_document_version_id: string | null
           id: string
           inventory_id: string
@@ -7246,6 +7256,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           delivered_at?: string
+          delivery_kind?: string
           evidence_document_version_id?: string | null
           id?: string
           inventory_id: string
@@ -7259,6 +7270,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           delivered_at?: string
+          delivery_kind?: string
           evidence_document_version_id?: string | null
           id?: string
           inventory_id?: string
@@ -7427,6 +7439,81 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ppe_inventory_movements: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          delivery_id: string | null
+          evidence_document_version_id: string | null
+          id: string
+          inventory_id: string
+          movement_type: string
+          note: string | null
+          organization_id: string
+          quantity_delta: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          delivery_id?: string | null
+          evidence_document_version_id?: string | null
+          id?: string
+          inventory_id: string
+          movement_type: string
+          note?: string | null
+          organization_id: string
+          quantity_delta: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          delivery_id?: string | null
+          evidence_document_version_id?: string | null
+          id?: string
+          inventory_id?: string
+          movement_type?: string
+          note?: string | null
+          organization_id?: string
+          quantity_delta?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ppe_inventory_movements_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "ppe_deliveries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_inventory_movements_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_inventory_movements_inventory_id_fkey"
+            columns: ["inventory_id"]
+            isOneToOne: false
+            referencedRelation: "ppe_inventory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ppe_inventory_movements_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "ppe_inventory_movements_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -9107,6 +9194,7 @@ export type Database = {
           code: string
           created_at: string
           created_by: string | null
+          default_passing_percent: number
           description: string | null
           duration_minutes: number | null
           id: string
@@ -9120,6 +9208,7 @@ export type Database = {
           code: string
           created_at?: string
           created_by?: string | null
+          default_passing_percent?: number
           description?: string | null
           duration_minutes?: number | null
           id?: string
@@ -9133,6 +9222,7 @@ export type Database = {
           code?: string
           created_at?: string
           created_by?: string | null
+          default_passing_percent?: number
           description?: string | null
           duration_minutes?: number | null
           id?: string
@@ -9289,6 +9379,231 @@ export type Database = {
           },
         ]
       }
+      training_evaluation_options: {
+        Row: {
+          display_order: number
+          id: string
+          is_correct: boolean
+          label: string
+          organization_id: string
+          question_id: string
+        }
+        Insert: {
+          display_order: number
+          id?: string
+          is_correct?: boolean
+          label: string
+          organization_id: string
+          question_id: string
+        }
+        Update: {
+          display_order?: number
+          id?: string
+          is_correct?: boolean
+          label?: string
+          organization_id?: string
+          question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_evaluation_options_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "training_evaluation_options_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_evaluation_options_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "training_evaluation_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_evaluation_questions: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          organization_id: string
+          prompt: string
+          template_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          display_order: number
+          id?: string
+          organization_id: string
+          prompt: string
+          template_id: string
+          weight: number
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          organization_id?: string
+          prompt?: string
+          template_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_evaluation_questions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "training_evaluation_questions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_evaluation_questions_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "training_evaluation_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_evaluation_responses: {
+        Row: {
+          id: string
+          option_id: string
+          organization_id: string
+          question_id: string
+          selected_at: string
+          training_evaluation_id: string
+        }
+        Insert: {
+          id?: string
+          option_id: string
+          organization_id: string
+          question_id: string
+          selected_at?: string
+          training_evaluation_id: string
+        }
+        Update: {
+          id?: string
+          option_id?: string
+          organization_id?: string
+          question_id?: string
+          selected_at?: string
+          training_evaluation_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_evaluation_responses_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "training_evaluation_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_evaluation_responses_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "training_evaluation_responses_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_evaluation_responses_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "training_evaluation_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_evaluation_responses_training_evaluation_id_fkey"
+            columns: ["training_evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "training_evaluations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_evaluation_templates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          organization_id: string
+          passing_percent: number
+          status: string
+          title: string
+          training_catalog_id: string
+          updated_at: string
+          version_number: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          organization_id: string
+          passing_percent: number
+          status?: string
+          title: string
+          training_catalog_id: string
+          updated_at?: string
+          version_number: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          organization_id?: string
+          passing_percent?: number
+          status?: string
+          title?: string
+          training_catalog_id?: string
+          updated_at?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_evaluation_templates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "training_evaluation_templates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_evaluation_templates_training_catalog_id_fkey"
+            columns: ["training_catalog_id"]
+            isOneToOne: false
+            referencedRelation: "training_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       training_evaluations: {
         Row: {
           created_at: string
@@ -9300,6 +9615,9 @@ export type Database = {
           organization_id: string
           passed: boolean
           score: number
+          scoring_snapshot: Json
+          status: string
+          template_id: string | null
           training_enrollment_id: string
         }
         Insert: {
@@ -9312,6 +9630,9 @@ export type Database = {
           organization_id: string
           passed: boolean
           score: number
+          scoring_snapshot?: Json
+          status?: string
+          template_id?: string | null
           training_enrollment_id: string
         }
         Update: {
@@ -9324,6 +9645,9 @@ export type Database = {
           organization_id?: string
           passed?: boolean
           score?: number
+          scoring_snapshot?: Json
+          status?: string
+          template_id?: string | null
           training_enrollment_id?: string
         }
         Relationships: [
@@ -9346,6 +9670,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_evaluations_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "training_evaluation_templates"
             referencedColumns: ["id"]
           },
           {
@@ -9698,6 +10029,10 @@ export type Database = {
     }
     Functions: {
       accept_my_invitations: { Args: never; Returns: number }
+      accept_ppe_delivery: {
+        Args: { p_delivery_id: string }
+        Returns: undefined
+      }
       add_invited_member: {
         Args: {
           p_organization_id: string
@@ -9751,12 +10086,32 @@ export type Database = {
         }
         Returns: string
       }
+      create_ppe_inventory: {
+        Args: {
+          p_organization_id: string
+          p_ppe_catalog_id: string
+          p_reorder_point?: number
+          p_site_id: string
+          p_size_label?: string
+        }
+        Returns: string
+      }
       decide_normative_review: {
         Args: {
           p_artifact_id: string
           p_decision: string
           p_note: string
           p_proposal_id?: string
+        }
+        Returns: string
+      }
+      deliver_ppe: {
+        Args: {
+          p_assignment_id: string
+          p_delivery_kind?: string
+          p_evidence_document_version_id?: string
+          p_inventory_id: string
+          p_quantity: number
         }
         Returns: string
       }
@@ -9771,6 +10126,23 @@ export type Database = {
           user_id: string
         }[]
       }
+      grade_training_evaluation: {
+        Args: {
+          p_answers: Json
+          p_enrollment_id: string
+          p_template_id: string
+        }
+        Returns: string
+      }
+      inspect_ppe: {
+        Args: {
+          p_assignment_id: string
+          p_evidence_document_version_id?: string
+          p_notes?: string
+          p_status: string
+        }
+        Returns: string
+      }
       manage_normative_reviewer: {
         Args: {
           p_email: string
@@ -9780,8 +10152,26 @@ export type Database = {
         }
         Returns: string
       }
+      record_ppe_inventory_movement: {
+        Args: {
+          p_evidence_document_version_id?: string
+          p_inventory_id: string
+          p_movement_type: string
+          p_note?: string
+          p_quantity: number
+        }
+        Returns: string
+      }
       reject_classification_change: {
         Args: { p_note: string; p_proposal_id: string }
+        Returns: string
+      }
+      retire_ppe: {
+        Args: {
+          p_assignment_id: string
+          p_evidence_document_version_id?: string
+          p_reason: string
+        }
         Returns: string
       }
       save_organization_onboarding_step: {

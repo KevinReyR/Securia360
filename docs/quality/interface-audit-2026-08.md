@@ -15,10 +15,11 @@ Fecha: 2026-08-27. Alcance: Etapa 40A. Esta matriz diferencia explícitamente el
 | Documentos, versiones y evidencias | Documentos | Cargar, listar, filtrar, paginar, abrir detalle, crear versión, descargar enlace firmado, archivar y eliminar lógicamente | `documents.read/create/update/delete` | Validadores de identidad; aislamiento Data API configurable | Disponible: falta integración Storage/E2E |
 | Brechas y acciones | Planificación | Consultar brechas y acciones | `improvements.read` | Sin prueba de flujo | Lectura únicamente; no marcar como completo |
 | Riesgos y controles | Riesgos | Consultar controles y registrar verificación | `risks.read/validate` | Sin prueba de flujo | Parcial; faltan creación y reevaluación |
+| EPP | EPP | Catálogo → inventario → asignación → entrega/reposición → aceptación → inspección → baja | `ppe.read/manage/validate` y aceptación propia | Validadores, concurrencia/RLS configurable y navegación | Disponible; integración remota se ejecuta solo en entorno aislado autorizado |
 
 ## Dominios con datos, pero sin flujo web mínimo
 
-Las tablas ya existen y están protegidas con RLS, pero sus rutas aún no deben activarse en la navegación: fuentes y requisitos normativos, estándares/perfiles/clasificación/aplicabilidad/snapshots/evaluaciones, plan anual/tareas, matriz completa de riesgos, capacitaciones, EPP, contratistas, incidentes, salud ocupacional, emergencias, comités, auditorías, indicadores, notificaciones, automatizaciones, importaciones, Copilot y administración SaaS.
+Las tablas ya existen y están protegidas con RLS, pero sus rutas aún no deben activarse en la navegación: fuentes y requisitos normativos, estándares/perfiles/clasificación/aplicabilidad/snapshots/evaluaciones, contratistas, incidentes, salud ocupacional, emergencias, comités, auditorías, indicadores, notificaciones, automatizaciones, importaciones, Copilot y administración SaaS.
 
 ## Priorización
 
