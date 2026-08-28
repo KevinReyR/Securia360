@@ -76,6 +76,12 @@ export const permissionCodes = [
   "analytics.read",
   "analytics.manage",
   "analytics.approve",
+  "notifications.read",
+  "notifications.manage",
+  "notifications.templates_approve",
+  "automations.read",
+  "automations.manage",
+  "automations.approve",
 ] as const;
 
 export type PermissionCode = (typeof permissionCodes)[number];

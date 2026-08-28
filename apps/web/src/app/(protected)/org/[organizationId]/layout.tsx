@@ -14,5 +14,5 @@ export default async function OrganizationLayout({ children, params }: { childre
   const { data: profile } = await supabase.from("profiles").select("first_name,last_name").eq("id", tenant.userId).maybeSingle();
   const displayName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") || "Usuario Securia360";
   const initials = [profile?.first_name, profile?.last_name].filter(Boolean).map((part) => part!.slice(0, 1)).join("").toUpperCase() || tenant.email.slice(0, 2).toUpperCase() || "US";
-  return <AppShell organizationId={organizationId} organizations={organizations} user={{ displayName, email: tenant.email, initials }}>{children}</AppShell>;
+  return <AppShell organizationId={organizationId} organizations={organizations} user={{ id: tenant.userId, displayName, email: tenant.email, initials }}>{children}</AppShell>;
 }

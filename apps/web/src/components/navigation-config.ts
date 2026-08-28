@@ -29,7 +29,7 @@ export const navigationItems = [
   { label: "Gobierno y auditoría", suffix: "governance", icon: ClipboardText, available: true, keywords: ["comités", "actas", "auditorías", "revisión por la dirección"] },
   { label: "Documentos", suffix: "documents", icon: Files, available: true, keywords: ["evidencias", "archivos"] },
   { label: "Analítica", suffix: "analytics", icon: ChartLineUp, available: true, keywords: ["indicadores", "reportes"] },
-  { label: "Automatizaciones", icon: Lightning, available: false, keywords: ["flujos", "alertas"] },
+  { label: "Automatizaciones", suffix: "automations", icon: Lightning, available: true, keywords: ["flujos", "alertas"] },
   { label: "Securia Copilot", icon: Sparkle, available: false, keywords: ["ia", "asistente"] },
   { label: "Configuración", suffix: "settings/organization", icon: Gear, available: true, keywords: ["empresa", "estructura", "perfil"] },
 ] as const;

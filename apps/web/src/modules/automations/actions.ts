@@ -1,0 +1,21 @@
+"use server";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { z } from "zod";
+import { can } from "@/modules/auth/permissions";
+import { requireAuthenticatedUser } from "@/modules/organizations/tenant";
+import { automationDefinition, automationIdSchema, automationRuleSchema, automationStatusSchema, automationVersionSchema } from "./schemas";
+
+const id = z.uuid(); const path = (org: string, status = "saved") => `/org/${org}/automations?status=${status}`;
+const values = (f: FormData) => Object.fromEntries(f); async function db() { return (await requireAuthenticatedUser()).supabase as any; }
+async function guard(org: string, permission: "automations.read" | "automations.manage" | "automations.approve") { if (!(await can(org, permission))) redirect(path(org, "forbidden")); }
+function org(f: FormData) { return id.parse(f.get("organizationId")); }
+async function done(organizationId: string, status: string) { revalidatePath(`/org/${organizationId}/automations`); revalidatePath(`/org/${organizationId}`, "layout"); redirect(path(organizationId, status)); }
+
+export async function createAutomationRule(f: FormData) { const organizationId = org(f); const parsed = automationRuleSchema.safeParse(values(f)); if (!parsed.success) return done(organizationId,"invalid"); await guard(organizationId,"automations.manage"); const { error } = await (await db()).from("automation_rules").insert({ organization_id: organizationId, ...parsed.data, status: "draft" }); return done(organizationId, error ? "error" : "saved"); }
+export async function createAutomationVersion(f: FormData) { const organizationId = org(f); const parsed = automationVersionSchema.safeParse(values(f)); if (!parsed.success) return done(organizationId,"invalid"); await guard(organizationId,"automations.manage"); const { conditions, action } = automationDefinition(parsed.data); const { error } = await (await db()).from("automation_rule_versions").insert({ organization_id: organizationId, automation_rule_id: parsed.data.automation_rule_id, version_number: parsed.data.version_number, event_type: parsed.data.event_type, conditions, action, status: "draft" }); return done(organizationId,error ? "error" : "saved"); }
+export async function approveAutomationVersion(f: FormData) { const organizationId = org(f); const parsed = automationIdSchema.safeParse({ id: f.get("id") }); if (!parsed.success) return done(organizationId,"invalid"); await guard(organizationId,"automations.approve"); const { error } = await (await db()).from("automation_rule_versions").update({ status: "approved" }).eq("id",parsed.data.id).eq("organization_id",organizationId); return done(organizationId,error ? "error" : "approved"); }
+export async function setAutomationStatus(f: FormData) { const organizationId=org(f); const parsed=automationStatusSchema.safeParse({ id:f.get("id"),status:f.get("status") }); if(!parsed.success) return done(organizationId,"invalid"); await guard(organizationId, parsed.data.status === "emergency_stopped" || parsed.data.status === "active" ? "automations.approve" : "automations.manage"); const { error }=await (await db()).from("automation_rules").update({status:parsed.data.status}).eq("id",parsed.data.id).eq("organization_id",organizationId); return done(organizationId,error?"error":"saved"); }
+export async function dryRunAutomation(f: FormData) { const organizationId=org(f); const version=id.safeParse(f.get("versionId")); const event=id.safeParse(f.get("eventId")); if(!version.success||!event.success) return done(organizationId,"invalid"); await guard(organizationId,"automations.manage"); const {error}=await (await db()).rpc("request_automation_dry_run",{p_rule_version_id:version.data,p_event_id:event.data}); return done(organizationId,error?"error":"dry-run"); }
+export async function retryAutomationExecution(f: FormData) { const organizationId=org(f); const parsed=automationIdSchema.safeParse({id:f.get("id")}); if(!parsed.success) return done(organizationId,"invalid"); await guard(organizationId,"automations.approve"); const {error}=await (await db()).rpc("retry_automation_execution",{p_execution_id:parsed.data.id}); return done(organizationId,error?"error":"retry-queued"); }

@@ -22,8 +22,8 @@
 | Salud ocupacional | conceptos de aptitud, restricciones, programas y decisiones confirmadas | Datos mínimos, sin historias clínicas ni diagnósticos. |
 | Emergencias | escenarios, recursos, brigadas, planes, simulacros, resultados, hallazgos y acciones | Preparación y simulacros trazables por sede, con planes versionados y acciones verificables. |
 | Gobierno y analítica | comités, firmas internas de actas, auditorías, revisión por la dirección e indicadores versionados | Históricos, segregación de aprobación y resultados reproducibles por período. |
-| Notificaciones | preferencias, plantillas, bandeja y cola de entrega | Bandeja privada e idempotencia por evento lógico. |
-| Automatizaciones | reglas, versiones y ejecuciones | Motor declarativo limitado, observable e idempotente. |
+| Notificaciones | preferencias, plantillas, bandeja, entregas y `notification_event_consumptions` | Bandeja privada, consumo idempotente independiente del outbox, quiet hours solo para correo y Realtime limitado al destinatario. |
+| Automatizaciones | `automation_rules`, versiones y ejecuciones | Motor declarativo, versionado, con apagado de emergencia, cron, reintentos e idempotencia por evento. |
 
 ## Convenciones
 
@@ -71,6 +71,8 @@ Las entidades normativas (`normative_sources`, `requirements`, `minimum_standard
 - `20260827070000_add_minimal_occupational_health.sql`: agrega salud ocupacional mínima y controles de privacidad por rol.
 - `20260828132709_harden_incident_and_occupational_health_workflows.sql`: protege documentos sensibles, transiciones, cierre trazable y confirmación humana separada.
 - `20260828134357_harden_emergency_site_scope_and_evidence.sql`: aplica RLS por sede, evidencia privada y eventos de ciclo de vida para emergencias.
+- `20260828202453_harden_notification_inbox.sql`: añade el consumidor idempotente de notificaciones, retry/backoff, RLS de preferencias personales, inmutabilidad de plantillas/mensajes, auditoría y publicación Realtime limitada a la bandeja.
+- `20260828212106_harden_automation_engine.sql`: endurece reglas y versiones, agrega ejecución observable, reintentos, límites, dry-run, cron y apagado de emergencia.
 - `20260826131521_allow_tenant_cascade_cleanup.sql`: conserva esa protección en operaciones directas sin bloquear cascadas del tenant.
 - `20260826131659_skip_audit_during_tenant_cascade.sql`: evita recrear auditoría hija durante el borrado explícito de una organización.
 - `20260826132501_preserve_existing_membership_status.sql`: una reinvitación no degrada membresías activas o suspendidas.

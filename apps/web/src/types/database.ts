@@ -1061,39 +1061,54 @@ export type Database = {
       }
       automation_executions: {
         Row: {
+          attempt_count: number
           automation_rule_version_id: string
+          available_at: string
           completed_at: string | null
           created_at: string
           domain_event_id: string
           dry_run: boolean
           id: string
           idempotency_key: string
+          last_error: string | null
+          locked_at: string | null
+          locked_by: string | null
           organization_id: string
           result: Json
           started_at: string
           status: string
         }
         Insert: {
+          attempt_count?: number
           automation_rule_version_id: string
+          available_at?: string
           completed_at?: string | null
           created_at?: string
           domain_event_id: string
           dry_run?: boolean
           id?: string
           idempotency_key: string
+          last_error?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
           organization_id: string
           result?: Json
           started_at?: string
           status?: string
         }
         Update: {
+          attempt_count?: number
           automation_rule_version_id?: string
+          available_at?: string
           completed_at?: string | null
           created_at?: string
           domain_event_id?: string
           dry_run?: boolean
           id?: string
           idempotency_key?: string
+          last_error?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
           organization_id?: string
           result?: Json
           started_at?: string
@@ -1196,8 +1211,11 @@ export type Database = {
       }
       automation_rules: {
         Row: {
+          activated_at: string | null
           code: string
           created_at: string
+          emergency_stopped_at: string | null
+          emergency_stopped_by: string | null
           id: string
           max_executions_per_hour: number
           name: string
@@ -1206,8 +1224,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          activated_at?: string | null
           code: string
           created_at?: string
+          emergency_stopped_at?: string | null
+          emergency_stopped_by?: string | null
           id?: string
           max_executions_per_hour?: number
           name: string
@@ -1216,8 +1237,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          activated_at?: string | null
           code?: string
           created_at?: string
+          emergency_stopped_at?: string | null
+          emergency_stopped_by?: string | null
           id?: string
           max_executions_per_hour?: number
           name?: string
@@ -6229,6 +6253,73 @@ export type Database = {
           },
         ]
       }
+      notification_event_consumptions: {
+        Row: {
+          attempt_count: number
+          available_at: string
+          completed_at: string | null
+          created_at: string
+          domain_event_id: string
+          id: string
+          idempotency_key: string
+          last_error: string | null
+          locked_at: string | null
+          locked_by: string | null
+          organization_id: string
+          status: string
+        }
+        Insert: {
+          attempt_count?: number
+          available_at?: string
+          completed_at?: string | null
+          created_at?: string
+          domain_event_id: string
+          id?: string
+          idempotency_key: string
+          last_error?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          organization_id: string
+          status?: string
+        }
+        Update: {
+          attempt_count?: number
+          available_at?: string
+          completed_at?: string | null
+          created_at?: string
+          domain_event_id?: string
+          id?: string
+          idempotency_key?: string
+          last_error?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          organization_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_event_consumptions_domain_event_id_fkey"
+            columns: ["domain_event_id"]
+            isOneToOne: true
+            referencedRelation: "domain_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_event_consumptions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "notification_event_consumptions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_preferences: {
         Row: {
           created_at: string
@@ -10290,6 +10381,14 @@ export type Database = {
         }
         Returns: string
       }
+      list_automation_event_candidates: {
+        Args: { p_limit?: number; p_organization_id: string }
+        Returns: {
+          event_type: string
+          id: string
+          occurred_at: string
+        }[]
+      }
       manage_normative_reviewer: {
         Args: {
           p_email: string
@@ -10313,6 +10412,10 @@ export type Database = {
         Args: { p_note: string; p_proposal_id: string }
         Returns: string
       }
+      request_automation_dry_run: {
+        Args: { p_event_id: string; p_rule_version_id: string }
+        Returns: string
+      }
       request_indicator_calculation: {
         Args: {
           p_indicator_version_id: string
@@ -10328,6 +10431,10 @@ export type Database = {
           p_reason: string
         }
         Returns: string
+      }
+      retry_automation_execution: {
+        Args: { p_execution_id: string }
+        Returns: undefined
       }
       save_organization_onboarding_step: {
         Args: { p_data: Json; p_organization_id: string; p_step: number }

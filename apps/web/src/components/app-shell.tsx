@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Buildings, List, MagnifyingGlass, SignOut, UserCircle } from "@phosphor-icons/react";
+import { Buildings, List, MagnifyingGlass, SignOut, UserCircle } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { logout } from "@/app/auth/login/actions";
@@ -8,6 +8,7 @@ import { AppBreadcrumbs } from "./app-breadcrumbs";
 import { NavigationCommand } from "./navigation-command";
 import { SidebarNav } from "./sidebar-nav";
 import { TenantSwitcher } from "./tenant-switcher";
+import { NotificationInbox } from "@/modules/notifications/inbox";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "./ui/drawer";
@@ -19,7 +20,7 @@ type AppShellProps = {
   children: React.ReactNode;
   organizationId: string;
   organizations: OrganizationSummary[];
-  user: { displayName: string; email: string; initials: string };
+  user: { id: string; displayName: string; email: string; initials: string };
 };
 
 function Brand() {
@@ -64,10 +65,7 @@ export function AppShell({ children, organizationId, organizations, user }: AppS
             <div className="hidden min-w-0 sm:block"><TenantSwitcher organizations={organizations} activeId={organizationId} /></div>
             <div className="flex items-center gap-1">
               <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} aria-label="Buscar en Securia360"><MagnifyingGlass size={19} /></Button></TooltipTrigger><TooltipContent>Buscar <span className="ml-1 opacity-70">Ctrl K</span></TooltipContent></Tooltip>
-              <DropdownMenu>
-                <Tooltip><TooltipTrigger asChild><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="Notificaciones"><Bell size={19} /></Button></DropdownMenuTrigger></TooltipTrigger><TooltipContent>Notificaciones</TooltipContent></Tooltip>
-                <DropdownMenuContent align="end" className="w-80"><DropdownMenuLabel>Notificaciones</DropdownMenuLabel><DropdownMenuSeparator /><div className="px-3 py-7 text-center"><div className="mx-auto grid size-9 place-items-center rounded-lg bg-[var(--muted-surface)] text-[var(--muted)]"><Bell size={18} /></div><p className="mt-3 text-sm font-semibold">Todo al día</p><p className="mt-1 text-xs leading-5 text-[var(--muted)]">Las alertas operativas aparecerán aquí.</p></div></DropdownMenuContent>
-              </DropdownMenu>
+              <NotificationInbox organizationId={organizationId} userId={user.id} />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild><button className="ml-1 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-[var(--focus-ring)]" aria-label="Abrir menú de perfil"><Avatar><AvatarFallback>{user.initials}</AvatarFallback></Avatar></button></DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-64"><DropdownMenuLabel><span className="block truncate text-sm text-[var(--foreground)]">{user.displayName}</span><span className="mt-0.5 block truncate font-normal text-[var(--muted)]">{user.email}</span></DropdownMenuLabel><DropdownMenuSeparator /><DropdownMenuItem asChild><Link href={`/org/${organizationId}/settings/profile`}><UserCircle size={17} />Mi perfil</Link></DropdownMenuItem><DropdownMenuItem asChild><Link href={`/org/${organizationId}/settings/organization`}><Buildings size={17} />Organización</Link></DropdownMenuItem><DropdownMenuSeparator /><form action={logout}><DropdownMenuItem asChild><button type="submit" className="w-full text-[var(--danger)]"><SignOut size={17} />Cerrar sesión</button></DropdownMenuItem></form></DropdownMenuContent>
