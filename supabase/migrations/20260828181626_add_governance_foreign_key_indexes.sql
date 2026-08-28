@@ -1,0 +1,24 @@
+-- Cover foreign keys used by governance filters, RLS joins and closure workflows.
+create index audit_actions_organization_idx on public.audit_actions(organization_id);
+create index audit_actions_task_idx on public.audit_actions(task_id) where task_id is not null;
+create index audit_actions_improvement_action_idx on public.audit_actions(improvement_action_id) where improvement_action_id is not null;
+create index audit_agenda_engagement_idx on public.audit_agenda_items(audit_engagement_id, scheduled_at);
+create index audit_agenda_assigned_idx on public.audit_agenda_items(assigned_to) where assigned_to is not null;
+create index audit_agenda_organization_idx on public.audit_agenda_items(organization_id);
+create index audit_checklists_organization_idx on public.audit_checklists(organization_id);
+create index audit_engagements_organization_idx on public.audit_engagements(organization_id);
+create index audit_engagements_site_idx on public.audit_engagements(site_id) where site_id is not null;
+create index audit_evidences_document_idx on public.audit_evidences(document_version_id);
+create index audit_evidences_organization_idx on public.audit_evidences(organization_id);
+create index audit_findings_organization_idx on public.audit_findings(organization_id);
+create index audit_reports_document_idx on public.audit_reports(document_version_id) where document_version_id is not null;
+create index committee_members_member_idx on public.committee_members(organization_member_id);
+create index committee_members_organization_idx on public.committee_members(organization_id);
+create index meeting_agenda_organization_idx on public.meeting_agenda_items(organization_id);
+create index meeting_attendance_member_idx on public.meeting_attendance(organization_member_id);
+create index meeting_minutes_document_idx on public.meeting_minutes(document_version_id) where document_version_id is not null;
+create index meeting_minutes_organization_idx on public.meeting_minutes(organization_id);
+create index management_reviews_chair_idx on public.management_reviews(chair_user_id) where chair_user_id is not null;
+create index management_reviews_document_idx on public.management_reviews(document_version_id) where document_version_id is not null;
+create index management_commitments_task_idx on public.management_review_commitments(task_id) where task_id is not null;
+notify pgrst, 'reload schema';

@@ -21,7 +21,7 @@
 | Incidentes | `incidents`, investigación, causas, acciones, evidencia y detalles sensibles separados | Privacidad reforzada y trazabilidad sin conclusiones automáticas. |
 | Salud ocupacional | conceptos de aptitud, restricciones, programas y decisiones confirmadas | Datos mínimos, sin historias clínicas ni diagnósticos. |
 | Emergencias | escenarios, recursos, brigadas, planes, simulacros, resultados, hallazgos y acciones | Preparación y simulacros trazables por sede, con planes versionados y acciones verificables. |
-| Gobierno y analítica | comités, auditorías, revisión por la dirección e indicadores versionados | Históricos, segregación de aprobación y resultados reproducibles por período. |
+| Gobierno y analítica | comités, firmas internas de actas, auditorías, revisión por la dirección e indicadores versionados | Históricos, segregación de aprobación y resultados reproducibles por período. |
 | Notificaciones | preferencias, plantillas, bandeja y cola de entrega | Bandeja privada e idempotencia por evento lógico. |
 | Automatizaciones | reglas, versiones y ejecuciones | Motor declarativo limitado, observable e idempotente. |
 
@@ -64,6 +64,8 @@ Las entidades normativas (`normative_sources`, `requirements`, `minimum_standard
 - `20260827040000_add_ppe_domain.sql`: agrega catálogo, inventario, asignación, entrega transaccional, inspección y baja de EPP.
 - `20260828124544_harden_ppe_inventory_and_workflows.sql`: registra movimientos inmutables, protege entrega/aceptación/inspección/baja mediante RPC transaccionales y añade historial de vida útil y reposición.
 - `20260827050000_add_contractors_and_suppliers.sql`: agrega contratistas, contratos, requisitos, portal restringido y aprobaciones auditables.
+- `20260828180120_harden_governance_workflows.sql`: añade constancias internas de actas, evidencia obligatoria para verificar acciones de auditoría, cierres independientes e inmutabilidad de revisión por la dirección.
+- `20260828200600_harden_analytics_dashboard.sql`: endurece versiones y resultados de indicadores, añade snapshots reproducibles, cálculo idempotente de servidor y el job diario de cierre.
 - `20260828130856_harden_contractor_portal_and_document_scope.sql`: limita envíos a su contacto, habilita evidencia privada acotada por requisito y protege transiciones de aprobación.
 - `20260827060000_add_incidents_and_health_sensitive_domain.sql`: agrega reporte, investigación, evidencia y detalle sensible protegido.
 - `20260827070000_add_minimal_occupational_health.sql`: agrega salud ocupacional mínima y controles de privacidad por rol.

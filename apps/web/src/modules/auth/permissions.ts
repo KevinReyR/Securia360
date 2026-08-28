@@ -67,6 +67,15 @@ export const permissionCodes = [
   "emergencies.manage",
   "emergencies.approve",
   "emergencies.directory_read",
+  "committees.read",
+  "committees.manage",
+  "committees.approve",
+  "audits.read",
+  "audits.manage",
+  "audits.approve",
+  "analytics.read",
+  "analytics.manage",
+  "analytics.approve",
 ] as const;
 
 export type PermissionCode = (typeof permissionCodes)[number];

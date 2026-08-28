@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -455,6 +455,7 @@ export type Database = {
           audit_finding_id: string
           created_at: string
           due_at: string | null
+          evidence_document_version_id: string | null
           id: string
           improvement_action_id: string | null
           organization_id: string
@@ -467,6 +468,7 @@ export type Database = {
           audit_finding_id: string
           created_at?: string
           due_at?: string | null
+          evidence_document_version_id?: string | null
           id?: string
           improvement_action_id?: string | null
           organization_id: string
@@ -479,6 +481,7 @@ export type Database = {
           audit_finding_id?: string
           created_at?: string
           due_at?: string | null
+          evidence_document_version_id?: string | null
           id?: string
           improvement_action_id?: string | null
           organization_id?: string
@@ -493,6 +496,13 @@ export type Database = {
             columns: ["audit_finding_id"]
             isOneToOne: false
             referencedRelation: "audit_findings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_actions_evidence_document_version_id_fkey"
+            columns: ["evidence_document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
             referencedColumns: ["id"]
           },
           {
@@ -4691,36 +4701,60 @@ export type Database = {
       indicator_calculation_runs: {
         Row: {
           calculated_at: string
+          completed_at: string | null
           created_at: string
+          failure_reason: string | null
+          formula_snapshot: string
           id: string
           idempotency_key: string
           indicator_version_id: string
           organization_id: string
           period_end: string
           period_start: string
+          requested_by: string | null
+          source_snapshot: Json
+          started_at: string | null
           status: string
+          target_direction_snapshot: string
+          target_value_snapshot: number | null
         }
         Insert: {
           calculated_at?: string
+          completed_at?: string | null
           created_at?: string
+          failure_reason?: string | null
+          formula_snapshot?: string
           id?: string
           idempotency_key: string
           indicator_version_id: string
           organization_id: string
           period_end: string
           period_start: string
+          requested_by?: string | null
+          source_snapshot?: Json
+          started_at?: string | null
           status?: string
+          target_direction_snapshot?: string
+          target_value_snapshot?: number | null
         }
         Update: {
           calculated_at?: string
+          completed_at?: string | null
           created_at?: string
+          failure_reason?: string | null
+          formula_snapshot?: string
           id?: string
           idempotency_key?: string
           indicator_version_id?: string
           organization_id?: string
           period_end?: string
           period_start?: string
+          requested_by?: string | null
+          source_snapshot?: Json
+          started_at?: string | null
           status?: string
+          target_direction_snapshot?: string
+          target_value_snapshot?: number | null
         }
         Relationships: [
           {
@@ -4803,11 +4837,16 @@ export type Database = {
           created_at: string
           dimension_values: Json
           explanation: Json
+          formula_snapshot: string
           id: string
           indicator_version_id: string
+          legal_entity_id: string | null
           organization_id: string
           period_end: string
           period_start: string
+          site_id: string | null
+          source_snapshot: Json
+          target_direction_snapshot: string
           target_value: number | null
           value: number
         }
@@ -4816,11 +4855,16 @@ export type Database = {
           created_at?: string
           dimension_values?: Json
           explanation?: Json
+          formula_snapshot?: string
           id?: string
           indicator_version_id: string
+          legal_entity_id?: string | null
           organization_id: string
           period_end: string
           period_start: string
+          site_id?: string | null
+          source_snapshot?: Json
+          target_direction_snapshot?: string
           target_value?: number | null
           value: number
         }
@@ -4829,11 +4873,16 @@ export type Database = {
           created_at?: string
           dimension_values?: Json
           explanation?: Json
+          formula_snapshot?: string
           id?: string
           indicator_version_id?: string
+          legal_entity_id?: string | null
           organization_id?: string
           period_end?: string
           period_start?: string
+          site_id?: string | null
+          source_snapshot?: Json
+          target_direction_snapshot?: string
           target_value?: number | null
           value?: number
         }
@@ -4853,6 +4902,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "indicator_results_legal_entity_id_fkey"
+            columns: ["legal_entity_id"]
+            isOneToOne: false
+            referencedRelation: "legal_entities"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "indicator_results_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
@@ -4864,6 +4920,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_results_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
             referencedColumns: ["id"]
           },
         ]
@@ -5224,7 +5287,9 @@ export type Database = {
           approved_by: string | null
           chair_user_id: string | null
           created_at: string
+          document_version_id: string | null
           id: string
+          minutes_content: Json
           organization_id: string
           period_end: string
           period_start: string
@@ -5236,7 +5301,9 @@ export type Database = {
           approved_by?: string | null
           chair_user_id?: string | null
           created_at?: string
+          document_version_id?: string | null
           id?: string
+          minutes_content?: Json
           organization_id: string
           period_end: string
           period_start: string
@@ -5248,7 +5315,9 @@ export type Database = {
           approved_by?: string | null
           chair_user_id?: string | null
           created_at?: string
+          document_version_id?: string | null
           id?: string
+          minutes_content?: Json
           organization_id?: string
           period_end?: string
           period_start?: string
@@ -5256,6 +5325,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "management_reviews_document_version_id_fkey"
+            columns: ["document_version_id"]
+            isOneToOne: false
+            referencedRelation: "document_versions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "management_reviews_organization_id_fkey"
             columns: ["organization_id"]
@@ -5370,6 +5446,71 @@ export type Database = {
             columns: ["organization_member_id"]
             isOneToOne: false
             referencedRelation: "organization_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meeting_minute_signatures: {
+        Row: {
+          committee_member_id: string | null
+          content_hash: string
+          content_snapshot: Json
+          id: string
+          meeting_minutes_id: string
+          organization_id: string
+          signed_at: string
+          signer_role: string
+          signer_user_id: string
+        }
+        Insert: {
+          committee_member_id?: string | null
+          content_hash: string
+          content_snapshot: Json
+          id?: string
+          meeting_minutes_id: string
+          organization_id: string
+          signed_at?: string
+          signer_role: string
+          signer_user_id: string
+        }
+        Update: {
+          committee_member_id?: string | null
+          content_hash?: string
+          content_snapshot?: Json
+          id?: string
+          meeting_minutes_id?: string
+          organization_id?: string
+          signed_at?: string
+          signer_role?: string
+          signer_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_minute_signatures_committee_member_id_fkey"
+            columns: ["committee_member_id"]
+            isOneToOne: false
+            referencedRelation: "committee_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_minute_signatures_meeting_minutes_id_fkey"
+            columns: ["meeting_minutes_id"]
+            isOneToOne: false
+            referencedRelation: "meeting_minutes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_minute_signatures_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "meeting_minute_signatures_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -10170,6 +10311,14 @@ export type Database = {
       }
       reject_classification_change: {
         Args: { p_note: string; p_proposal_id: string }
+        Returns: string
+      }
+      request_indicator_calculation: {
+        Args: {
+          p_indicator_version_id: string
+          p_period_end: string
+          p_period_start: string
+        }
         Returns: string
       }
       retire_ppe: {

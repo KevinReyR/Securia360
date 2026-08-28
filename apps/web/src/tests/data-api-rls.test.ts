@@ -286,4 +286,59 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
     expect((await userB.from("work_restrictions").insert({ organization_id: fixture.organizationB, occupational_fitness_concept_id: fitness.data!.id, restriction_summary: "cross tenant", effective_from: "2026-08-28" })).error).not.toBeNull();
     await Promise.all([userA.auth.signOut(), userB.auth.signOut()]);
   }, 30_000);
+
+  it("keeps governance records tenant-isolated and blocks self-approval", async () => {
+    const userA = newPublicClient(); const userB = newPublicClient(); const userC = newPublicClient();
+    await Promise.all([
+      assertNoError(await userA.auth.signInWithPassword({ email: fixture.userAEmail, password }), "sign in governance User A"),
+      assertNoError(await userB.auth.signInWithPassword({ email: fixture.userBEmail, password }), "sign in governance User B"),
+      assertNoError(await userC.auth.signInWithPassword({ email: `${prefix}-c@example.invalid`, password }), "sign in governance User C"),
+    ]);
+    const type = await admin.from("committee_types").select("id").eq("code", "copasst").single();
+    await assertNoError(type, "read committee type");
+    const committee = await userA.from("committees").insert({ organization_id: fixture.organizationA, committee_type_id: type.data!.id, name: `CI Committee ${runId}` }).select("id").single();
+    expect(committee.error).toBeNull();
+    const period = await userA.from("committee_periods").insert({ organization_id: fixture.organizationA, committee_id: committee.data!.id, starts_on: "2026-01-01" }).select("id").single();
+    expect(period.error).toBeNull();
+    const meeting = await userA.from("committee_meetings").insert({ organization_id: fixture.organizationA, committee_period_id: period.data!.id, scheduled_at: new Date().toISOString() }).select("id").single();
+    expect(meeting.error).toBeNull();
+    const minutes = await userA.from("meeting_minutes").insert({ organization_id: fixture.organizationA, committee_meeting_id: meeting.data!.id, content: { body: "Acta de integración" } }).select("id").single();
+    expect(minutes.error).toBeNull();
+    expect((await userB.from("meeting_minutes").select("id").eq("id", minutes.data!.id)).data).toEqual([]);
+    expect((await userA.from("meeting_minutes").update({ status: "approved" }).eq("id", minutes.data!.id)).error).toBeNull();
+    expect((await userA.from("meeting_minutes").update({ content: { body: "mutación indebida" } }).eq("id", minutes.data!.id)).error).not.toBeNull();
+    expect((await userA.from("meeting_minute_signatures").insert({ organization_id: fixture.organizationA, meeting_minutes_id: minutes.data!.id, signer_user_id: fixture.userAId, signer_role: "secretary", content_hash: "0".repeat(64), content_snapshot: {} })).error).toBeNull();
+
+    const program = await userA.from("audit_programs").insert({ organization_id: fixture.organizationA, name: `CI Audit ${runId}`, year: 2026 }).select("id").single();
+    expect(program.error).toBeNull();
+    const engagement = await userA.from("audit_engagements").insert({ organization_id: fixture.organizationA, audit_program_id: program.data!.id, title: "CI independent audit", require_independent_approval: true }).select("id").single();
+    expect(engagement.error).toBeNull();
+    expect((await userA.from("audit_team_members").insert({ organization_id: fixture.organizationA, audit_engagement_id: engagement.data!.id, organization_member_id: fixture.memberA, team_role: "lead_auditor", independence_declared_at: new Date().toISOString() })).error).toBeNull();
+    const report = await userA.from("audit_reports").insert({ organization_id: fixture.organizationA, audit_engagement_id: engagement.data!.id, summary: "Informe de integración" }).select("id").single();
+    expect(report.error).toBeNull();
+    expect((await userA.from("audit_reports").update({ status: "approved" }).eq("id", report.data!.id)).error).not.toBeNull();
+    expect((await userC.from("audit_reports").update({ status: "approved" }).eq("id", report.data!.id)).error).toBeNull();
+    await Promise.all([userA.auth.signOut(), userB.auth.signOut(), userC.auth.signOut()]);
+  }, 30_000);
+
+  it("keeps indicator calculations server-side and tenant-isolated", async () => {
+    const userA = newPublicClient(); const userB = newPublicClient();
+    await Promise.all([
+      assertNoError(await userA.auth.signInWithPassword({ email: fixture.userAEmail, password }), "sign in analytics User A"),
+      assertNoError(await userB.auth.signInWithPassword({ email: fixture.userBEmail, password }), "sign in analytics User B"),
+    ]);
+    const catalog = await userA.from("indicator_catalog").insert({ organization_id: fixture.organizationA, code: `CI_ANALYTICS_${runId.slice(0, 8)}`, name: "CI open tasks", status: "active" }).select("id").single();
+    expect(catalog.error).toBeNull();
+    const version = await userA.from("indicator_versions").insert({ organization_id: fixture.organizationA, indicator_id: catalog.data!.id, version_number: 1, formula_description: "Cuenta tareas abiertas de la organización.", source_config: { template: "open_tasks_count" }, periodicity: "daily", target_direction: "at_most", effective_from: "2026-01-01", status: "draft" }).select("id").single();
+    expect(version.error).toBeNull();
+    expect((await userA.from("indicator_versions").update({ status: "approved" }).eq("id", version.data!.id)).error).toBeNull();
+    expect((await userA.rpc("request_indicator_calculation", { p_indicator_version_id: version.data!.id, p_period_start: "2026-08-27", p_period_end: "2026-08-27" })).error).toBeNull();
+    expect((await userA.rpc("request_indicator_calculation", { p_indicator_version_id: version.data!.id, p_period_start: "2026-08-27", p_period_end: "2026-08-27" })).error).toBeNull();
+    const results = await userA.from("indicator_results").select("id").eq("indicator_version_id", version.data!.id);
+    expect(results.data).toHaveLength(1);
+    expect((await userB.from("indicator_results").select("id").eq("indicator_version_id", version.data!.id)).data).toEqual([]);
+    expect((await userB.rpc("request_indicator_calculation", { p_indicator_version_id: version.data!.id, p_period_start: "2026-08-27", p_period_end: "2026-08-27" })).error).not.toBeNull();
+    expect((await userA.from("indicator_results").insert({ organization_id: fixture.organizationA, indicator_version_id: version.data!.id, calculation_run_id: "00000000-0000-4000-8000-000000000001", period_start: "2026-08-27", period_end: "2026-08-27", value: 1 })).error).not.toBeNull();
+    await Promise.all([userA.auth.signOut(), userB.auth.signOut()]);
+  }, 30_000);
 });

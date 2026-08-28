@@ -19,7 +19,7 @@ Fecha: 2026-08-27. Alcance: Etapa 40A. Esta matriz diferencia explícitamente el
 
 ## Dominios con datos, pero sin flujo web mínimo
 
-Las tablas ya existen y están protegidas con RLS, pero sus rutas aún no deben activarse en la navegación: comités, auditorías, indicadores, notificaciones, automatizaciones, importaciones, Copilot y administración SaaS. Incidentes, Salud ocupacional y Emergencias ya cuentan con un flujo vertical protegido; los datos sensibles y los recursos por sede requieren sus permisos específicos.
+Comités, auditorías, revisión por la dirección e indicadores cuentan con ruta protegida, formularios, estados, auditoría e inmutabilidad de aprobación. Analítica distingue explícitamente métricas vivas de resultados históricos calculados en servidor. Notificaciones, automatizaciones, importaciones, Copilot y administración SaaS permanecen pendientes de flujo vertical. Incidentes, Salud ocupacional y Emergencias ya cuentan con un flujo vertical protegido; los datos sensibles y los recursos por sede requieren sus permisos específicos.
 
 ## Priorización
 
