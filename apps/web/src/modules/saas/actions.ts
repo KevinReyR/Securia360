@@ -1,0 +1,6 @@
+"use server";
+import { revalidatePath } from "next/cache";
+import { requireAuthenticatedUser } from "@/modules/organizations/tenant";
+type Client={rpc:(name:string,args:Record<string,unknown>)=>Promise<{error:{message?:string}|null}>};
+export async function saveSubscription(form:FormData){const {supabase}=await requireAuthenticatedUser();const {error}=await (supabase as unknown as Client).rpc("manage_saas_subscription",{p_organization_id:String(form.get("organizationId")),p_plan_id:String(form.get("planId")),p_status:String(form.get("status")),p_trial_ends_at:form.get("trialEndsAt")||null,p_period_start:form.get("periodStart")||null,p_period_end:form.get("periodEnd")||null,p_note:String(form.get("note")||"")});if(error)throw new Error("No fue posible guardar la suscripción.");revalidatePath("/internal/saas-admin");}
+export async function supportSession(form:FormData){const {supabase}=await requireAuthenticatedUser();const {error}=await (supabase as unknown as Client).rpc("manage_saas_support_session",{p_organization_id:String(form.get("organizationId")),p_action:String(form.get("action")),p_reason:String(form.get("reason")),p_session_id:form.get("sessionId")||null});if(error)throw new Error("No fue posible registrar la sesión de soporte.");revalidatePath("/internal/saas-admin");}

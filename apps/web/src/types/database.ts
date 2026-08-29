@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       activities: {
@@ -1276,6 +1301,7 @@ export type Database = {
           name: string
           status: string
           updated_at: string
+          version: number
         }
         Insert: {
           code: string
@@ -1286,6 +1312,7 @@ export type Database = {
           name: string
           status?: string
           updated_at?: string
+          version?: number
         }
         Update: {
           code?: string
@@ -1296,12 +1323,14 @@ export type Database = {
           name?: string
           status?: string
           updated_at?: string
+          version?: number
         }
         Relationships: []
       }
       billing_subscriptions: {
         Row: {
           billing_plan_id: string
+          commercial_note: string | null
           created_at: string
           current_period_end: string | null
           current_period_start: string | null
@@ -1315,6 +1344,7 @@ export type Database = {
         }
         Insert: {
           billing_plan_id: string
+          commercial_note?: string | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
@@ -1328,6 +1358,7 @@ export type Database = {
         }
         Update: {
           billing_plan_id?: string
+          commercial_note?: string | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
@@ -2510,6 +2541,7 @@ export type Database = {
         Row: {
           conversation_id: string
           created_at: string
+          decision_note: string | null
           id: string
           organization_id: string
           proposal: Json
@@ -2522,6 +2554,7 @@ export type Database = {
         Insert: {
           conversation_id: string
           created_at?: string
+          decision_note?: string | null
           id?: string
           organization_id: string
           proposal: Json
@@ -2534,6 +2567,7 @@ export type Database = {
         Update: {
           conversation_id?: string
           created_at?: string
+          decision_note?: string | null
           id?: string
           organization_id?: string
           proposal?: Json
@@ -2664,6 +2698,93 @@ export type Database = {
           },
         ]
       }
+      copilot_runs: {
+        Row: {
+          actor_user_id: string
+          assistant_message_id: string | null
+          completed_at: string | null
+          conversation_id: string
+          created_at: string
+          error_code: string | null
+          id: string
+          model: string
+          organization_id: string
+          provider: string
+          provider_response_id: string | null
+          request_hash: string
+          status: string
+          user_message_id: string
+        }
+        Insert: {
+          actor_user_id: string
+          assistant_message_id?: string | null
+          completed_at?: string | null
+          conversation_id: string
+          created_at?: string
+          error_code?: string | null
+          id?: string
+          model: string
+          organization_id: string
+          provider: string
+          provider_response_id?: string | null
+          request_hash: string
+          status: string
+          user_message_id: string
+        }
+        Update: {
+          actor_user_id?: string
+          assistant_message_id?: string | null
+          completed_at?: string | null
+          conversation_id?: string
+          created_at?: string
+          error_code?: string | null
+          id?: string
+          model?: string
+          organization_id?: string
+          provider?: string
+          provider_response_id?: string | null
+          request_hash?: string
+          status?: string
+          user_message_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copilot_runs_assistant_message_id_fkey"
+            columns: ["assistant_message_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copilot_runs_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copilot_runs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "copilot_runs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copilot_runs_user_message_id_fkey"
+            columns: ["user_message_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       copilot_sources: {
         Row: {
           assistant_message_id: string
@@ -2672,6 +2793,8 @@ export type Database = {
           id: string
           organization_id: string
           source_id: string
+          source_label: string
+          source_snapshot: Json
           source_type: string
           source_version_id: string | null
         }
@@ -2682,6 +2805,8 @@ export type Database = {
           id?: string
           organization_id: string
           source_id: string
+          source_label?: string
+          source_snapshot?: Json
           source_type: string
           source_version_id?: string | null
         }
@@ -2692,6 +2817,8 @@ export type Database = {
           id?: string
           organization_id?: string
           source_id?: string
+          source_label?: string
+          source_snapshot?: Json
           source_type?: string
           source_version_id?: string | null
         }
@@ -3770,6 +3897,8 @@ export type Database = {
       }
       import_job_effects: {
         Row: {
+          after_data: Json | null
+          after_updated_at: string | null
           before_data: Json | null
           created_at: string
           entity_id: string
@@ -3778,8 +3907,11 @@ export type Database = {
           import_job_id: string
           operation: string
           organization_id: string
+          rollback_conflict: boolean
         }
         Insert: {
+          after_data?: Json | null
+          after_updated_at?: string | null
           before_data?: Json | null
           created_at?: string
           entity_id: string
@@ -3788,8 +3920,11 @@ export type Database = {
           import_job_id: string
           operation: string
           organization_id: string
+          rollback_conflict?: boolean
         }
         Update: {
+          after_data?: Json | null
+          after_updated_at?: string | null
           before_data?: Json | null
           created_at?: string
           entity_id?: string
@@ -3798,6 +3933,7 @@ export type Database = {
           import_job_id?: string
           operation?: string
           organization_id?: string
+          rollback_conflict?: boolean
         }
         Relationships: [
           {
@@ -3834,10 +3970,14 @@ export type Database = {
           idempotency_key: string
           import_type: string
           mapping: Json
+          mapping_hash: string | null
           mode: string
           organization_id: string
+          rolled_back_at: string | null
           status: string
+          storage_path: string | null
           summary: Json
+          target_entity_type: string | null
           updated_at: string
         }
         Insert: {
@@ -3850,10 +3990,14 @@ export type Database = {
           idempotency_key: string
           import_type: string
           mapping?: Json
+          mapping_hash?: string | null
           mode?: string
           organization_id: string
+          rolled_back_at?: string | null
           status?: string
+          storage_path?: string | null
           summary?: Json
+          target_entity_type?: string | null
           updated_at?: string
         }
         Update: {
@@ -3866,10 +4010,14 @@ export type Database = {
           idempotency_key?: string
           import_type?: string
           mapping?: Json
+          mapping_hash?: string | null
           mode?: string
           organization_id?: string
+          rolled_back_at?: string | null
           status?: string
+          storage_path?: string | null
           summary?: Json
+          target_entity_type?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -8862,10 +9010,74 @@ export type Database = {
           },
         ]
       }
+      saas_admin_audit: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          after_data: Json | null
+          before_data: Json | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      saas_admin_roles: {
+        Row: {
+          created_at: string
+          granted_by: string | null
+          reason: string
+          role: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by?: string | null
+          reason: string
+          role: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string | null
+          reason?: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       saas_support_sessions: {
         Row: {
           created_at: string
           ended_at: string | null
+          ended_by: string | null
           id: string
           organization_id: string
           reason: string
@@ -8876,6 +9088,7 @@ export type Database = {
         Insert: {
           created_at?: string
           ended_at?: string | null
+          ended_by?: string | null
           id?: string
           organization_id: string
           reason: string
@@ -8886,6 +9099,7 @@ export type Database = {
         Update: {
           created_at?: string
           ended_at?: string | null
+          ended_by?: string | null
           id?: string
           organization_id?: string
           reason?: string
@@ -10155,6 +10369,155 @@ export type Database = {
           },
         ]
       }
+      workers: {
+        Row: {
+          area_id: string | null
+          created_at: string
+          created_by: string | null
+          employee_code: string
+          first_name: string
+          id: string
+          imported_from_job_id: string | null
+          last_name: string
+          legal_entity_id: string
+          organization_id: string
+          site_id: string | null
+          status: string
+          updated_at: string
+          updated_by: string | null
+          work_email: string | null
+        }
+        Insert: {
+          area_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_code: string
+          first_name: string
+          id?: string
+          imported_from_job_id?: string | null
+          last_name: string
+          legal_entity_id: string
+          organization_id: string
+          site_id?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_email?: string | null
+        }
+        Update: {
+          area_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_code?: string
+          first_name?: string
+          id?: string
+          imported_from_job_id?: string | null
+          last_name?: string
+          legal_entity_id?: string
+          organization_id?: string
+          site_id?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_email?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workers_imported_from_job_id_fkey"
+            columns: ["imported_from_job_id"]
+            isOneToOne: false
+            referencedRelation: "import_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workers_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "workers_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workers_organization_id_legal_entity_id_fkey"
+            columns: ["organization_id", "legal_entity_id"]
+            isOneToOne: false
+            referencedRelation: "legal_entities"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "workers_organization_id_site_id_area_id_fkey"
+            columns: ["organization_id", "site_id", "area_id"]
+            isOneToOne: false
+            referencedRelation: "areas"
+            referencedColumns: ["organization_id", "site_id", "id"]
+          },
+          {
+            foreignKeyName: "workers_organization_id_site_id_fkey"
+            columns: ["organization_id", "site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      workforce_recalculation_requests: {
+        Row: {
+          id: string
+          import_job_id: string
+          organization_id: string
+          processed_at: string | null
+          requested_at: string
+          requested_by: string | null
+          status: string
+        }
+        Insert: {
+          id?: string
+          import_job_id: string
+          organization_id: string
+          processed_at?: string | null
+          requested_at?: string
+          requested_by?: string | null
+          status?: string
+        }
+        Update: {
+          id?: string
+          import_job_id?: string
+          organization_id?: string
+          processed_at?: string | null
+          requested_at?: string
+          requested_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workforce_recalculation_requests_import_job_id_fkey"
+            columns: ["import_job_id"]
+            isOneToOne: true
+            referencedRelation: "import_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workforce_recalculation_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "workforce_recalculation_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       emergency_resilient_directory: {
@@ -10292,6 +10655,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      commit_import_job: { Args: { p_import_job_id: string }; Returns: string }
       complete_assessment: {
         Args: { p_assessment_id: string }
         Returns: number
@@ -10299,6 +10663,49 @@ export type Database = {
       complete_organization_onboarding: {
         Args: { p_idempotency_key: string; p_organization_id: string }
         Returns: Json
+      }
+      create_copilot_conversation: {
+        Args: { p_organization_id: string; p_title?: string }
+        Returns: {
+          actor_user_id: string
+          created_at: string
+          id: string
+          organization_id: string
+          title: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "copilot_conversations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_copilot_proposal: {
+        Args: {
+          p_conversation_id: string
+          p_proposal: Json
+          p_proposal_type: string
+        }
+        Returns: {
+          conversation_id: string
+          created_at: string
+          decision_note: string | null
+          id: string
+          organization_id: string
+          proposal: Json
+          proposal_type: string
+          proposed_by: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "copilot_action_proposals"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       create_normative_review_artifact: {
         Args: {
@@ -10333,6 +10740,32 @@ export type Database = {
           p_size_label?: string
         }
         Returns: string
+      }
+      decide_copilot_proposal: {
+        Args: {
+          p_decision_note: string
+          p_proposal_id: string
+          p_status: string
+        }
+        Returns: {
+          conversation_id: string
+          created_at: string
+          decision_note: string | null
+          id: string
+          organization_id: string
+          proposal: Json
+          proposal_type: string
+          proposed_by: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "copilot_action_proposals"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       decide_normative_review: {
         Args: {
@@ -10398,6 +10831,81 @@ export type Database = {
         }
         Returns: string
       }
+      manage_saas_subscription: {
+        Args: {
+          p_note?: string
+          p_organization_id: string
+          p_period_end: string
+          p_period_start: string
+          p_plan_id: string
+          p_status: string
+          p_trial_ends_at: string
+        }
+        Returns: string
+      }
+      manage_saas_support_session: {
+        Args: {
+          p_action: string
+          p_organization_id: string
+          p_reason: string
+          p_session_id?: string
+        }
+        Returns: string
+      }
+      record_copilot_response: {
+        Args: {
+          p_content: string
+          p_conversation_id: string
+          p_error_code: string
+          p_model: string
+          p_prompt_injection_flag: boolean
+          p_provider: string
+          p_provider_response_id: string
+          p_request_hash: string
+          p_sources?: Json
+          p_status: string
+          p_user_message_id: string
+        }
+        Returns: {
+          actor_user_id: string | null
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          organization_id: string
+          prompt_injection_flag: boolean
+          role: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "copilot_messages"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      record_copilot_user_message: {
+        Args: {
+          p_content: string
+          p_conversation_id: string
+          p_prompt_injection_flag?: boolean
+        }
+        Returns: {
+          actor_user_id: string | null
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          organization_id: string
+          prompt_injection_flag: boolean
+          role: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "copilot_messages"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       record_ppe_inventory_movement: {
         Args: {
           p_evidence_document_version_id?: string
@@ -10436,9 +10944,25 @@ export type Database = {
         Args: { p_execution_id: string }
         Returns: undefined
       }
+      rollback_import_job: { Args: { p_import_job_id: string }; Returns: Json }
       save_organization_onboarding_step: {
         Args: { p_data: Json; p_organization_id: string; p_step: number }
         Returns: Json
+      }
+      stage_import_job: {
+        Args: {
+          p_content_hash: string
+          p_file_name: string
+          p_import_type: string
+          p_job_id: string
+          p_mapping: Json
+          p_mapping_hash: string
+          p_organization_id: string
+          p_rows: Json
+          p_storage_path: string
+          p_target_entity_type: string
+        }
+        Returns: string
       }
     }
     Enums: {
@@ -10568,6 +11092,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

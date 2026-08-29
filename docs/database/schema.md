@@ -48,6 +48,9 @@ Las entidades normativas (`normative_sources`, `requirements`, `minimum_standard
 
 ## Migraciones
 
+- `20260828235342_complete_workforce_imports.sql`: crea `workers` como nómina mínima no sensible, completa staging privado de CSV/XLSX, efectos y reversión lógica, solicitud única de recálculo y políticas RLS/Storage de importaciones.
+- `20260829000646_validate_import_preview_references.sql`: convierte referencias inexistentes y códigos repetidos en errores visibles por fila durante la previsualización.
+
 - `20260826013555_harden_core_security_and_tenant_api.sql`: defaults seguros, RPC `can`, identidad inmutable de membresía y auditoría.
 - `20260826014615_add_secure_member_invitation_api.sql`: invitación atómica y aceptación de membresías.
 - `20260826015115_protect_last_organization_admin.sql`: evita dejar un tenant sin administrador activo.

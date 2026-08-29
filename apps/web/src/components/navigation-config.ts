@@ -28,9 +28,10 @@ export const navigationItems = [
   { label: "Emergencias", suffix: "emergencies", icon: WarningDiamond, available: true, keywords: ["simulacros", "brigadas", "planes"] },
   { label: "Gobierno y auditoría", suffix: "governance", icon: ClipboardText, available: true, keywords: ["comités", "actas", "auditorías", "revisión por la dirección"] },
   { label: "Documentos", suffix: "documents", icon: Files, available: true, keywords: ["evidencias", "archivos"] },
+  { label: "Importaciones", suffix: "imports", icon: Files, available: true, keywords: ["csv", "xlsx", "trabajadores", "estructura"] },
   { label: "Analítica", suffix: "analytics", icon: ChartLineUp, available: true, keywords: ["indicadores", "reportes"] },
   { label: "Automatizaciones", suffix: "automations", icon: Lightning, available: true, keywords: ["flujos", "alertas"] },
-  { label: "Securia Copilot", icon: Sparkle, available: false, keywords: ["ia", "asistente"] },
+  { label: "Securia Copilot", suffix: "copilot", icon: Sparkle, available: true, keywords: ["ia", "asistente"] },
   { label: "Configuración", suffix: "settings/organization", icon: Gear, available: true, keywords: ["empresa", "estructura", "perfil"] },
 ] as const;
 

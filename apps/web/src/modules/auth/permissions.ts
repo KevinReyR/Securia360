@@ -82,6 +82,13 @@ export const permissionCodes = [
   "automations.read",
   "automations.manage",
   "automations.approve",
+  "imports.read",
+  "imports.manage",
+  "copilot.read",
+  "copilot.manage",
+  "copilot.confirm_critical",
+  "billing.read",
+  "billing.manage",
 ] as const;
 
 export type PermissionCode = (typeof permissionCodes)[number];

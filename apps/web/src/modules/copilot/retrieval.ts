@@ -1,0 +1,12 @@
+import { can } from "@/modules/auth/permissions";
+import { requireAuthenticatedUser } from "@/modules/organizations/tenant";
+import { safeContext } from "./security";
+export type CopilotSource = { source_type: "document_version"|"normative_source_version"|"requirement"|"assessment"|"risk"; source_id: string; source_version_id?: string; source_label: string; excerpt: string; source_snapshot: Record<string, unknown> };
+export async function retrieveAuthorizedContext(organizationId: string): Promise<CopilotSource[]> {
+ const { supabase } = await requireAuthenticatedUser(); const out: CopilotSource[] = [];
+ if (await can(organizationId,"documents.read")) { const {data} = await supabase.from("documents").select("id,title,status,expires_at").eq("organization_id",organizationId).limit(8); for (const d of data ?? []) out.push({source_type:"document_version",source_id:d.id,source_label:`Documento: ${d.title}`,excerpt:safeContext(`Metadato de documento ${d.title}; estado ${d.status}; vencimiento ${d.expires_at ?? "no informado"}.`),source_snapshot:{title:d.title,status:d.status,expires_at:d.expires_at}}); }
+ if (await can(organizationId,"assessments.read")) { const {data} = await supabase.from("assessments").select("id,status,score,created_at").eq("organization_id",organizationId).limit(8); for (const a of data ?? []) out.push({source_type:"assessment",source_id:a.id,source_label:"Evaluación",excerpt:safeContext(`Evaluación ${a.status}; puntaje ${a.score ?? "no disponible"}.`),source_snapshot:{status:a.status,score:a.score,created_at:a.created_at}}); }
+ if (await can(organizationId,"risks.read")) { const {data} = await supabase.from("risk_assessments").select("id,status,created_at").eq("organization_id",organizationId).limit(8); for (const r of data ?? []) out.push({source_type:"risk",source_id:r.id,source_label:"Valoración de riesgo",excerpt:safeContext(`Valoración de riesgo en estado ${r.status}.`),source_snapshot:{status:r.status,created_at:r.created_at}}); }
+ if (await can(organizationId,"classifications.read")) { const {data} = await supabase.from("requirements").select("id,code,title,status").limit(8); for (const r of data ?? []) out.push({source_type:"requirement",source_id:r.id,source_label:`Requisito: ${r.code}`,excerpt:safeContext(`${r.title}; estado ${r.status}.`),source_snapshot:{code:r.code,title:r.title,status:r.status}}); }
+ return out;
+}
