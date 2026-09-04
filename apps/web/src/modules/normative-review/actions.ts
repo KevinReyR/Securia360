@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { requireAuthenticatedUser } from "@/modules/organizations/tenant";
 import { artifactSchema, decisionSchema, proposalSchema, reviewerSchema } from "./schemas";
 
-const route = (status: string) => `/internal/normative-review?status=${status}`;
+const route = (status: string) => `/internal/normative-review?notice=${status}`;
 type RpcClient = { rpc: (name: string, args: Record<string, unknown>) => Promise<{ error: { message?: string; code?: string } | null }> };
 
 function status(error: { code?: string } | null) {

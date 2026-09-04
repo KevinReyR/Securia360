@@ -1,6 +1,41 @@
 "use server";
+
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireAuthenticatedUser } from "@/modules/organizations/tenant";
-type Client={rpc:(name:string,args:Record<string,unknown>)=>Promise<{error:{message?:string}|null}>};
-export async function saveSubscription(form:FormData){const {supabase}=await requireAuthenticatedUser();const {error}=await (supabase as unknown as Client).rpc("manage_saas_subscription",{p_organization_id:String(form.get("organizationId")),p_plan_id:String(form.get("planId")),p_status:String(form.get("status")),p_trial_ends_at:form.get("trialEndsAt")||null,p_period_start:form.get("periodStart")||null,p_period_end:form.get("periodEnd")||null,p_note:String(form.get("note")||"")});if(error)throw new Error("No fue posible guardar la suscripción.");revalidatePath("/internal/saas-admin");}
-export async function supportSession(form:FormData){const {supabase}=await requireAuthenticatedUser();const {error}=await (supabase as unknown as Client).rpc("manage_saas_support_session",{p_organization_id:String(form.get("organizationId")),p_action:String(form.get("action")),p_reason:String(form.get("reason")),p_session_id:form.get("sessionId")||null});if(error)throw new Error("No fue posible registrar la sesión de soporte.");revalidatePath("/internal/saas-admin");}
+import { subscriptionSchema, supportSessionSchema } from "./schemas";
+
+type Client = { rpc: (name: string, args: Record<string, unknown>) => Promise<{ error: { code?: string } | null }> };
+const route = (notice: string) => `/internal/saas-admin?notice=${notice}`;
+const errorNotice = (code?: string) => code === "42501" ? "forbidden" : code === "23514" || code === "22023" ? "invalid" : "error";
+
+export async function saveSubscription(formData: FormData) {
+  const parsed = subscriptionSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) redirect(route("invalid"));
+  const { supabase } = await requireAuthenticatedUser();
+  const { error } = await (supabase as unknown as Client).rpc("manage_saas_subscription", {
+    p_organization_id: parsed.data.organizationId,
+    p_plan_id: parsed.data.planId,
+    p_status: parsed.data.status,
+    p_trial_ends_at: parsed.data.trialEndsAt,
+    p_period_start: parsed.data.periodStart,
+    p_period_end: parsed.data.periodEnd,
+    p_note: parsed.data.note,
+  });
+  revalidatePath("/internal/saas-admin");
+  redirect(route(error ? errorNotice(error.code) : "saved"));
+}
+
+export async function supportSession(formData: FormData) {
+  const parsed = supportSessionSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) redirect(route("invalid"));
+  const { supabase } = await requireAuthenticatedUser();
+  const { error } = await (supabase as unknown as Client).rpc("manage_saas_support_session", {
+    p_organization_id: parsed.data.organizationId,
+    p_action: parsed.data.action,
+    p_reason: parsed.data.reason,
+    p_session_id: parsed.data.sessionId,
+  });
+  revalidatePath("/internal/saas-admin");
+  redirect(route(error ? errorNotice(error.code) : "saved"));
+}

@@ -11,6 +11,7 @@ describe("normative review validation", () => {
 
   it("rejects malformed editorial content and invalid transitions", () => {
     expect(artifactSchema.safeParse({ artifactType: "UI_TEXT", artifactKey: "ui.disclaimer", title: "Advertencia", sourcePath: "src/a.tsx", content: '{"text":"Revisión humana"}' }).success).toBe(true);
+    expect(artifactSchema.safeParse({ artifactType: "UI_TEXT", artifactKey: "ui.disclaimer", title: "Advertencia", sourcePath: "src/a.tsx", content: "Revisión humana obligatoria" }).success).toBe(true);
     expect(proposalSchema.safeParse({ artifactId: id, content: "[]", rationale: "Corregir alcance" }).success).toBe(false);
     expect(decisionSchema.safeParse({ artifactId: id, proposalId: null, decision: "approved", note: "Aprobado por criterio profesional" }).success).toBe(true);
   });

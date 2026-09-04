@@ -1,14 +1,17 @@
 import { z } from "zod";
 
 const text = z.string().trim().min(3).max(2000);
-const jsonObject = z.string().trim().min(2).max(20_000).transform((value, context) => {
+const structuredContent = z.string().trim().min(2).max(20_000).transform((value, context) => {
   try {
     const parsed: unknown = JSON.parse(value);
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error();
     return parsed;
   } catch {
-    context.addIssue({ code: "custom", message: "Debe ser un objeto JSON válido." });
-    return z.NEVER;
+    if (value.startsWith("{") || value.startsWith("[")) {
+      context.addIssue({ code: "custom", message: "El contenido estructurado no tiene un formato válido." });
+      return z.NEVER;
+    }
+    return { text: value };
   }
 });
 
@@ -24,12 +27,12 @@ export const artifactSchema = z.object({
   artifactKey: z.string().trim().min(3).max(160),
   title: z.string().trim().min(3).max(300),
   sourcePath: z.string().trim().max(500).optional(),
-  content: jsonObject,
+  content: structuredContent,
 });
 
 export const proposalSchema = z.object({
   artifactId: z.uuid(),
-  content: jsonObject,
+  content: structuredContent,
   rationale: text,
 });
 

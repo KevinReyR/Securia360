@@ -115,3 +115,13 @@ El selector global de sede no se mostrará hasta que cada consulta operativa con
 - La bandeja de notificaciones distingue prioridad y lectura, ofrece filtros y preferencias personales, y conserva mensajes seguros sin información sensible completa.
 - Indicadores, automatizaciones e importaciones comparten navegación contextual dentro de Análisis; todos los accesos mantienen el JWT del actor, `can(permission, context)` y RLS existentes.
 - No se añadió una migración ni se modificó Supabase: este corte es exclusivamente de interfaz, lenguaje y organización de flujos ya protegidos.
+
+### Estado del sexto corte: áreas internas y consolidación
+
+- La revisión normativa interna presenta inventario, propuestas y decisiones con contenido estructurado legible, historial inmutable y acciones bajo demanda; ya no exige ni muestra JSON como interfaz principal.
+- La administración SaaS separa visualmente suscripciones, límites comerciales y soporte auditado. Una suspensión comercial explica de forma explícita que no modifica datos, membresías, permisos ni RLS.
+- El portal de contratistas funciona como una experiencia independiente y restringida: resume contratos, sedes autorizadas, requisitos y envíos propios sin exponer navegación ni información interna del tenant.
+- Los accesos internos y referencias sensibles se representan con etiquetas humanas; los identificadores permanecen únicamente como valores técnicos de formularios y consultas autorizadas.
+- Se añadieron estados globales de carga y página no encontrada, con navegación de recuperación, foco y lenguaje orientado a la acción.
+- Los formularios SaaS y editoriales incorporan validación Zod en servidor y mensajes consistentes sin propagar errores de PostgreSQL.
+- No se añadió una migración ni se modificó Supabase. Las capacidades existentes continúan usando la sesión del actor, funciones autorizadas, permisos internos y políticas RLS actuales.
