@@ -7,7 +7,7 @@ import { can, type PermissionCode } from "@/modules/auth/permissions";
 import { requireAuthenticatedUser } from "@/modules/organizations/tenant";
 import { communicationSchema, incidentActionSchema, incidentActionStateSchema, incidentCauseSchema, incidentPersonSchema, incidentSchema, incidentStateSchema, investigationSchema, investigationStateSchema } from "./schemas";
 
-const id = z.uuid(); const path=(o:string,s:string)=>`/org/${o}/incidents?status=${s}`;
+const id = z.uuid(); const path=(o:string,s:string)=>`/org/${o}/incidents?notice=${s}`;
 const org=(f:FormData)=>id.parse(f.get("organizationId")); const values=(f:FormData)=>Object.fromEntries(f);
 async function client(){return (await requireAuthenticatedUser()).supabase as any;} async function guard(o:string,p:PermissionCode){if(!(await can(o,p)))redirect(path(o,"forbidden"));}
 async function finish(o:string,status:string){revalidatePath(`/org/${o}/incidents`);redirect(path(o,status));}

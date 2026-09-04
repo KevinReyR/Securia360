@@ -9,7 +9,7 @@ import { requireAuthenticatedUser } from "@/modules/organizations/tenant";
 import { assignmentSchema, deliveryAcceptanceSchema, deliverySchema, inspectionSchema, inventorySchema, movementSchema, ppeCatalogSchema, retirementSchema } from "./schemas";
 
 const orgId = z.uuid();
-const route = (organizationId: string, status: string) => `/org/${organizationId}/ppe?status=${status}`;
+const route = (organizationId: string, status: string) => `/org/${organizationId}/ppe?notice=${status}`;
 const refresh = (organizationId: string) => revalidatePath(`/org/${organizationId}/ppe`);
 const input = (formData: FormData) => Object.fromEntries(formData);
 async function guard(organizationId: string, permission: PermissionCode) { if (!(await can(organizationId, permission))) redirect(route(organizationId, "forbidden")); }

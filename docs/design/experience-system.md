@@ -93,3 +93,14 @@ El selector global de sede no se mostrará hasta que cada consulta operativa con
 - Documentos incorpora resumen de activos, próximos vencimientos y archivados; su detalle traduce el contexto y estado sin exponer nombres técnicos.
 - Cumplimiento separa catálogo, decisiones, cortes históricos y evaluaciones mediante navegación estable, estados legibles y auditoría traducida.
 - No se añadió una migración: este corte reutiliza permisos, RLS, acciones y modelos existentes sin cambiar el esquema remoto.
+
+### Estado del cuarto corte: operación y datos sensibles
+
+- Capacitaciones guía el flujo de catálogo, plan, sesión, convocatoria, asistencia, evaluación y certificado; las respuestas se construyen desde preguntas legibles y la calificación sigue ocurriendo en el servidor.
+- EPP prioriza inventario, alertas, asignaciones e historial por persona sin exponer identificadores internos.
+- Contratistas presenta empresas, contratos, requisitos, envíos, evaluaciones y accesos al portal como un expediente operativo filtrable.
+- Incidentes organiza reporte, investigación, personas, causas, acciones, evidencia y cierre con advertencias de privacidad y acceso sensible.
+- Salud ocupacional separa gestión general, acceso médico y decisiones de talento humano; no solicita diagnósticos ni historias clínicas y exige confirmación humana independiente.
+- Emergencias agrupa recursos, brigadas, planes versionados, simulacros, hallazgos, acciones y un directorio local cifrado por sede.
+- Los formularios secundarios se abren bajo demanda, los estados se presentan en lenguaje natural y la navegación contextual permite cambiar de módulo sin perder la organización.
+- No se añadió una migración: este corte reutiliza el modelo, RLS, permisos y auditoría existentes.

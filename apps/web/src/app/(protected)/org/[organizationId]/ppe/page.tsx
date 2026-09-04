@@ -2,9 +2,15 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { EmptyState } from "@/components/empty-state";
+import { OperationsNav } from "@/components/operations-nav";
+import { PageHeader } from "@/components/page-header";
+import { StatusBanner } from "@/components/status-banner";
 import { Input } from "@/components/ui/input";
+import { KpiCard } from "@/components/ui/kpi-card";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Textarea } from "@/components/ui/textarea";
 import { can } from "@/modules/auth/permissions";
+import { displayPersonName } from "@/modules/organizations/directory";
 import { requireAuthenticatedUser } from "@/modules/organizations/tenant";
 import {
   acceptPpeDelivery,
@@ -23,7 +29,7 @@ export default async function PpePage({
   searchParams,
 }: {
   params: Promise<{ organizationId: string }>;
-  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; page?: string; notice?: string }>;
 }) {
   const { organizationId } = await params;
   const filters = await searchParams;
@@ -150,6 +156,11 @@ export default async function PpePage({
   const hidden = (
     <input type="hidden" name="organizationId" value={organizationId} />
   );
+  const memberUserIds = members.map((member: any) => member.user_id);
+  const { data: memberProfiles } = memberUserIds.length
+    ? await db.from("profiles").select("id,first_name,middle_name,last_name,second_last_name").in("id", memberUserIds)
+    : { data: [] };
+  const memberName = (member: any) => displayPersonName(memberProfiles?.find((profile: any) => profile.id === member.user_id), "Persona con acceso restringido");
   const evidence = (
     <>
       <select name="evidence_document_version_id" defaultValue="">
@@ -170,16 +181,11 @@ export default async function PpePage({
   const catalogName = (id: string) =>
     catalog.find((item: any) => item.id === id)?.name ?? "Elemento";
   return (
-    <main className="grid gap-6 p-6">
-      <header>
-        <h1 className="text-3xl font-semibold">
-          Elementos de protección personal
-        </h1>
-        <p className="text-sm text-[var(--muted)]">
-          Inventario trazable, entrega verificable y evidencia privada por
-          trabajador.
-        </p>
-      </header>
+    <main className="grid gap-7">
+      <PageHeader eyebrow="Operación preventiva" title="Elementos de protección personal" description="Controla existencias, entregas, aceptación, inspecciones y reposiciones con evidencia privada." />
+      <OperationsNav organizationId={organizationId} current="ppe" />
+      <StatusBanner status={filters.notice} />
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><KpiCard label="Elementos" value={catalog.length} /><KpiCard label="Unidades disponibles" value={inventory.reduce((total: number, item: any) => total + Number(item.quantity_on_hand ?? 0), 0)} /><KpiCard label="Asignaciones activas" value={assignments.filter((item: any) => item.status === "active").length} /><KpiCard label="Requieren reposición" value={assignments.filter((item: any) => item.replacement_required).length} /></section>
       <Card>
         <CardContent className="pt-6">
           <form className="flex flex-wrap gap-2">
@@ -273,7 +279,7 @@ export default async function PpePage({
                 <select name="organization_member_id">
                   {members.map((m: any) => (
                     <option key={m.id} value={m.id}>
-                      {m.user_id}
+                      {memberName(m)}
                     </option>
                   ))}
                 </select>
@@ -362,20 +368,16 @@ export default async function PpePage({
             const assignmentDeliveries = deliveries.filter(
               (d: any) => d.ppe_assignment_id === assignment.id,
             );
+            const assignedMember = members.find((member: any) => member.id === assignment.organization_member_id);
             const due =
               assignment.life_expires_at &&
               new Date(`${assignment.life_expires_at}T00:00:00Z`) < new Date();
             return (
               <Card key={assignment.id}>
-                <CardHeader>
-                  {catalogName(assignment.ppe_catalog_id)} · {assignment.status}
-                  {assignment.replacement_required || due
-                    ? " · Reemplazo requerido"
-                    : ""}
-                </CardHeader>
+                <CardHeader><div className="flex flex-wrap items-center justify-between gap-3"><span className="font-semibold">{catalogName(assignment.ppe_catalog_id)}</span><div className="flex gap-2"><StatusBadge>{assignment.status}</StatusBadge>{assignment.replacement_required || due ? <StatusBadge status="warning">Reemplazo requerido</StatusBadge> : null}</div></div></CardHeader>
                 <CardContent className="grid gap-3">
                   <p className="text-sm text-[var(--muted)]">
-                    Talla: {assignment.size_label || "No aplica"} · Vida útil:{" "}
+                    {assignedMember ? `${memberName(assignedMember)} · ` : ""}Talla: {assignment.size_label || "No aplica"} · Vida útil:{" "}
                     {assignment.life_expires_at ?? "Sin vencimiento"}
                   </p>
                   {validate && assignment.status === "active" ? (
