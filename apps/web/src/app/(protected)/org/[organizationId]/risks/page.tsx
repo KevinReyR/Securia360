@@ -1,6 +1,7 @@
 import { EmptyState } from "@/components/empty-state";
 import { FormDrawer } from "@/components/form-drawer";
 import { PageHeader } from "@/components/page-header";
+import { SgsstFlowNav } from "@/components/sgsst-flow-nav";
 import { StatusBanner } from "@/components/status-banner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -60,9 +61,11 @@ export default async function RisksPage({ params, searchParams }: { params: Prom
   const openAlerts = alerts ?? [];
   const controlAlerts = new Map(openAlerts.map((alert) => [alert.risk_control_id, alert.alert_type]));
   const { status } = await searchParams;
+  const nextStep = !processes?.length ? "Crea el primer proceso" : !activities?.length ? "Añade una actividad al proceso" : !riskTasks?.length ? "Describe una tarea de trabajo" : !identifications?.length ? "Identifica el primer peligro" : !assessments?.length ? "Evalúa el riesgo con una metodología aprobada" : !controls?.length ? "Define el control prioritario" : "Revisa alertas y eficacia de los controles";
 
-  return <div className="grid gap-7"><PageHeader eyebrow="Matriz de peligros" title="Controles y seguimiento" description="La jerarquía orienta la priorización; la decisión y verificación siguen siendo responsabilidad profesional." /><StatusBanner status={status} />
+  return <div className="grid gap-7"><PageHeader eyebrow="Matriz de peligros" title="Controles y seguimiento" description="La jerarquía orienta la priorización; la decisión y verificación siguen siendo responsabilidad profesional." /><SgsstFlowNav organizationId={organizationId} current="risks" /><StatusBanner status={status} />
     <div className="grid gap-3 sm:grid-cols-3"><KpiCard label="Controles registrados" value={controls?.length ?? 0} /><KpiCard label="Alertas abiertas" value={openAlerts.length} /><KpiCard label="Verificados" value={controls?.filter((control) => control.last_verified_at).length ?? 0} /></div>
+    <aside className="rounded-[14px] border border-[var(--brand-border)] bg-[var(--brand-soft)] p-4"><p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--brand)]">Siguiente paso recomendado</p><p className="mt-1 font-semibold text-[var(--foreground)]">{nextStep}</p><p className="mt-1 text-sm text-[var(--muted-strong)]">La secuencia conserva el contexto desde el proceso hasta la reevaluación.</p></aside>
     <Card><CardHeader><h2 className="font-semibold">Jerarquía de controles</h2></CardHeader><CardContent><ol className="grid gap-2 lg:grid-cols-5">{hierarchy.map(([code, label, description], index) => <li key={code} className="rounded-lg border border-[var(--border)] p-3"><p className="text-xs font-bold text-[var(--brand)]">{index + 1}. {label}</p><p className="mt-1 text-xs leading-5 text-[var(--muted)]">{description}</p></li>)}</ol></CardContent></Card>
     {mayManage ? <Card><CardHeader><h2 className="font-semibold">Construir la matriz</h2><p className="mt-1 text-sm text-[var(--muted)]">Avanza en orden. Cada registro conserva el contexto del paso anterior.</p></CardHeader><CardContent className="flex flex-wrap gap-2">
       <FormDrawer triggerLabel="Proceso" title="Nuevo proceso" description="Define el proceso que agrupa las actividades de trabajo." variant="secondary"><form action={createRiskProcess} className="grid gap-4"><input type="hidden" name="organizationId" value={organizationId}/><label className="grid gap-1.5 text-sm font-medium">Nombre<Input name="name" required /></label><label className="grid gap-1.5 text-sm font-medium">Código<Input name="code" required /></label><label className="grid gap-1.5 text-sm font-medium">Descripción<Textarea name="description" /></label><Button>Crear proceso</Button></form></FormDrawer>

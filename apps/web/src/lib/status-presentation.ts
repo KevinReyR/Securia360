@@ -5,6 +5,7 @@ export type StatusPresentation = { label: string; tone: StatusTone; explanation:
 const statusCatalog: Record<string, StatusPresentation> = {
   active: { label: "Activa", tone: "success", explanation: "Disponible para el trabajo habitual." },
   approved: { label: "Aprobada", tone: "success", explanation: "La revisión requerida fue completada." },
+  reviewed: { label: "Revisada por experto", tone: "success", explanation: "Una persona experta registró su revisión." },
   applicable: { label: "Aplica", tone: "success", explanation: "La regla revisada determinó aplicabilidad para los datos considerados." },
   met: { label: "Cumple", tone: "success", explanation: "La evidencia registrada satisface el criterio evaluado." },
   resolved: { label: "Resuelta", tone: "success", explanation: "La brecha fue cerrada mediante una decisión autorizada." },

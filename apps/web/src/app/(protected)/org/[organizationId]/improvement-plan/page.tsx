@@ -1,6 +1,7 @@
 import { EmptyState } from "@/components/empty-state";
 import { FormDrawer } from "@/components/form-drawer";
 import { PageHeader } from "@/components/page-header";
+import { SgsstFlowNav } from "@/components/sgsst-flow-nav";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -71,6 +72,7 @@ export default async function ImprovementPlanPage({ params, searchParams }: { pa
 
   return <div className="grid gap-7">
     <PageHeader eyebrow="Cierre de brechas" title="Plan de mejoramiento" description="Gestiona brechas, acciones, evidencias y validación sin duplicar el resultado de los recálculos." />
+    <SgsstFlowNav organizationId={organizationId} current="improvement" />
     <ImprovementStatusBanner status={status} />
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><KpiCard label="Brechas abiertas" value={gapsResult.count ?? 0} /><KpiCard label="Acciones pendientes" value={pending} /><KpiCard label="Con evidencia" value={actions.filter((item) => item.evidence_document_version_id).length} /><KpiCard label="Validadas" value={actions.filter((item) => item.status === "verified").length} /></div>
     <Card><CardHeader><h2 className="font-semibold">Flujo de mejora continua</h2></CardHeader><CardContent><ol className="flex flex-wrap gap-2">{flow.map((step, index) => <li key={step} className="rounded-full bg-[var(--muted-surface)] px-3 py-1.5 text-sm font-medium">{index + 1}. {step}</li>)}</ol></CardContent></Card>

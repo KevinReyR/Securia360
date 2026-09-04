@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
 import { FormDrawer } from "@/components/form-drawer";
 import { PageHeader } from "@/components/page-header";
+import { SgsstFlowNav } from "@/components/sgsst-flow-nav";
 import { StatusBanner } from "@/components/status-banner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,10 +42,15 @@ export default async function DocumentsPage({ params, searchParams }: {
   if (state !== "all") query = query.eq("status", state);
   if (q.trim()) query = query.ilike("title", `%${q.trim().replace(/[%_]/g, "")}%`);
 
-  const [documents, mayUpload, mayRead] = await Promise.all([
+  const currentTime = new Date();
+  const expiresBefore = new Date(currentTime.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+  const [documents, mayUpload, mayRead, activeCount, archivedCount, expiringCount] = await Promise.all([
     query.range((currentPage - 1) * pageSize, currentPage * pageSize - 1),
     can(organizationId, "documents.create"),
     can(organizationId, "documents.read"),
+    supabase.from("documents").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).eq("status", "active"),
+    supabase.from("documents").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).eq("status", "archived"),
+    supabase.from("documents").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).eq("status", "active").gte("expires_at", currentTime.toISOString()).lte("expires_at", expiresBefore),
   ]);
   const totalPages = Math.max(1, Math.ceil((documents.count ?? 0) / pageSize));
   const pageHref = (next: number) => `/org/${organizationId}/documents?${new URLSearchParams({ ...(q ? { q } : {}), ...(state !== "active" ? { state } : {}), page: String(next) }).toString()}`;
@@ -67,7 +73,11 @@ export default async function DocumentsPage({ params, searchParams }: {
   return (
     <div className="grid gap-7">
       <PageHeader eyebrow="Biblioteca" title="Documentos y evidencias" description="Consulta versiones, controla vencimientos y conserva cada archivo en su contexto." action={mayUpload ? <FormDrawer triggerLabel="Cargar documento" title="Nuevo documento" description="Añade un archivo general a la biblioteca de la organización.">{uploadForm}</FormDrawer> : undefined} />
+      <SgsstFlowNav organizationId={organizationId} current="documents" />
       <StatusBanner status={status} />
+      <section aria-label="Resumen documental" className="grid gap-px overflow-hidden rounded-[14px] border border-[var(--border)] bg-[var(--border)] sm:grid-cols-3">
+        {[["Documentos activos", activeCount.count ?? 0], ["Vencen en 30 días", expiringCount.count ?? 0], ["Archivados", archivedCount.count ?? 0]].map(([label, value]) => <div key={label} className="bg-[var(--surface)] p-4"><p className="text-xs font-medium text-[var(--muted)]">{label}</p><p className="mt-1 text-2xl font-semibold tracking-[-0.04em]">{value}</p></div>)}
+      </section>
       <Card>
         <CardHeader className="border-b border-[var(--border)]"><CardTitle>Biblioteca</CardTitle></CardHeader>
         <CardContent className="grid gap-5 pt-5">

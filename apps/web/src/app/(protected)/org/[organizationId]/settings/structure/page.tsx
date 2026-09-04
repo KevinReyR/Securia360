@@ -1,6 +1,10 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { Buildings, MapPin, TreeStructure } from "@phosphor-icons/react/dist/ssr";
 import { EmptyState } from "@/components/empty-state";
 import { StructureDeleteForm } from "@/components/structure-delete-form";
 import { FormDrawer } from "@/components/form-drawer";
+import { OrganizationSettingsNav } from "@/components/organization-settings-nav";
 import { PageHeader } from "@/components/page-header";
 import { StatusBanner } from "@/components/status-banner";
 import { Badge } from "@/components/ui/badge";
@@ -54,7 +58,13 @@ export default async function StructureSettings({ params, searchParams }: { para
   return (
     <div className="grid gap-7">
       <PageHeader title="Estructura empresarial" description="Organiza razones sociales, sedes y áreas para mantener cada actividad en el contexto correcto." />
+      <OrganizationSettingsNav organizationId={organizationId} current="structure" />
       <StatusBanner status={status} />
+      <section aria-label="Resumen de estructura" className="grid gap-3 sm:grid-cols-3">
+        <StructureMetric icon={<Buildings size={20} weight="duotone" />} label="Razones sociales activas" value={(entities ?? []).filter((item) => item.status === "active").length} />
+        <StructureMetric icon={<MapPin size={20} weight="duotone" />} label="Sedes activas" value={(sites ?? []).filter((item) => item.status === "active").length} />
+        <StructureMetric icon={<TreeStructure size={20} weight="duotone" />} label="Áreas activas" value={(areas ?? []).filter((item) => item.status === "active").length} />
+      </section>
       <form className="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:grid-cols-[1fr_10rem_12rem_auto]" method="get"><Input name="q" defaultValue={q} placeholder="Buscar por nombre o código" aria-label="Buscar estructura" /><Select name="state" defaultValue={state} aria-label="Filtrar por estado"><option value="all">Todos los estados</option><option value="active">Activos</option><option value="inactive">Inactivos</option></Select><Select name="site" defaultValue={selectedSite} aria-label="Filtrar por sede"><option value="all">Todas las sedes</option>{sites?.map((site) => <option key={site.id} value={site.id}>{site.name}</option>)}</Select><Button type="submit">Filtrar</Button></form>
       {maxPages > 1 ? <nav aria-label="Paginación de estructura" className="flex items-center justify-end gap-3 text-sm"><Link className="text-[var(--brand)] disabled:pointer-events-none" aria-disabled={selectedPage === 1} href={pageHref(Math.max(1, selectedPage - 1))}>Anterior</Link><span className="text-[var(--muted)]">Página {selectedPage} de {maxPages}</span><Link className="text-[var(--brand)]" aria-disabled={selectedPage === maxPages} href={pageHref(Math.min(maxPages, selectedPage + 1))}>Siguiente</Link></nav> : null}
       <Card>
@@ -108,6 +118,10 @@ function StatusForm({ organizationId, table, id, active, siteId }: { organizatio
   return <form action={setStructureStatus}><input type="hidden" name="organizationId" value={organizationId} /><input type="hidden" name="table" value={table} /><input type="hidden" name="id" value={id} /><input type="hidden" name="status" value={active ? "inactive" : "active"} />{siteId ? <input type="hidden" name="siteId" value={siteId} /> : null}<Button type="submit" size="sm" variant="secondary">{active ? "Desactivar" : "Activar"}</Button></form>;
 }
 
+function StructureMetric({ icon, label, value }: { icon: ReactNode; label: string; value: number }) {
+  return <div className="flex items-center gap-4 border-b border-[var(--border)] px-1 py-4"><span className="grid size-10 place-items-center rounded-[10px] bg-[var(--brand-soft)] text-[var(--brand)]">{icon}</span><div><p className="font-mono text-2xl font-semibold tabular-nums tracking-[-0.04em]">{value}</p><p className="mt-0.5 text-xs text-[var(--muted)]">{label}</p></div></div>;
+}
+
 function LegalEntityEditForm({ organizationId, entity }: { organizationId: string; entity: LegalEntity }) {
   return <details className="mt-4 border-t border-[var(--border)] pt-3"><summary className="cursor-pointer text-sm font-semibold text-[var(--brand)]">Editar datos</summary><form action={updateLegalEntity} className="mt-4 grid gap-3 sm:grid-cols-2"><input type="hidden" name="organizationId" value={organizationId} /><input type="hidden" name="entityId" value={entity.id} /><label className="grid gap-2 text-sm font-medium sm:col-span-2">Razón social<Input name="legal_name" defaultValue={entity.legal_name} required /></label><label className="grid gap-2 text-sm font-medium">Nombre comercial<Input name="trade_name" defaultValue={entity.trade_name ?? ""} /></label><label className="grid gap-2 text-sm font-medium">NIT<Input name="tax_id" defaultValue={entity.tax_id} required /></label><label className="grid gap-2 text-sm font-medium">CIIU<Input name="ciiu_code" defaultValue={entity.ciiu_code ?? ""} /></label><label className="grid gap-2 text-sm font-medium">Actividad económica<Input name="economic_activity" defaultValue={entity.economic_activity ?? ""} /></label><label className="grid gap-2 text-sm font-medium">Representante legal<Input name="legal_representative" defaultValue={entity.legal_representative ?? ""} /></label><label className="grid gap-2 text-sm font-medium">Trabajadores<Input name="employee_count" type="number" min={0} defaultValue={entity.employee_count} required /></label><label className="grid gap-2 text-sm font-medium">Clase de riesgo<RiskSelect value={entity.risk_class ?? 1} /></label><div className="sm:col-span-2"><Button type="submit" size="sm">Guardar cambios</Button></div></form></details>;
 }
@@ -123,4 +137,3 @@ function AreaEditForm({ organizationId, area, sites, areas }: { organizationId: 
 function RiskSelect({ value }: { value: number }) {
   return <Select name="risk_class" defaultValue={String(value)}><option value="1">I</option><option value="2">II</option><option value="3">III</option><option value="4">IV</option><option value="5">V</option></Select>;
 }
-import Link from "next/link";

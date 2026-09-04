@@ -74,3 +74,22 @@ La infraestructura visual, landing, acceso, selector de organización, shell, na
 - Validado: vista pública en 360, 768, 1280 y 1440 px, teclado básico, movimiento reducido, lint, tipos, pruebas y build.
 
 El selector global de sede no se mostrará hasta que cada consulta operativa consuma ese alcance. Mostrarlo antes produciría una expectativa falsa de filtrado y podría mezclar resultados de distintas sedes. Los módulos sensibles y de gobierno adoptarán estos patrones como cortes independientes antes de declararlos renovados.
+
+### Estado del segundo corte: Organización y personas
+
+- La configuración empresarial comparte una navegación estable entre Empresa, Estructura, Personas y Mi perfil.
+- Empresa presenta identidad, estado, país, zona horaria y métricas de estructura antes de ofrecer acciones de edición.
+- Personas separa dos conceptos: los miembros con acceso a la plataforma y la nómina operativa sin credenciales.
+- Los miembros disponen de ficha legible con responsabilidades, alcance por sede, estado, actividad auditada y retiro confirmado de accesos.
+- Los trabajadores disponen de ficha laboral mínima, ubicación y origen de importación; sus cambios continúan en el flujo auditado de importaciones.
+- Búsqueda, filtros, paginación, estados vacíos y enlaces de detalle conservan el contexto de la organización.
+- No se añadieron tablas ni permisos: las consultas reutilizan el JWT del actor, RLS y `can(permission, context)` existentes.
+
+### Estado del tercer corte: flujos centrales SG-SST
+
+- Cumplimiento, mejoramiento, planificación, riesgos y documentos comparten una navegación contextual que permite continuar el trabajo sin volver al menú principal.
+- Planificación muestra un resumen de carga, vencimientos, responsables y cierres antes del tablero o la agenda.
+- Riesgos orienta el siguiente paso según el avance real de la matriz y mantiene bloqueado el cálculo cuando no existe metodología aprobada y revisada.
+- Documentos incorpora resumen de activos, próximos vencimientos y archivados; su detalle traduce el contexto y estado sin exponer nombres técnicos.
+- Cumplimiento separa catálogo, decisiones, cortes históricos y evaluaciones mediante navegación estable, estados legibles y auditoría traducida.
+- No se añadió una migración: este corte reutiliza permisos, RLS, acciones y modelos existentes sin cambiar el esquema remoto.
