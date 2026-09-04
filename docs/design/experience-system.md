@@ -104,3 +104,14 @@ El selector global de sede no se mostrará hasta que cada consulta operativa con
 - Emergencias agrupa recursos, brigadas, planes versionados, simulacros, hallazgos, acciones y un directorio local cifrado por sede.
 - Los formularios secundarios se abren bajo demanda, los estados se presentan en lenguaje natural y la navegación contextual permite cambiar de módulo sin perder la organización.
 - No se añadió una migración: este corte reutiliza el modelo, RLS, permisos y auditoría existentes.
+
+### Estado del quinto corte: gobierno e inteligencia
+
+- Gobierno reúne Comités, Auditorías y Revisión por la dirección en una experiencia común, con resumen ejecutivo, estados legibles, responsables por nombre y advertencias claras de inmutabilidad e independencia.
+- Analítica separa visualmente el estado vivo de los resultados históricos. Las fórmulas, fuentes, metas y alcances se explican sin presentar configuración técnica como información de negocio.
+- Automatizaciones incorpora un constructor declarativo, versiones, simulación, ejecuciones, reintentos y apagado de emergencia sin mostrar JSON, SQL ni código arbitrario.
+- Importaciones guía carga, mapeo, vista previa, validación, confirmación y reversión. Las columnas y errores se presentan con etiquetas legibles y el historial conserva idempotencia y trazabilidad.
+- Securia Copilot utiliza una conversación enfocada, fuentes visibles, advertencias de contexto no confiable y propuestas que siempre requieren decisión humana; no ejecuta acciones críticas.
+- La bandeja de notificaciones distingue prioridad y lectura, ofrece filtros y preferencias personales, y conserva mensajes seguros sin información sensible completa.
+- Indicadores, automatizaciones e importaciones comparten navegación contextual dentro de Análisis; todos los accesos mantienen el JWT del actor, `can(permission, context)` y RLS existentes.
+- No se añadió una migración ni se modificó Supabase: este corte es exclusivamente de interfaz, lenguaje y organización de flujos ya protegidos.
