@@ -2,11 +2,11 @@ import type { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-card)]", className)} {...props} />;
+  return <div className={cn("rounded-[14px] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-card)]", className)} {...props} />;
 }
 
 export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("border-b border-[var(--border)] px-5 py-4", className)} {...props} />;
+  return <div className={cn("border-b border-[var(--border)] px-5 py-[18px]", className)} {...props} />;
 }
 
 export function CardContent({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
@@ -14,7 +14,7 @@ export function CardContent({ className, ...props }: HTMLAttributes<HTMLDivEleme
 }
 
 export function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {
-  return <h3 className={cn("font-semibold tracking-[-0.01em]", className)} {...props} />;
+  return <h3 className={cn("font-semibold tracking-[-0.018em]", className)} {...props} />;
 }
 
 export function CardDescription({ className, ...props }: HTMLAttributes<HTMLParagraphElement>) {

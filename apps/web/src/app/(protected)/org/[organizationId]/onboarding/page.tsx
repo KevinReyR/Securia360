@@ -35,7 +35,7 @@ export default async function OnboardingPage({ params, searchParams }: { params:
   const memberOptions: OnboardingMemberOption[] = (members ?? []).map((member) => {
     const profile = profiles?.find((item) => item.id === member.user_id);
     const name = profile ? `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim() : "";
-    return { id: member.id, label: name || (member.user_id === userId ? "Usuario creador" : member.user_id) };
+    return { id: member.id, label: name || (member.user_id === userId ? "Persona que creó la organización" : "Persona sin perfil completo") };
   });
 
   const fallbackSites = (existingSites ?? [])
@@ -70,5 +70,5 @@ export default async function OnboardingPage({ params, searchParams }: { params:
   };
   const { status } = await searchParams;
 
-  return <div><PageHeader eyebrow="Configuración empresarial" title="Onboarding de la organización" description="El avance se guarda en cada paso y puede retomarse más adelante." /><div className="mt-6"><StatusBanner status={status} /><Card><CardContent><OnboardingForm organizationId={organizationId} initialStep={progress?.current_step ?? 1} initialValues={initialValues} members={memberOptions} /></CardContent></Card></div></div>;
+  return <div className="mx-auto max-w-6xl"><PageHeader eyebrow="Puesta en marcha" title="Configura tu organización" description="Avanza paso a paso. Guardaremos el progreso para que puedas continuar después." /><div className="mt-6"><StatusBanner status={status} /><Card><CardContent className="p-6 lg:p-8"><OnboardingForm organizationId={organizationId} initialStep={progress?.current_step ?? 1} initialValues={initialValues} members={memberOptions} /></CardContent></Card></div></div>;
 }

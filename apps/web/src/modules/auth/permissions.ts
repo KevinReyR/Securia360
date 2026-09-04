@@ -102,3 +102,18 @@ export async function can(organizationId: string, permission: PermissionCode, si
   });
   return !error && data === true;
 }
+
+export async function listPermissionCodes(organizationId: string, userId: string): Promise<PermissionCode[]> {
+  const supabase = await createClient();
+  const { data: membership } = await supabase.from("organization_members").select("id").eq("organization_id", organizationId).eq("user_id", userId).eq("status", "active").maybeSingle();
+  if (!membership) return [];
+  const { data: assignments } = await supabase.from("member_roles").select("role_id").eq("organization_id", organizationId).eq("organization_member_id", membership.id);
+  const roleIds = [...new Set((assignments ?? []).map((assignment) => assignment.role_id))];
+  if (!roleIds.length) return ["organization.read"];
+  const { data } = await supabase.from("role_permissions").select("permissions!inner(code)").in("role_id", roleIds);
+  const known = new Set<string>(permissionCodes);
+  return [...new Set((data ?? []).flatMap((row) => {
+    const permission = row.permissions as unknown as { code?: string } | null;
+    return permission?.code && known.has(permission.code) ? [permission.code as PermissionCode] : [];
+  }))];
+}

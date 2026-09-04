@@ -1,5 +1,7 @@
 # Securia360
 
+Securia360 es una plataforma empresarial de gestión SG-SST desarrollada por Reinova Labs. La experiencia visual y sus patrones de interacción están documentados en [docs/design/experience-system.md](docs/design/experience-system.md). La evaluación de nombre e identidad permanece abierta y se documenta en [docs/brand/identity-and-naming.md](docs/brand/identity-and-naming.md).
+
 Núcleo SaaS multiempresa de Reinova Labs para Securia360. Esta iteración incorpora autenticación, RBAC, aislamiento por RLS y estructura empresarial sobre Next.js y Supabase.
 
 ## Requisitos

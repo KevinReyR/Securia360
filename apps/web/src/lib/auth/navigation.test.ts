@@ -15,11 +15,11 @@ describe("safeNextPath", () => {
 });
 
 describe("isPublicAuthPath", () => {
-  it.each(["/auth/login", "/auth/signup", "/auth/callback"])("allows %s without a session", (path) => {
+  it.each(["/", "/auth/login", "/auth/signup", "/auth/callback", "/auth/forgot-password", "/auth/reset-password"])("allows %s without a session", (path) => {
     expect(isPublicAuthPath(path)).toBe(true);
   });
 
-  it.each(["/dashboard", "/auth/admin", "/"])("keeps %s protected", (path) => {
+  it.each(["/dashboard", "/auth/admin"])("keeps %s protected", (path) => {
     expect(isPublicAuthPath(path)).toBe(false);
   });
 });

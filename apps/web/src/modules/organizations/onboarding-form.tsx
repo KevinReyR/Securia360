@@ -26,12 +26,12 @@ type OnboardingFormProps = {
 };
 
 const steps = [
-  { title: "Organización", description: "Identidad del tenant" },
-  { title: "Razón social", description: "Entidad jurídica principal" },
+  { title: "Organización", description: "Datos principales" },
+  { title: "Razón social", description: "Información jurídica" },
   { title: "Actividad económica", description: "Descripción de la operación" },
   { title: "CIIU", description: "Clasificación económica" },
-  { title: "Trabajadores", description: "Fuente para aplicabilidad" },
-  { title: "Clase de riesgo", description: "Clasificación vigente" },
+  { title: "Trabajadores", description: "Tamaño de la empresa" },
+  { title: "Clase de riesgo", description: "Información de la actividad" },
   { title: "Sedes", description: "Ubicaciones operativas" },
   { title: "Responsable SST", description: "Miembro responsable" },
   { title: "Caracterización", description: "Condiciones de la operación" },
@@ -136,12 +136,12 @@ export function OnboardingForm({ organizationId, initialStep, initialValues, mem
         {step === 3 ? <Field label="Actividad económica principal" error={form.formState.errors.economic_activity?.economic_activity?.message}><Input {...form.register("economic_activity.economic_activity")} placeholder="Describe brevemente la actividad principal" /></Field> : null}
         {step === 4 ? <Field label="Código CIIU" error={form.formState.errors.ciiu?.ciiu_code?.message}><Input {...form.register("ciiu.ciiu_code")} inputMode="numeric" maxLength={4} placeholder="Ej. 6201" /></Field> : null}
         {step === 5 ? <Field label="Número de trabajadores" error={form.formState.errors.workforce?.employee_count?.message}><Input type="number" min={0} max={10_000_000} {...form.register("workforce.employee_count", { valueAsNumber: true })} /></Field> : null}
-        {step === 6 ? <Field label="Clase de riesgo"><Select {...form.register("risk.risk_class", { valueAsNumber: true })}><option value={1}>I — Riesgo mínimo</option><option value={2}>II — Riesgo bajo</option><option value={3}>III — Riesgo medio</option><option value={4}>IV — Riesgo alto</option><option value={5}>V — Riesgo máximo</option></Select></Field> : null}
+        {step === 6 ? <Field label="Clase de riesgo"><Select {...form.register("risk.risk_class", { valueAsNumber: true })}><option value={1}>I - Riesgo mínimo</option><option value={2}>II - Riesgo bajo</option><option value={3}>III - Riesgo medio</option><option value={4}>IV - Riesgo alto</option><option value={5}>V - Riesgo máximo</option></Select></Field> : null}
         {step === 7 ? <div className="grid gap-4">{sites.fields.map((site, index) => <fieldset key={site.id} className="grid gap-4 rounded-xl border border-[var(--border)] p-4 sm:grid-cols-2"><legend className="px-2 text-sm font-semibold">Sede {index + 1}</legend><Field label="Nombre" error={form.formState.errors.sites?.[index]?.name?.message}><Input {...form.register(`sites.${index}.name`)} /></Field><Field label="Código" error={form.formState.errors.sites?.[index]?.code?.message}><Input {...form.register(`sites.${index}.code`)} /></Field><Field label="Dirección"><Input {...form.register(`sites.${index}.address`)} /></Field><Field label="Ciudad"><Input {...form.register(`sites.${index}.city`)} /></Field><Field label="Departamento"><Input {...form.register(`sites.${index}.department`)} /></Field><div className="flex items-end justify-end"><Button type="button" size="sm" variant="ghost" disabled={sites.fields.length === 1} onClick={() => sites.remove(index)}><Trash aria-hidden="true" /> Retirar sede</Button></div></fieldset>)}<Button type="button" variant="secondary" className="justify-self-start" onClick={() => sites.append({ name: "", code: "", address: "", city: "", department: "" })}><Plus aria-hidden="true" /> Agregar sede</Button></div> : null}
         {step === 8 ? <div className="grid gap-4"><Field label="Miembro responsable del SG-SST" error={form.formState.errors.responsible?.member_id?.message}><Select {...form.register("responsible.member_id")}><option value="">Selecciona un miembro activo</option>{members.map((member) => <option key={member.id} value={member.id}>{member.label}</option>)}</Select></Field><p className="text-sm text-[var(--muted)]">Al finalizar se asignará el rol global Responsable SST sin retirar los roles existentes.</p></div> : null}
         {step === 9 ? <fieldset><legend className="mb-4 text-sm font-semibold">Selecciona las condiciones presentes en la operación</legend><div className="grid gap-3 sm:grid-cols-2">{characteristicFields.map(([name, label]) => <Controller key={name} control={form.control} name={`characteristics.${name}`} render={({ field }) => <label className="flex min-h-12 items-center gap-3 rounded-lg border border-[var(--border)] bg-white p-3 text-sm transition-colors hover:bg-[var(--muted-surface)]"><Checkbox checked={field.value} onCheckedChange={(checked) => field.onChange(checked === true)} />{label}</label>} />)}</div></fieldset> : null}
         {message ? <Alert variant="danger" className="mt-6">{message}</Alert> : null}
-        <div className="mt-7 flex flex-wrap justify-between gap-3 border-t border-[var(--border)] pt-5"><Button type="button" variant="secondary" disabled={step === 1 || pending} onClick={() => setStep((current) => Math.max(current - 1, 1))}>Anterior</Button>{step < 9 ? <Button type="button" disabled={pending} onClick={continueFlow}>{pending ? "Guardando…" : "Guardar y continuar"}</Button> : <Button type="button" disabled={pending} onClick={finishFlow}>{pending ? "Finalizando…" : "Finalizar configuración"}</Button>}</div>
+        <div className="mt-7 flex flex-wrap justify-between gap-3 border-t border-[var(--border)] pt-5"><Button type="button" variant="secondary" disabled={step === 1 || pending} onClick={() => setStep((current) => Math.max(current - 1, 1))}>Anterior</Button>{step < 9 ? <Button type="button" disabled={pending} onClick={continueFlow}>{pending ? "Guardando..." : "Guardar y continuar"}</Button> : <Button type="button" disabled={pending} onClick={finishFlow}>{pending ? "Finalizando..." : "Finalizar configuración"}</Button>}</div>
       </form>
     </div>
   );

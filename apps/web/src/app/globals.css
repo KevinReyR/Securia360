@@ -1,23 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f6f5;
-  --foreground: #17221c;
+  --background: #f3f5f4;
+  --foreground: #162019;
   --surface: #ffffff;
   --surface-raised: #ffffff;
-  --muted: #647168;
-  --muted-strong: #48544d;
-  --muted-surface: #f0f3f1;
-  --neutral-soft: #e9eeeb;
-  --border: #d9e0db;
-  --border-strong: #b9c5bd;
-  --brand: #17643a;
-  --brand-hover: #10532f;
-  --brand-soft: #dff2e6;
-  --focus-ring: rgb(23 100 58 / 20%);
-  --sidebar: #10251a;
-  --sidebar-surface: #193524;
-  --sidebar-border: #2d4b38;
+  --muted: #647067;
+  --muted-strong: #455148;
+  --muted-surface: #f0f2f1;
+  --muted-bg: var(--muted-surface);
+  --neutral-soft: #e9edeb;
+  --border: #dce1de;
+  --border-strong: #bac4be;
+  --brand: #12663b;
+  --brand-hover: #0d512f;
+  --brand-strong: #0d512f;
+  --brand-soft: #e2f2e8;
+  --primary: var(--brand);
+  --ring: var(--brand);
+  --focus-ring: rgb(18 102 59 / 22%);
+  --sidebar: #14231b;
+  --sidebar-surface: #1c3024;
+  --sidebar-border: #2d4638;
   --sidebar-text: #f1f8f3;
   --sidebar-muted: #a9beb0;
   --success: #146c43;
@@ -36,7 +40,7 @@
   --danger-border: #edc2c2;
   --skeleton: #e4e9e6;
   --shadow-control: 0 1px 2px rgb(16 37 26 / 5%);
-  --shadow-card: 0 1px 2px rgb(16 37 26 / 4%);
+  --shadow-card: 0 1px 2px rgb(16 37 26 / 3%);
   --shadow-overlay: 0 24px 64px rgb(16 37 26 / 18%), 0 4px 14px rgb(16 37 26 / 8%);
 }
 
@@ -49,7 +53,7 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   font-size: 1rem;
   line-height: 1.5;
   font-optical-sizing: auto;
@@ -62,6 +66,13 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+code,
+kbd,
+pre,
+.font-mono {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 button,
@@ -126,4 +137,12 @@ select {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
 }

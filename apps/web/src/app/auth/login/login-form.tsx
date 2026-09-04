@@ -26,7 +26,7 @@ export function LoginForm({ next }: { next: string }) {
         />
       </label>
       <label className="grid gap-2 text-sm font-medium">
-        Contraseña
+        <span className="flex items-center justify-between gap-3">Contraseña<a href="/auth/forgot-password" className="text-xs font-semibold text-[var(--brand)] hover:underline">¿La olvidaste?</a></span>
         <Input
           className="h-11"
           name="password"
@@ -45,7 +45,7 @@ export function LoginForm({ next }: { next: string }) {
         type="submit"
         disabled={pending}
       >
-        {pending ? "Ingresando…" : "Iniciar sesión"}
+        {pending ? "Ingresando..." : "Iniciar sesión"}
       </Button>
     </form>
   );
