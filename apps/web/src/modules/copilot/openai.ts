@@ -1,5 +1,11 @@
 import OpenAI from "openai";
-export function copilotConfig() { const apiKey = process.env.OPENAI_API_KEY; const model = process.env.OPENAI_COPILOT_MODEL; return apiKey && model ? { apiKey, model } : null; }
+export function copilotConfig() {
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
+  // Vercel occasionally preserves a pasted line break; accept only the first
+  // token so the provider receives a valid model identifier.
+  const model = process.env.OPENAI_COPILOT_MODEL?.trim().split(/\s+/)[0];
+  return apiKey && model ? { apiKey, model } : null;
+}
 export async function askOpenAi(question: string, context: string) {
   const config = copilotConfig(); if (!config) return { text: "Copilot está disponible en modo consulta, pero falta configurar el proveedor de IA en el servidor.", responseId: null, blocked: true };
   const client = new OpenAI({ apiKey: config.apiKey, timeout: 30_000 });
