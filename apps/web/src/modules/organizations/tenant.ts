@@ -64,10 +64,29 @@ export async function getPreferredOrganizationId() {
   return cookieStore.get(ACTIVE_ORGANIZATION_COOKIE)?.value ?? null;
 }
 
+export function resolveInitialDestination(input: {
+  internalRole: string | null;
+  organizations: OrganizationSummary[];
+  preferredOrganizationId: string | null;
+}) {
+  if (input.internalRole === "saas_admin" || input.internalRole === "saas_support") return "/internal/saas-admin";
+  if (input.organizations.length === 0) return "/organizations";
+  const active = input.organizations.find((item) => item.id === input.preferredOrganizationId) ?? input.organizations[0];
+  return `/org/${active.id}/dashboard`;
+}
+
 export async function redirectToActiveTenant() {
+  const { userId, supabase } = await requireAuthenticatedUser();
+  const { data: internalRole } = await supabase
+    .from("saas_admin_roles")
+    .select("role,status")
+    .eq("user_id", userId)
+    .maybeSingle();
   const organizations = await listOrganizations();
-  if (organizations.length === 0) redirect("/organizations");
   const preferred = await getPreferredOrganizationId();
-  const active = organizations.find((item) => item.id === preferred) ?? organizations[0];
-  redirect(`/org/${active.id}/dashboard`);
+  redirect(resolveInitialDestination({
+    internalRole: internalRole?.status === "active" ? internalRole.role : null,
+    organizations,
+    preferredOrganizationId: preferred,
+  }));
 }

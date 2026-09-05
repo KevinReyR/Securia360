@@ -17,6 +17,7 @@ export type E2EFixture = {
   userB: TestUser;
   switcher: TestUser;
   member: TestUser;
+  internalAdmin: TestUser;
   deleteUserByEmail: (email: string) => Promise<void>;
   cleanup: () => Promise<void>;
 };
@@ -68,6 +69,15 @@ export async function createE2EFixture(): Promise<E2EFixture> {
   const userB = await createUser("admin-b");
   const switcher = await createUser("switcher");
   const member = await createUser("member");
+  const internalAdmin = await createUser("saas-admin");
+  const internalRole = await admin.from("saas_admin_roles").insert({
+    user_id: internalAdmin.id,
+    role: "saas_admin",
+    status: "active",
+    granted_by: internalAdmin.id,
+    reason: "Administrador efímero para validar el acceso E2E.",
+  });
+  assertNoError(internalRole, "grant E2E SaaS administrator");
 
   const organizationAName = `E2E Organización A ${prefix}`;
   const organizationBName = `E2E Organización B ${prefix}`;
@@ -178,11 +188,13 @@ export async function createE2EFixture(): Promise<E2EFixture> {
     }
     const deleteOrganizations = await admin.from("organizations").delete().in("id", organizationIds);
     assertNoError(deleteOrganizations, "delete E2E organizations");
+    const deleteInternalRole = await admin.from("saas_admin_roles").delete().eq("user_id", internalAdmin.id);
+    assertNoError(deleteInternalRole, "delete E2E SaaS administrator role");
     await Promise.all(createdUserIds.map(async (id) => {
       const deleted = await admin.auth.admin.deleteUser(id);
       assertNoError(deleted, `delete E2E user ${id}`);
     }));
   };
 
-  return { runId, organizationA, organizationB, organizationAName, organizationBName, siteA, improvementGapA, improvementGapTitle, siteManagerRole, userA, userB, switcher, member, deleteUserByEmail, cleanup };
+  return { runId, organizationA, organizationB, organizationAName, organizationBName, siteA, improvementGapA, improvementGapTitle, siteManagerRole, userA, userB, switcher, member, internalAdmin, deleteUserByEmail, cleanup };
 }

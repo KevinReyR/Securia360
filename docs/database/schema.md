@@ -24,6 +24,7 @@
 | Gobierno y analítica | comités, firmas internas de actas, auditorías, revisión por la dirección e indicadores versionados | Históricos, segregación de aprobación y resultados reproducibles por período. |
 | Notificaciones | preferencias, plantillas, bandeja, entregas y `notification_event_consumptions` | Bandeja privada, consumo idempotente independiente del outbox, quiet hours solo para correo y Realtime limitado al destinatario. |
 | Automatizaciones | `automation_rules`, versiones y ejecuciones | Motor declarativo, versionado, con apagado de emergencia, cron, reintentos e idempotencia por evento. |
+| Administración SaaS | `billing_plans`, `billing_plan_versions`, `billing_subscriptions`, `billing_usage_periods`, `billing_reconciliations`, `saas_support_sessions`, `saas_admin_roles`, `saas_admin_audit` | Planes comerciales versionados, suscripción anclada a versión, conciliación manual y soporte interno sin alterar RBAC/RLS del tenant. |
 
 ## Convenciones
 
@@ -47,6 +48,9 @@
 Las entidades normativas (`normative_sources`, `requirements`, `minimum_standards`, `risk_methodologies`, clasificaciones y snapshots) se incorporarán en la iteración normativa. La separación conceptual definida en `AGENTS.md` no debe colapsarse en una tabla genérica de regulaciones.
 
 ## Migraciones
+
+- `20260905024816_complete_saas_admin_console.sql`: versiona planes, fija la versión aplicada por suscripción, añade conciliaciones manuales, corrige la validación de operadores de soporte y restringe todas las mutaciones a operaciones internas auditadas.
+- `20260905030238_allow_saas_internal_organization_directory.sql`: permite a operadores SaaS activos consultar únicamente el directorio base de organizaciones necesario para suscripciones y soporte, sin ampliar acceso a datos operativos del tenant.
 
 - `20260828235342_complete_workforce_imports.sql`: crea `workers` como nómina mínima no sensible, completa staging privado de CSV/XLSX, efectos y reversión lógica, solicitud única de recálculo y políticas RLS/Storage de importaciones.
 - `20260829000646_validate_import_preview_references.sql`: convierte referencias inexistentes y códigos repetidos en errores visibles por fila durante la previsualización.

@@ -14,7 +14,7 @@ async function login(page: Page, email: string, password: string) {
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña").fill(password);
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
-  await page.waitForURL(/\/(organizations|org\/[^/]+\/dashboard)$/);
+  await page.waitForURL(/\/(organizations|internal\/saas-admin|org\/[^/]+\/dashboard)$/);
 }
 
 async function logout(page: Page) {
@@ -40,6 +40,19 @@ test.describe("critical isolated SaaS flows", () => {
 
   test.afterAll(async () => {
     await fixture?.cleanup();
+  });
+
+  test("routes an internal administrator to the platform console and denies a tenant administrator", async ({ page }) => {
+    await login(page, fixture.internalAdmin.email, fixture.internalAdmin.password);
+    await expect(page).toHaveURL(/\/internal\/saas-admin/);
+    await expect(page.getByRole("heading", { name: "Resumen" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Planes" })).toBeVisible();
+    await page.getByRole("button", { name: "Cerrar sesión" }).click();
+    await page.waitForURL(/\/auth\/login$/);
+
+    await login(page, fixture.userA.email, fixture.userA.password);
+    await page.goto("/internal/saas-admin");
+    await expect(page).toHaveURL(/\/organizations$/);
   });
 
   test("signs up without email confirmation, resumes onboarding, completes it, and logs out", async ({ page }) => {

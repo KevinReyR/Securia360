@@ -32,6 +32,7 @@ export function StatusBanner({ status }: { status?: string }) {
     notfound: { variant: "danger", text: "El recurso no existe o no tienes acceso a él." },
     error: { variant: "danger", text: "No fue posible guardar. Revisa los datos y tus permisos." },
     invalid: { variant: "danger", text: "Hay datos incompletos o inválidos. Revisa los campos señalados." },
+    conflict: { variant: "warning", text: "Ya existe un registro con esa referencia o hay un borrador pendiente. Revisa el historial antes de continuar." },
     "calculation-error": { variant: "danger", text: "No fue posible solicitar el cálculo. Revisa la versión, el período y tus permisos." },
     "commit-error": { variant: "danger", text: "No fue posible confirmar la importación. Revisa sus validaciones y vuelve a intentarlo." },
     "rollback-error": { variant: "danger", text: "No fue posible revertir todos los efectos. Consulta el reporte de conflictos." },

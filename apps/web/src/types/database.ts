@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       activities: {
@@ -1291,10 +1266,64 @@ export type Database = {
           },
         ]
       }
+      billing_plan_versions: {
+        Row: {
+          billing_plan_id: string
+          created_at: string
+          created_by: string | null
+          feature_flags: Json
+          id: string
+          limits: Json
+          name_snapshot: string
+          published_at: string | null
+          published_by: string | null
+          status: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          billing_plan_id: string
+          created_at?: string
+          created_by?: string | null
+          feature_flags?: Json
+          id?: string
+          limits?: Json
+          name_snapshot: string
+          published_at?: string | null
+          published_by?: string | null
+          status?: string
+          updated_at?: string
+          version: number
+        }
+        Update: {
+          billing_plan_id?: string
+          created_at?: string
+          created_by?: string | null
+          feature_flags?: Json
+          id?: string
+          limits?: Json
+          name_snapshot?: string
+          published_at?: string | null
+          published_by?: string | null
+          status?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_plan_versions_billing_plan_id_fkey"
+            columns: ["billing_plan_id"]
+            isOneToOne: false
+            referencedRelation: "billing_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       billing_plans: {
         Row: {
           code: string
           created_at: string
+          current_version_id: string | null
           feature_flags: Json
           id: string
           limits: Json
@@ -1306,6 +1335,7 @@ export type Database = {
         Insert: {
           code: string
           created_at?: string
+          current_version_id?: string | null
           feature_flags?: Json
           id?: string
           limits?: Json
@@ -1317,6 +1347,7 @@ export type Database = {
         Update: {
           code?: string
           created_at?: string
+          current_version_id?: string | null
           feature_flags?: Json
           id?: string
           limits?: Json
@@ -1325,11 +1356,87 @@ export type Database = {
           updated_at?: string
           version?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "billing_plans_current_version_fk"
+            columns: ["current_version_id", "id"]
+            isOneToOne: false
+            referencedRelation: "billing_plan_versions"
+            referencedColumns: ["id", "billing_plan_id"]
+          },
+        ]
+      }
+      billing_reconciliations: {
+        Row: {
+          billing_subscription_id: string
+          created_at: string
+          id: string
+          note: string | null
+          occurred_at: string
+          organization_id: string
+          recorded_by: string
+          reference: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          billing_subscription_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          occurred_at: string
+          organization_id: string
+          recorded_by: string
+          reference: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          billing_subscription_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          occurred_at?: string
+          organization_id?: string
+          recorded_by?: string
+          reference?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_reconciliations_billing_subscription_id_fkey"
+            columns: ["billing_subscription_id"]
+            isOneToOne: false
+            referencedRelation: "billing_subscriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_reconciliations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "management_dashboard_metrics"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "billing_reconciliations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       billing_subscriptions: {
         Row: {
           billing_plan_id: string
+          billing_plan_version_id: string
           commercial_note: string | null
           created_at: string
           current_period_end: string | null
@@ -1344,6 +1451,7 @@ export type Database = {
         }
         Insert: {
           billing_plan_id: string
+          billing_plan_version_id: string
           commercial_note?: string | null
           created_at?: string
           current_period_end?: string | null
@@ -1358,6 +1466,7 @@ export type Database = {
         }
         Update: {
           billing_plan_id?: string
+          billing_plan_version_id?: string
           commercial_note?: string | null
           created_at?: string
           current_period_end?: string | null
@@ -1391,6 +1500,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "organizations"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_subscriptions_plan_version_fk"
+            columns: ["billing_plan_version_id", "billing_plan_id"]
+            isOneToOne: false
+            referencedRelation: "billing_plan_versions"
+            referencedColumns: ["id", "billing_plan_id"]
           },
         ]
       }
@@ -10647,6 +10763,10 @@ export type Database = {
         Args: { p_proposal_id: string }
         Returns: string
       }
+      archive_saas_billing_plan: {
+        Args: { p_plan_id: string }
+        Returns: string
+      }
       can: {
         Args: {
           p_organization_id: string
@@ -10738,6 +10858,24 @@ export type Database = {
           p_reorder_point?: number
           p_site_id: string
           p_size_label?: string
+        }
+        Returns: string
+      }
+      create_saas_billing_plan: {
+        Args: {
+          p_code: string
+          p_feature_flags?: Json
+          p_limits?: Json
+          p_name: string
+        }
+        Returns: string
+      }
+      create_saas_billing_plan_version: {
+        Args: {
+          p_feature_flags: Json
+          p_limits: Json
+          p_name: string
+          p_plan_id: string
         }
         Returns: string
       }
@@ -10843,6 +10981,20 @@ export type Database = {
         }
         Returns: string
       }
+      manage_saas_subscription_v2: {
+        Args: {
+          p_customer_reference?: string
+          p_note?: string
+          p_organization_id: string
+          p_period_end: string
+          p_period_start: string
+          p_plan_version_id: string
+          p_status: string
+          p_subscription_reference?: string
+          p_trial_ends_at: string
+        }
+        Returns: string
+      }
       manage_saas_support_session: {
         Args: {
           p_action: string
@@ -10850,6 +11002,10 @@ export type Database = {
           p_reason: string
           p_session_id?: string
         }
+        Returns: string
+      }
+      publish_saas_billing_plan_version: {
+        Args: { p_version_id: string }
         Returns: string
       }
       record_copilot_response: {
@@ -10916,6 +11072,16 @@ export type Database = {
         }
         Returns: string
       }
+      record_saas_reconciliation: {
+        Args: {
+          p_note?: string
+          p_occurred_at: string
+          p_reference: string
+          p_status?: string
+          p_subscription_id: string
+        }
+        Returns: string
+      }
       reject_classification_change: {
         Args: { p_note: string; p_proposal_id: string }
         Returns: string
@@ -10930,6 +11096,11 @@ export type Database = {
           p_period_end: string
           p_period_start: string
         }
+        Returns: string
+      }
+      reset_demo_organization: { Args: never; Returns: undefined }
+      resolve_saas_reconciliation: {
+        Args: { p_note: string; p_reconciliation_id: string; p_status: string }
         Returns: string
       }
       retire_ppe: {
@@ -10982,12 +11153,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -11011,11 +11182,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -11036,11 +11207,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -11061,11 +11232,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -11078,11 +11249,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -11092,9 +11263,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

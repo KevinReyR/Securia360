@@ -8,5 +8,5 @@ export default async function OrganizationLayout({ children, params }: { childre
   const { organizationId } = await params;
   let workspace;
   try { workspace = await loadWorkspaceContext(organizationId); } catch { redirect("/organizations?error=access"); }
-  return <AppShell organizationId={organizationId} organizations={workspace.organizations} allowedPermissions={workspace.context.permissions} experienceProfile={workspace.context.experienceProfile} isDemo={workspace.isDemo} user={workspace.context.user}>{children}</AppShell>;
+  return <AppShell organizationId={organizationId} organizations={workspace.organizations} allowedPermissions={workspace.context.permissions} experienceProfile={workspace.context.experienceProfile} internalSaasRole={workspace.internalSaasRole} isDemo={workspace.isDemo} user={workspace.context.user}>{children}</AppShell>;
 }
