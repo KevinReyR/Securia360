@@ -99,6 +99,8 @@ test.describe("critical isolated SaaS flows", () => {
       await expect(page.getByRole("heading", { name: `Hola, ${name}` })).toBeVisible();
 
       await logout(page);
+      await page.goto(onboardingUrl);
+      await page.waitForURL(/\/auth\/login\?next=/);
     } finally {
       await fixture.deleteUserByEmail(email);
     }

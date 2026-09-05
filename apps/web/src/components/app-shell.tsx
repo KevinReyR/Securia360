@@ -1,9 +1,8 @@
 "use client";
 
-import { Buildings, List, MagnifyingGlass, Question, SignOut, UserCircle } from "@phosphor-icons/react";
+import { Buildings, List, MagnifyingGlass, Question, UserCircle } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { logout } from "@/app/auth/login/actions";
 import { AppBreadcrumbs } from "./app-breadcrumbs";
 import { BrandMark } from "./brand-mark";
 import { NavigationCommand } from "./navigation-command";
@@ -18,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/t
 import type { OrganizationSummary } from "@/modules/organizations/tenant";
 import type { PermissionCode } from "@/modules/auth/permissions";
 import { experienceProfileLabels, type ExperienceProfile } from "@/modules/workspace/types";
+import { LogoutMenuItem } from "./logout-controls";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -71,7 +71,7 @@ export function AppShell({ children, organizationId, organizations, user, allowe
               <NotificationInbox organizationId={organizationId} userId={user.id} />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild><button className="ml-1 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-[var(--focus-ring)]" aria-label="Abrir menú de perfil"><Avatar><AvatarFallback>{user.initials}</AvatarFallback></Avatar></button></DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-64"><DropdownMenuLabel><span className="block truncate text-sm text-[var(--foreground)]">{user.displayName}</span><span className="mt-0.5 block truncate font-normal text-[var(--muted)]">{user.email}</span><span className="mt-2 inline-flex rounded-full bg-[var(--brand-soft)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[.06em] text-[var(--brand)]">{experienceProfileLabels[experienceProfile]}</span></DropdownMenuLabel><DropdownMenuSeparator /><DropdownMenuItem asChild><Link href={`/org/${organizationId}/settings/profile`}><UserCircle size={17} />Mi perfil</Link></DropdownMenuItem><DropdownMenuItem asChild><Link href={`/org/${organizationId}/settings/organization`}><Buildings size={17} />Organización</Link></DropdownMenuItem><DropdownMenuSeparator /><form action={logout}><DropdownMenuItem asChild><button type="submit" className="w-full text-[var(--danger)]"><SignOut size={17} />Cerrar sesión</button></DropdownMenuItem></form></DropdownMenuContent>
+                <DropdownMenuContent align="end" className="w-64"><DropdownMenuLabel><span className="block truncate text-sm text-[var(--foreground)]">{user.displayName}</span><span className="mt-0.5 block truncate font-normal text-[var(--muted)]">{user.email}</span><span className="mt-2 inline-flex rounded-full bg-[var(--brand-soft)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[.06em] text-[var(--brand)]">{experienceProfileLabels[experienceProfile]}</span></DropdownMenuLabel><DropdownMenuSeparator /><DropdownMenuItem asChild><Link href={`/org/${organizationId}/settings/profile`}><UserCircle size={17} />Mi perfil</Link></DropdownMenuItem><DropdownMenuItem asChild><Link href={`/org/${organizationId}/settings/organization`}><Buildings size={17} />Organización</Link></DropdownMenuItem><DropdownMenuSeparator /><LogoutMenuItem /></DropdownMenuContent>
               </DropdownMenu>
             </div>
           </header>

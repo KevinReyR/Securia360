@@ -1,11 +1,11 @@
-import { CalendarDots, FileArrowUp, FileText, SignOut } from "@phosphor-icons/react/dist/ssr";
-import { logout } from "@/app/auth/login/actions";
+import { CalendarDots, FileArrowUp, FileText } from "@phosphor-icons/react/dist/ssr";
 import { BrandMark } from "@/components/brand-mark";
 import { EmptyState } from "@/components/empty-state";
 import { FormDrawer } from "@/components/form-drawer";
 import { PageHeader } from "@/components/page-header";
 import { StatusBanner } from "@/components/status-banner";
 import { Button } from "@/components/ui/button";
+import { LogoutButton } from "@/components/logout-controls";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -29,7 +29,7 @@ export default async function ContractorPortal({ searchParams }: { searchParams:
   const requirementsPending = (requirements ?? []).filter((requirement) => !(submissions ?? []).some((submission) => submission.contract_document_requirement_id === requirement.id && submission.status === "approved")).length;
   const dueSoon = (requirements ?? []).filter((requirement) => isDueSoon(requirement.due_at)).length;
 
-  return <div className="min-h-[100dvh] bg-[var(--background)]"><header className="border-b border-[var(--border)] bg-[var(--surface)]"><div className="mx-auto flex min-h-16 max-w-[1320px] items-center justify-between px-4 sm:px-6"><BrandMark href="/contractor-portal" /><form action={logout}><Button type="submit" variant="ghost" size="sm"><SignOut size={17} />Cerrar sesión</Button></form></div></header><main className="mx-auto grid max-w-[1320px] gap-6 px-4 py-6 sm:px-6 lg:py-10">
+  return <div className="min-h-[100dvh] bg-[var(--background)]"><header className="border-b border-[var(--border)] bg-[var(--surface)]"><div className="mx-auto flex min-h-16 max-w-[1320px] items-center justify-between px-4 sm:px-6"><BrandMark href="/contractor-portal" /><LogoutButton /></div></header><main className="mx-auto grid max-w-[1320px] gap-6 px-4 py-6 sm:px-6 lg:py-10">
     <PageHeader eyebrow="Portal de contratistas" title="Contratos y requisitos autorizados" description="Consulta exclusivamente los contratos, sedes y documentos incluidos en tu acceso. No puedes ver información interna ni datos de otros contratistas." />
     <StatusBanner status={status} />
     {!accesses?.length ? <EmptyState title="No tienes accesos activos" description="La organización contratante debe vincular tu cuenta y aprobar el acceso a un contrato o sede." /> : <>
