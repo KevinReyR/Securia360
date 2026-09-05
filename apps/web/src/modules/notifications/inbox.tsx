@@ -25,12 +25,10 @@ export function NotificationInbox({ organizationId, userId }: { organizationId: 
       if (active) { setItems((data ?? []) as Notice[]); setLoading(false); }
     };
     void load();
-    const channel = supabase.channel(`notification-inbox:${organizationId}:${userId}`).on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `recipient_user_id=eq.${userId}` }, (payload) => {
-      const notice = payload.new as Notice;
-      if (notice.organization_id !== organizationId) return;
-      setItems((current) => [notice, ...current.filter((item) => item.id !== notice.id)].slice(0, 20));
-    }).subscribe();
-    return () => { active = false; void supabase.removeChannel(channel); };
+    // Realtime is intentionally disabled until the project's publication
+    // filter cache is consistent; polling preserves the same RLS-protected read.
+    const interval = window.setInterval(() => void load(), 60_000);
+    return () => { active = false; window.clearInterval(interval); };
   }, [organizationId, userId]);
 
   const markRead = async (notice: Notice) => {
