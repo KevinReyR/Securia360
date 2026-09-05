@@ -1,7 +1,7 @@
 # Perfiles y responsabilidades en Securia360
 
-**Estado:** guía operativa del modelo RBAC vigente  
-**Actualizada:** 4 de septiembre de 2026  
+**Estado:** guía operativa del modelo RBAC vigente
+**Actualizada:** 4 de septiembre de 2026
 **Audiencia:** administradores de empresa, equipos SST, dirección, auditores y equipo interno de Reinova Labs.
 
 Securia360 separa con claridad dos ámbitos de responsabilidad:
@@ -37,7 +37,7 @@ Estos perfiles no son roles de una empresa cliente. Se conceden por separado, se
 
 ### Administrador de organización
 
-**Rol técnico:** `organization_admin`  
+**Rol técnico:** `organization_admin`
 **Propósito:** responsable de la configuración, gobierno de acceso y operación integral de una empresa dentro de Securia360.
 
 Puede gestionar la organización, estructura empresarial, miembros, invitaciones, roles y alcance por sede. Por diseño, tiene las capacidades funcionales que se han añadido para los módulos del tenant, pero debe delegar la operación diaria a perfiles especializados cuando sea posible.
@@ -46,7 +46,7 @@ No puede acceder a otra organización sin una membresía activa allí, ni admini
 
 ### Responsable o coordinador SST
 
-**Roles técnicos:** `sst_manager`, `sst_coordinator`  
+**Roles técnicos:** `sst_manager`, `sst_coordinator`
 **Propósito:** liderar la ejecución y coordinación del SG-SST, priorizar riesgos, cumplimiento, acciones, evidencias y seguimiento.
 
 Es el perfil recomendado para articular los flujos de cumplimiento, planificación, riesgos, capacitaciones, EPP, emergencias e investigaciones, siempre que se le asignen los permisos específicos de esos módulos. Puede ser global o limitado a una sede.
@@ -55,63 +55,63 @@ En la configuración base estos roles administran la estructura empresarial y el
 
 ### Profesional SST
 
-**Rol técnico:** `sst_professional`  
+**Rol técnico:** `sst_professional`
 **Propósito:** ejecutar técnicamente actividades SST bajo la dirección del coordinador o responsable SST.
 
 Es adecuado para levantar matrices de riesgo, evidencias, capacitaciones, controles, inspecciones y seguimiento de tareas. Puede recibir permisos de gestión acotados, sin necesidad de habilitar aprobación, cierre definitivo o administración de miembros.
 
 ### Gerente o dirección
 
-**Rol técnico:** `manager`  
+**Rol técnico:** `manager`
 **Propósito:** tomar decisiones, revisar cumplimiento, aprobar prioridades y hacer seguimiento gerencial.
 
 Su configuración recomendada privilegia consulta de indicadores, plan anual, acciones, auditorías y vencimientos, con permisos puntuales de aprobación cuando la empresa defina segregación. No requiere acceso a expedientes sensibles ni a edición operacional rutinaria.
 
 ### Talento humano
 
-**Rol técnico:** `hr_manager`  
+**Rol técnico:** `hr_manager`
 **Propósito:** coordinar personas, estructura, capacitaciones y restricciones funcionales estrictamente necesarias.
 
 Debe acceder solo a los datos mínimos requeridos. La información de salud ocupacional se separa: el permiso `occupational_health.hr_sensitive` permite consultar restricciones funcionales autorizadas, pero no historias clínicas ni diagnósticos. Las decisiones que afecten a una persona requieren confirmación humana por un segundo usuario autorizado.
 
 ### Responsable de operaciones
 
-**Rol técnico:** `operations_manager`  
+**Rol técnico:** `operations_manager`
 **Propósito:** integrar la operación de sedes, procesos, controles, emergencias y ejecución de tareas con el SG-SST.
 
 Es apropiado para gestionar acciones operativas, recursos de emergencia y controles vinculados a procesos. Los permisos de aprobación, datos sensibles y administración de acceso deben permanecer separados salvo necesidad justificada.
 
 ### Responsable de sede
 
-**Rol técnico:** `site_manager`  
+**Rol técnico:** `site_manager`
 **Propósito:** administrar la ejecución de una sede concreta.
 
 Debe asignarse con alcance por sede. Puede gestionar la estructura y los flujos operativos que la organización le delegue dentro de esa sede, sin ver ni modificar información de otras sedes. Es útil para recursos de emergencia, tareas, EPP, capacitación y controles locales.
 
 ### Auditor
 
-**Rol técnico:** `auditor`  
+**Rol técnico:** `auditor`
 **Propósito:** revisar evidencia, hallazgos, informes, trazabilidad y seguimiento de auditorías.
 
 El perfil se orienta a consulta y auditoría. Si una auditoría exige independencia, quien integra el equipo auditor no puede aprobar el informe ni verificar o cerrar sus propios hallazgos o acciones, aunque tenga permisos funcionales. La segregación se aplica en la operación y no depende solo de la interfaz.
 
 ### Trabajador
 
-**Rol técnico:** `worker`  
+**Rol técnico:** `worker`
 **Propósito:** participar en los flujos que le han sido asignados.
 
 Puede consultar su contexto organizacional y, cuando se le concedan las capacidades correspondientes, actualizar tareas propias, confirmar asistencia, consultar certificados y aceptar entregas de EPP propias. No administra estructura, permisos, otros trabajadores ni información sensible de terceros.
 
 ### Contratista
 
-**Rol técnico:** `contractor` y acceso de portal por contrato/sede  
+**Rol técnico:** `contractor` y acceso de portal por contrato/sede
 **Propósito:** cumplir requisitos documentales y operativos de contratos autorizados.
 
 El portal de contratistas está separado del selector normal de organización. Un contacto contratista solo ve sus contratos activos, las sedes autorizadas, requisitos y sus propios envíos documentales. No puede aprobar documentos, contratos, accesos, evaluaciones ni consultar datos internos o de otros contratistas.
 
 ### Consulta
 
-**Rol técnico:** `viewer`  
+**Rol técnico:** `viewer`
 **Propósito:** aportar visibilidad controlada sin operar el sistema.
 
 Su uso recomendado es para consulta de estructura, información autorizada y auditoría de lectura. No debe incluir permisos de edición, aprobación, carga de evidencia ni datos personales o sensibles que no sean imprescindibles.
@@ -130,7 +130,7 @@ El catálogo inicial entrega unas capacidades mínimas a los roles de tenant. A 
 
 ## Matriz recomendada de responsabilidades por módulo
 
-Leyenda: **A** administra/configura; **G** gestiona operación; **V** valida, aprueba o cierra; **C** consulta; **P** actúa únicamente sobre asignaciones propias; **S** acceso limitado a sede, contrato o alcance autorizado; **—** sin acceso recomendado.  
+Leyenda: **A** administra/configura; **G** gestiona operación; **V** valida, aprueba o cierra; **C** consulta; **P** actúa únicamente sobre asignaciones propias; **S** acceso limitado a sede, contrato o alcance autorizado; **—** sin acceso recomendado.
 La matriz es un punto de partida de gobierno: cada celda debe convertirse en permisos explícitos mediante `can(permission, context)` y no sustituye RLS.
 
 | Capacidad o módulo | Admin. organización | Coord. / responsable SST | Profesional SST | Gerente | TH / Operaciones / sede | Auditor | Trabajador | Contratista | Consulta |
@@ -235,4 +235,3 @@ Actualice este documento cuando se cree una familia de permisos, cambie una regl
 3. auditoría de acciones críticas;
 4. textos de interfaz y experiencia por capacidades;
 5. documentación de privacidad cuando intervengan datos personales o sensibles.
-
