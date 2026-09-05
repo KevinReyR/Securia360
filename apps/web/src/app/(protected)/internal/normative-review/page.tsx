@@ -19,6 +19,7 @@ import { requireAuthenticatedUser } from "@/modules/organizations/tenant";
 type Search = { notice?: string; review?: string; type?: string; q?: string; page?: string };
 const PAGE_SIZE = 16;
 const artifactLabels: Record<string, string> = {
+  CLASSIFICATION_EVALUATOR_VERSION: "Evaluador de clasificación",
   NORMATIVE_SOURCE_VERSION: "Versión de fuente",
   REQUIREMENT: "Requisito",
   MINIMUM_STANDARD: "Estándar mínimo",
