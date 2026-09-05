@@ -25,7 +25,8 @@ export const assessmentMutationSchema = z.object({ organizationId: complianceTen
 export function domainStatus(error: unknown) {
   const message = error instanceof Error ? error.message : String(error ?? "");
   if (/permission|insufficient|row-level/i.test(message)) return "forbidden";
-  if (/reviewed|published|scoring|snapshot requires/i.test(message)) return "expert-pending";
-  if (/immutable|validated|cannot/i.test(message)) return "transition";
+  if (/reviewed|published|scoring|snapshot requires|not approved/i.test(message)) return "expert-pending";
+  if (/immutable|validated|cannot|only completed|already completed/i.test(message)) return "transition";
+  if (/assessment not found|no existe la evaluación/i.test(message)) return "not-found";
   return "error";
 }

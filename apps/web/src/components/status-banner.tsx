@@ -31,6 +31,7 @@ export function StatusBanner({ status }: { status?: string }) {
     confirmation: { variant: "danger", text: "La confirmación no coincide con el nombre actual del registro." },
     notfound: { variant: "danger", text: "El recurso no existe o no tienes acceso a él." },
     error: { variant: "danger", text: "No fue posible guardar. Revisa los datos y tus permisos." },
+    "not-found": { variant: "danger", text: "La evaluación ya no está disponible. Actualiza la página y vuelve a intentarlo." },
     invalid: { variant: "danger", text: "Hay datos incompletos o inválidos. Revisa los campos señalados." },
     conflict: { variant: "warning", text: "Ya existe un registro con esa referencia o hay un borrador pendiente. Revisa el historial antes de continuar." },
     "calculation-error": { variant: "danger", text: "No fue posible solicitar el cálculo. Revisa la versión, el período y tus permisos." },
