@@ -18,7 +18,7 @@ type Source = { source_label: string; excerpt: string | null };
 type Message = { id: string; role: string; content: string; prompt_injection_flag: boolean; created_at: string; copilot_sources: Source[] | null };
 type Proposal = { id: string; proposal_type: string; proposal: unknown; status: string; decision_note?: string | null; created_at: string };
 const proposalLabels: Record<string, string> = { draft_task: "Borrador de tarea", draft_action: "Borrador de acción", draft_document: "Borrador documental", critical_classification: "Propuesta de clasificación", critical_approval: "Propuesta de aprobación", legal_or_medical: "Consulta legal o médica" };
-const dateTime = (value: string | null | undefined) => value ? new Intl.DateTimeFormat("es-CO", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)) : "Sin fecha";
+const dateTime = (value: string | null | undefined) => value ? new Intl.DateTimeFormat("es-CO", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Bogota" }).format(new Date(value)) : "Sin fecha";
 
 export default async function CopilotPage({ params, searchParams }: {
   params: Promise<{ organizationId: string }>;
