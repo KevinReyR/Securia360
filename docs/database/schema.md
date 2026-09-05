@@ -51,6 +51,7 @@ Las entidades normativas (`normative_sources`, `requirements`, `minimum_standard
 
 - `20260905024816_complete_saas_admin_console.sql`: versiona planes, fija la versión aplicada por suscripción, añade conciliaciones manuales, corrige la validación de operadores de soporte y restringe todas las mutaciones a operaciones internas auditadas.
 - `20260905030238_allow_saas_internal_organization_directory.sql`: permite a operadores SaaS activos consultar únicamente el directorio base de organizaciones necesario para suscripciones y soporte, sin ampliar acceso a datos operativos del tenant.
+- `20260905031452_fix_saas_admin_role_access_grants.sql`: habilita la consulta del rol interno propio y la evaluación del predicado privado usado por RLS; las filas continúan restringidas por política y no se exponen a usuarios anónimos.
 
 - `20260828235342_complete_workforce_imports.sql`: crea `workers` como nómina mínima no sensible, completa staging privado de CSV/XLSX, efectos y reversión lógica, solicitud única de recálculo y políticas RLS/Storage de importaciones.
 - `20260829000646_validate_import_preview_references.sql`: convierte referencias inexistentes y códigos repetidos en errores visibles por fila durante la previsualización.
