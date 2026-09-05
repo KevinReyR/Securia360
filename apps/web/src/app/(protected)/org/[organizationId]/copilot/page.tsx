@@ -28,8 +28,8 @@ export default async function CopilotPage({ params, searchParams }: {
   const { conversation } = await searchParams;
   const [read, manage] = await Promise.all([can(organizationId, "copilot.read"), can(organizationId, "copilot.manage")]);
   if (!read) return <EmptyState title="Sin acceso a Securia Copilot" description="Solicita acceso al responsable de tu organización." />;
-  const { supabase } = await requireAuthenticatedUser();
-  const conversationResult = await supabase.from("copilot_conversations").select("id,title,updated_at").eq("organization_id", organizationId).order("updated_at", { ascending: false }).limit(30);
+  const { supabase, userId } = await requireAuthenticatedUser();
+  const conversationResult = await supabase.from("copilot_conversations").select("id,title,updated_at").eq("organization_id", organizationId).eq("actor_user_id", userId).order("updated_at", { ascending: false }).limit(30);
   const conversations = conversationResult.data ?? [];
   const active = conversation === "new" ? undefined : conversation ?? conversations[0]?.id;
   const result = active ? await Promise.all([
