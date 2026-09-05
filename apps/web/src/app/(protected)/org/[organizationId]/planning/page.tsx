@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/lib/supabase/server";
 import { can } from "@/modules/auth/permissions";
 import { addTaskComment, addTaskDependency, approvePlan, attachTaskEvidence, createActivity, createPlan, createTask, setTaskStatus } from "@/modules/organizations/planning-actions";
+import { formatUtcDateTime } from "@/modules/organizations/planning-presentation";
 import { requireTenant } from "@/modules/organizations/tenant";
 
 const taskStatusOptions = [
@@ -23,10 +24,6 @@ const taskStatusOptions = [
   ["cancelled", "Cancelada"],
 ] as const;
 const priorityOptions = [["critical", "Crítica"], ["high", "Alta"], ["medium", "Media"], ["low", "Baja"]] as const;
-
-function utc(value: string | null) {
-  return value ? new Date(value).toLocaleString("es-CO", { timeZone: "UTC", dateStyle: "medium", timeStyle: "short", timeZoneName: "short" }) : "Sin vencimiento";
-}
 
 function hiddenOrganization(organizationId: string) {
   return <input type="hidden" name="organizationId" value={organizationId} />;
@@ -96,7 +93,7 @@ export default async function PlanningPage({ params, searchParams }: {
     const dependencyCount = dependencies.filter((dependency) => dependency.task_id === task.id).length;
     const commentCount = comments.filter((comment) => comment.task_id === task.id).length;
     const management = <div className="grid gap-6">{mayChangeStatus ? <section className="grid gap-3"><h3 className="font-semibold">Estado</h3><form action={setTaskStatus} className="flex gap-2">{hiddenOrganization(organizationId)}<input type="hidden" name="task_id" value={task.id} /><Select name="status" defaultValue={task.status} aria-label={`Estado de ${task.title}`}>{taskStatusOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select><Button>Guardar</Button></form></section> : null}{manage ? <><section className="grid gap-3"><h3 className="font-semibold">Dependencia</h3><form action={addTaskDependency} className="flex gap-2">{hiddenOrganization(organizationId)}<input type="hidden" name="task_id" value={task.id} /><Select name="depends_on_task_id" defaultValue="" aria-label={`Dependencia de ${task.title}`}><option value="">Selecciona una tarea</option>{tasks.filter((option) => option.id !== task.id).map((option) => <option key={option.id} value={option.id}>{option.title}</option>)}</Select><Button variant="secondary">Vincular</Button></form></section><section className="grid gap-3"><h3 className="font-semibold">Comentario</h3><form action={addTaskComment} className="grid gap-2">{hiddenOrganization(organizationId)}<input type="hidden" name="task_id" value={task.id} /><Textarea name="body" aria-label={`Comentario de ${task.title}`} placeholder="Registra un avance o bloqueo" /><Button variant="secondary">Agregar comentario</Button></form></section><section className="grid gap-3"><h3 className="font-semibold">Evidencia</h3><form action={attachTaskEvidence} className="grid gap-2">{hiddenOrganization(organizationId)}<input type="hidden" name="task_id" value={task.id} /><Select name="document_version_id" defaultValue="" aria-label={`Evidencia de ${task.title}`}><option value="">Selecciona una versión</option>{versions.map((version) => <option key={version.id} value={version.id}>{version.original_name}</option>)}</Select><Button variant="secondary">Adjuntar evidencia</Button></form></section></> : null}</div>;
-    return <Card key={task.id} className="min-w-0"><CardHeader><div className="flex items-start justify-between gap-3"><div className="min-w-0"><CardTitle className="truncate">{task.title}</CardTitle><p className="mt-1 text-xs text-[var(--muted)]">{personName(task.assigned_to)}</p></div><StatusBadge>{task.status}</StatusBadge></div></CardHeader><CardContent className="grid gap-4"><p className="line-clamp-3 text-sm leading-6 text-[var(--muted-strong)]">{task.description || "Sin descripción."}</p><div className="grid gap-1 text-xs text-[var(--muted)]"><span><Clock size={14} className="mr-1 inline" />{utc(task.due_at)}</span><span>{task.recurrence_rule_id ? "Tarea recurrente" : "Tarea única"} · {dependencyCount} dependencias · {commentCount} comentarios</span></div>{mayChangeStatus || manage ? <FormDrawer triggerLabel="Gestionar" title={task.title} description="Actualiza el estado, registra avances y conserva la evidencia en un solo lugar." variant="secondary">{management}</FormDrawer> : null}</CardContent></Card>;
+    return <Card key={task.id} className="min-w-0"><CardHeader><div className="flex items-start justify-between gap-3"><div className="min-w-0"><CardTitle className="truncate">{task.title}</CardTitle><p className="mt-1 text-xs text-[var(--muted)]">{personName(task.assigned_to)}</p></div><StatusBadge>{task.status}</StatusBadge></div></CardHeader><CardContent className="grid gap-4"><p className="line-clamp-3 text-sm leading-6 text-[var(--muted-strong)]">{task.description || "Sin descripción."}</p><div className="grid gap-1 text-xs text-[var(--muted)]"><span><Clock size={14} className="mr-1 inline" />{formatUtcDateTime(task.due_at)}</span><span>{task.recurrence_rule_id ? "Tarea recurrente" : "Tarea única"} · {dependencyCount} dependencias · {commentCount} comentarios</span></div>{mayChangeStatus || manage ? <FormDrawer triggerLabel="Gestionar" title={task.title} description="Actualiza el estado, registra avances y conserva la evidencia en un solo lugar." variant="secondary">{management}</FormDrawer> : null}</CardContent></Card>;
   }
 
   const boardColumns = [
