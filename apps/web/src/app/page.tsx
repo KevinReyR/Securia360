@@ -11,14 +11,38 @@ const capabilities = [
   ["Evidencia siempre disponible", "Organiza documentos, versiones y vencimientos junto al trabajo que respaldan.", Files],
 ] as const;
 
+const regulatoryFramework = [
+  {
+    reference: "0312 / 2019",
+    title: "Resolución 0312 de 2019",
+    description: "Define los Estándares Mínimos del Sistema de Gestión de Seguridad y Salud en el Trabajo aplicables a empleadores y contratantes.",
+  },
+  {
+    reference: "1072 / 2015",
+    title: "Decreto 1072 de 2015",
+    description: "Decreto Único Reglamentario del Sector Trabajo. Su Libro 2, Parte 2, Título 4, Capítulo 6 establece disposiciones para la implementación del Sistema de Gestión de la Seguridad y Salud en el Trabajo.",
+  },
+  {
+    reference: "1562 / 2012",
+    title: "Ley 1562 de 2012",
+    description: "Modifica el Sistema General de Riesgos Laborales y establece disposiciones relacionadas con la prevención de riesgos y la seguridad y salud en el trabajo.",
+  },
+  {
+    reference: "GTC / 45",
+    title: "GTC 45",
+    description: "Guía Técnica Colombiana para la identificación de peligros y la valoración de riesgos en seguridad y salud ocupacional.",
+  },
+] as const;
+
 export default function HomePage() {
   return (
     <main className="min-h-[100dvh] bg-white text-[var(--foreground)]">
       <header className="sticky top-0 z-40 border-b border-black/[.06] bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-5 px-5 sm:px-8 lg:px-12">
           <BrandMark />
-          <nav aria-label="Navegación pública" className="hidden items-center gap-7 text-sm font-medium text-[var(--muted-strong)] md:flex">
+          <nav aria-label="Navegación pública" className="hidden items-center gap-6 text-sm font-medium text-[var(--muted-strong)] lg:flex">
             <a href="#capacidades" className="hover:text-[var(--foreground)]">Capacidades</a>
+            <a href="#marco-normativo" className="hover:text-[var(--foreground)]">Marco normativo</a>
             <a href="#seguridad" className="hover:text-[var(--foreground)]">Seguridad</a>
             <a href="#contacto" className="hover:text-[var(--foreground)]">Contacto</a>
           </nav>
@@ -73,6 +97,36 @@ export default function HomePage() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      <section id="marco-normativo" className="scroll-mt-20 border-b border-[var(--border)] bg-white">
+        <div className="mx-auto max-w-[1280px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+          <div className="max-w-3xl">
+            <p className="text-sm font-semibold text-[var(--brand)]">Marco normativo</p>
+            <h2 className="text-balance mt-3 text-4xl font-semibold leading-tight tracking-[-0.04em]">Alineado con el marco colombiano de seguridad y salud en el trabajo</h2>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted)]">{brand.name} está diseñado para apoyar una gestión estructurada y trazable del SG-SST, tomando como referencia las principales disposiciones legales y técnicas aplicables en Colombia.</p>
+          </div>
+
+          <div className="mt-12 grid border-t border-[var(--border)] md:grid-cols-2">
+            {regulatoryFramework.map((item, index) => (
+              <article
+                key={item.title}
+                className={`grid content-start gap-5 border-b border-[var(--border)] py-8 md:min-h-64 md:px-8 ${index % 2 === 0 ? "md:border-r md:pl-0" : "md:pr-0"}`}
+              >
+                <span className="font-mono text-xs font-semibold tracking-[0.08em] text-[var(--brand)]">{item.reference}</span>
+                <div>
+                  <h3 className="text-xl font-semibold tracking-[-0.025em]">{item.title}</h3>
+                  <p className="mt-3 max-w-[56ch] text-[15px] leading-7 text-[var(--muted)]">{item.description}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <aside className="mt-8 flex items-start gap-3 rounded-[14px] border border-[var(--border)] bg-[var(--muted-surface)] px-5 py-4 text-sm leading-6 text-[var(--muted-strong)]">
+            <ShieldCheck size={20} weight="duotone" className="mt-0.5 shrink-0 text-[var(--brand)]" aria-hidden="true" />
+            <p>La plataforma facilita la gestión y la trazabilidad de la información. Su uso no sustituye la interpretación normativa, la revisión profesional ni las obligaciones legales de cada organización.</p>
+          </aside>
         </div>
       </section>
 
