@@ -10,7 +10,7 @@ export const navigationHome: NavigationItem = { label: "Inicio", suffix: "dashbo
 export const navigationSections: NavigationSection[] = [
   { label: "Trabajo", icon: ListChecks, items: [
     { label: "Plan anual y tareas", suffix: "planning", icon: CalendarCheck, permission: "planning.read", keywords: ["pendientes", "tareas", "calendario"] },
-    { label: "Acciones de mejora", suffix: "improvement-plan", icon: ListChecks, permission: "improvements.read", keywords: ["brechas", "evidencias", "cierre"] },
+    { label: "Acciones de mejora", suffix: "improvement-plan", icon: ListChecks, permission: "improvements.read", keywords: ["oportunidades de mejora", "evidencias", "cierre"] },
   ] },
   { label: "Cumplimiento", icon: ShieldCheck, items: [
     { label: "Evaluación y requisitos", suffix: "compliance", icon: ClipboardText, permission: "assessments.read", keywords: ["0312", "clasificación", "aplicabilidad", "snapshots"] },

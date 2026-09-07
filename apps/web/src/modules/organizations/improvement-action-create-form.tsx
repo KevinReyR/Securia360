@@ -24,7 +24,7 @@ export function ImprovementActionCreateForm({ organizationId, gapId, defaultPrio
   }} className="grid gap-3 rounded-lg border border-dashed border-[var(--border)] p-4 md:grid-cols-2">
     <input type="hidden" name="organizationId" value={organizationId} />
     <input type="hidden" name="gap_id" value={gapId} />
-    <label className="grid gap-1 text-sm font-medium md:col-span-2">Nueva acción<Input name="title" required placeholder="Acción concreta para cerrar la brecha" /></label>
+    <label className="grid gap-1 text-sm font-medium md:col-span-2">Nueva acción<Input name="title" required placeholder="Acción concreta para cerrar la oportunidad de mejora" /></label>
     <label className="grid gap-1 text-sm font-medium md:col-span-2">Descripción<Textarea name="description" placeholder="Resultado esperado, alcance o instrucciones" /></label>
     <label className="grid gap-1 text-sm font-medium">Prioridad<Select name="priority" defaultValue={defaultPriority}><option value="critical">Crítica</option><option value="high">Alta</option><option value="medium">Media</option><option value="low">Baja</option></Select></label>
     <label className="grid gap-1 text-sm font-medium">Responsable<Select name="responsible_user_id" defaultValue=""><option value="">Sin asignar</option>{members.map((member) => <option key={member.id} value={member.id}>{member.label}</option>)}</Select></label>

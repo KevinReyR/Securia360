@@ -8,7 +8,7 @@ import { LandingAtmosphere } from "@/components/landing-atmosphere";
 import styles from "./landing.module.css";
 
 const capabilities = [
-  ["Cumplimiento conectado", "Convierte evaluaciones y requisitos en brechas, responsables y acciones verificables.", ClipboardText],
+  ["Cumplimiento conectado", "Convierte evaluaciones y requisitos en oportunidades de mejora, responsables y acciones verificables.", ClipboardText],
   ["Prevención en contexto", "Relaciona procesos, peligros, controles, capacitación y EPP sin perder la trazabilidad.", HardHat],
   ["Evidencia siempre disponible", "Organiza documentos, versiones y vencimientos junto al trabajo que respaldan.", Files],
 ] as const;

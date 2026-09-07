@@ -15,6 +15,36 @@ import { PHVA_CYCLES, publicAssessmentCompanySchema, type PublicAssessmentCatalo
 
 type Stage = "company" | "confirm" | "questions" | "review";
 
+export function buildStandardQuestion(standard: { code: string; criterion: string | null }) {
+  const criterion = standard.criterion?.trim().replace(/[.;:]+$/, "");
+  if (!criterion) return `¿La empresa cumple con el estándar ${standard.code} y puede demostrarlo con evidencia verificable?`;
+
+  const transformations: Array<[RegExp, string]> = [
+    [/^Asignar\s+/i, "¿La empresa ha asignado "],
+    [/^Asegurar\s+/i, "¿La empresa asegura "],
+    [/^Contar con\s+/i, "¿La empresa cuenta con "],
+    [/^Definir\s+/i, "¿La empresa ha definido "],
+    [/^Diseñar\s+/i, "¿La empresa ha diseñado "],
+    [/^Elaborar\s+/i, "¿La empresa ha elaborado "],
+    [/^Establecer\s+/i, "¿La empresa ha establecido "],
+    [/^Evaluar\s+/i, "¿La empresa ha evaluado "],
+    [/^Garantizar\s+/i, "¿La empresa garantiza "],
+    [/^Identificar\s+/i, "¿La empresa ha identificado "],
+    [/^Implementar\s+/i, "¿La empresa ha implementado "],
+    [/^Investigar\s+/i, "¿La empresa ha investigado "],
+    [/^Mantener\s+/i, "¿La empresa mantiene "],
+    [/^Medir\s+/i, "¿La empresa mide "],
+    [/^Realizar\s+/i, "¿La empresa ha realizado "],
+    [/^Reportar\s+/i, "¿La empresa ha reportado "],
+    [/^Suministrar\s+/i, "¿La empresa ha suministrado "],
+    [/^Verificar\s+/i, "¿La empresa verifica "],
+  ];
+
+  const transformation = transformations.find(([pattern]) => pattern.test(criterion));
+  if (transformation) return `${criterion.replace(transformation[0], transformation[1])}?`;
+  return `¿La empresa cumple con el siguiente criterio: ${criterion.charAt(0).toLowerCase()}${criterion.slice(1)}?`;
+}
+
 const emptyCompany = {
   legalName: "",
   taxId: "",
@@ -248,7 +278,6 @@ export function AssessmentWizard({ resumeId }: { resumeId?: string }) {
           <dl className="mt-7 grid gap-4 border-t border-[var(--border)] pt-6 sm:grid-cols-2"><div><dt className="text-xs font-semibold text-[var(--muted)]">Versión del perfil</dt><dd className="mt-1 text-sm font-medium">{suggestedProfile.versionCode}</dd></div><div><dt className="text-xs font-semibold text-[var(--muted)]">Referencia</dt><dd className="mt-1 text-sm font-medium">{suggestedProfile.source.officialReference}</dd></div></dl>
           <dl className="mt-4 grid gap-4 rounded-[12px] bg-[var(--muted-surface)] p-4 sm:grid-cols-[120px_1fr]"><div><dt className="text-xs font-semibold text-[var(--muted)]">CIIU y riesgo</dt><dd className="mt-1 font-mono text-sm font-semibold">{company.ciiuCode} · Clase {["", "I", "II", "III", "IV", "V"][company.riskClass]}</dd></div><div><dt className="text-xs font-semibold text-[var(--muted)]">Actividad</dt><dd className="mt-1 text-sm leading-6">{company.economicActivity}</dd></div></dl>
           {legacyDraft && legacyDraft.profile.code !== suggestedProfile.code ? <p role="alert" className="mt-4 rounded-[12px] border border-[var(--danger-border)] bg-[var(--danger-soft)] px-4 py-3 text-sm leading-6 text-[var(--danger)]">El riesgo de la actividad cambia el perfil de {legacyDraft.profile.standards.length} a {suggestedProfile.standards.length} estándares. Al confirmar se reiniciarán las respuestas anteriores porque no son compatibles con el nuevo conjunto.</p> : null}
-          <p className="mt-6 rounded-[12px] bg-[var(--warning-soft)] px-4 py-3 text-sm leading-6 text-[var(--warning)]">La sugerencia es orientativa y depende de los datos suministrados. Confirma la información con una persona competente antes de usar el resultado para decisiones formales.</p>
           <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><Button variant="secondary" onClick={() => setStage("company")}><ArrowLeft size={16} /> Corregir datos</Button><Button onClick={confirmProfile}>Confirmar e iniciar <ArrowRight size={16} /></Button></div>
         </div>
       </div>
@@ -294,6 +323,7 @@ export function AssessmentWizard({ resumeId }: { resumeId?: string }) {
             return (
               <article key={standard.code} className="rounded-[14px] border border-[var(--border)] bg-white p-5 shadow-[var(--shadow-control)] sm:p-6">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><p className="font-mono text-xs font-semibold text-[var(--brand)]">Estándar {standard.code}</p><h2 className="mt-2 text-lg font-semibold leading-7 tracking-[-0.02em]">{standard.title}</h2></div><span className="shrink-0 rounded-full bg-[var(--muted-surface)] px-2.5 py-1 text-xs font-semibold">Peso {standard.weight.toFixed(2)}%</span></div>
+                <p className="mt-5 rounded-[10px] border border-[var(--brand-soft)] bg-[var(--brand-soft)]/45 px-4 py-3 text-sm font-medium leading-6 text-[var(--foreground)]"><span className="mb-1 block text-xs font-semibold uppercase tracking-[0.08em] text-[var(--brand)]">Pregunta para responder</span>{buildStandardQuestion(standard)}</p>
                 <details className="mt-5 rounded-[10px] bg-[var(--muted-surface)] px-4 py-3 text-sm"><summary className="cursor-pointer font-semibold text-[var(--muted-strong)] outline-none focus-visible:ring-3 focus-visible:ring-[var(--focus-ring)]">Ver criterio y evidencia esperada</summary><div className="mt-4 grid gap-4 border-t border-[var(--border)] pt-4 leading-6 text-[var(--muted)]"><div><h3 className="font-semibold text-[var(--foreground)]">Criterio</h3><p className="mt-1">{standard.criterion || "El catálogo publicado no contiene un criterio adicional."}</p></div><div><h3 className="font-semibold text-[var(--foreground)]">Evidencia esperada</h3><p className="mt-1">{standard.expectedEvidence || "El catálogo publicado no contiene una evidencia adicional."}</p></div></div></details>
                 <RadioGroup value={value ?? ""} onValueChange={(next) => answer(standard.code, next as PublicAssessmentResponse)} aria-label={`Respuesta para el estándar ${standard.code}`} className="mt-5 sm:grid-cols-2">
                   <label className={`flex cursor-pointer items-center gap-3 rounded-[11px] border px-4 py-3 text-sm font-semibold transition-colors ${value === "met" ? "border-[var(--success-border)] bg-[var(--success-soft)] text-[var(--success)]" : "border-[var(--border)] hover:border-[var(--border-strong)]"}`}><RadioGroupItem value="met" /><Check size={17} /> Cumple</label>

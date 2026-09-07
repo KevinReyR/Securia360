@@ -20,7 +20,7 @@ export default function InitialAssessmentPage() {
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-[var(--success-border)] bg-white/80 px-3 py-1.5 text-xs font-semibold text-[var(--brand)] backdrop-blur-sm"><ShieldCheck size={15} weight="fill" /> Herramienta pública y gratuita</span>
             <h1 className="mt-6 text-balance text-[clamp(2.5rem,6vw,5rem)] font-semibold leading-[.98] tracking-[-0.055em]">Conoce el punto de partida de tu SG-SST.</h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-[var(--muted-strong)]">Responde los estándares que corresponden al tamaño y nivel de riesgo de tu empresa. Obtendrás un resultado orientativo y una lista priorizada de brechas.</p>
+            <p className="mt-6 max-w-xl text-lg leading-8 text-[var(--muted-strong)]">Responde los estándares que corresponden al tamaño y nivel de riesgo de tu empresa. Obtendrás un resultado orientativo y una lista priorizada de oportunidades de mejora.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button size="lg" asChild><Link href="/evaluacion-inicial/nueva">Iniciar evaluación <ArrowRight size={18} /></Link></Button>
               <Button size="lg" variant="secondary" asChild><a href="#mis-evaluaciones">Ver mis evaluaciones</a></Button>
