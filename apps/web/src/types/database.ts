@@ -10852,6 +10852,18 @@ export type Database = {
         Returns: string
       }
       get_public_initial_assessment_catalog: { Args: never; Returns: Json }
+      search_public_economic_activities: {
+        Args: { p_limit?: number; p_query?: string }
+        Returns: {
+          activity: string
+          catalog_version: string
+          ciiu_code: string
+          entry_id: string
+          risk_class: number
+          source_reference: string
+          source_review_status: string
+        }[]
+      }
       create_ppe_inventory: {
         Args: {
           p_organization_id: string

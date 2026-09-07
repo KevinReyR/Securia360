@@ -1,0 +1,2 @@
+create index if not exists economic_activity_catalog_versions_source_version_idx
+  on public_catalog.economic_activity_catalog_versions(normative_source_version_id);

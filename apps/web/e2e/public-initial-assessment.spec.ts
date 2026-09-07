@@ -24,15 +24,19 @@ for (const viewport of [
 }
 
 for (const scenario of [
-  { workers: 10, risk: "1", standards: 7 },
-  { workers: 11, risk: "3", standards: 21 },
-  { workers: 51, risk: "1", standards: 60 },
+  { workers: 10, risk: "II", activity: /almacenamiento y depósito de café/i, standards: 7 },
+  { workers: 11, risk: "II", activity: /almacenamiento y depósito de café/i, standards: 21 },
+  { workers: 10, risk: "IV", activity: /alquiler de maquinaria agrícola/i, standards: 60 },
 ]) {
   test(`completes the public ${scenario.standards}-standard profile`, async ({ page }) => {
     await page.goto("/evaluacion-inicial/nueva");
     await page.getByLabel("Razón social, obligatorio").fill(`Empresa E2E ${scenario.standards}`);
+    await page.getByRole("combobox", { name: /Código CIIU y actividad económica/ }).click();
+    await page.getByRole("combobox", { name: "Buscar actividad económica" }).fill("161-01");
+    await page.getByRole("option", { name: new RegExp(`161-01.*Riesgo ${scenario.risk}`, "i") }).filter({ hasText: scenario.activity }).click();
+    await expect(page.getByLabel("Clase de riesgo, obligatorio")).toHaveValue(`Clase ${scenario.risk}`);
+    await expect(page.getByLabel("Clase de riesgo, obligatorio")).toHaveAttribute("readonly", "");
     await page.getByLabel("Número de trabajadores, obligatorio").fill(String(scenario.workers));
-    await page.getByLabel("Clase de riesgo, obligatorio").selectOption(scenario.risk);
     await page.getByRole("button", { name: /Continuar/ }).click();
     await expect(page.getByText(new RegExp(`^${scenario.standards} estándares ·`))).toBeVisible();
     await page.getByRole("button", { name: /Confirmar e iniciar/ }).click();
@@ -51,9 +55,26 @@ for (const scenario of [
   });
 }
 
+test("CIIU search preserves duplicate-code activities and supports keyboard on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto("/evaluacion-inicial/nueva");
+  await page.getByRole("combobox", { name: /Código CIIU y actividad económica/ }).click();
+  const search = page.getByRole("combobox", { name: "Buscar actividad económica" });
+  await search.fill("161-01");
+  await expect(page.getByRole("option")).toHaveCount(3);
+  await expect(page.getByText(/almacenamiento y depósito de café/i)).toBeVisible();
+  await expect(page.getByText(/alquiler de maquinaria agrícola/i)).toBeVisible();
+  await expect(page.getByText(/fumigación y fertilización aérea/i)).toBeVisible();
+  await search.press("Enter");
+  await expect(page.getByLabel("Clase de riesgo, obligatorio")).toHaveValue("Clase II");
+});
+
 test("a draft resumes after reloading and an unknown id explains local-only storage", async ({ page }) => {
   await page.goto("/evaluacion-inicial/nueva");
   await page.getByLabel("Razón social, obligatorio").fill("Empresa Reanudación SAS");
+  await page.getByRole("combobox", { name: /Código CIIU y actividad económica/ }).click();
+  await page.getByRole("combobox", { name: "Buscar actividad económica" }).fill("161-01");
+  await page.getByRole("option", { name: /161-01.*Riesgo II/i }).filter({ hasText: /almacenamiento y depósito de café/i }).click();
   await page.getByLabel("Número de trabajadores, obligatorio").fill("10");
   await page.getByRole("button", { name: /Continuar/ }).click();
   await page.getByRole("button", { name: /Confirmar e iniciar/ }).click();

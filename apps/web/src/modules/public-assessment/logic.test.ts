@@ -16,6 +16,18 @@ const profile: PublicAssessmentProfile = {
   ],
 };
 
+const company = {
+  legalName: "Empresa Demo SAS",
+  taxId: "",
+  economicActivityEntryId: "22222222-2222-4222-8222-222222222222",
+  ciiuCode: "161-01",
+  economicActivity: "Almacenamiento y depósito de café.",
+  economicActivityCatalogVersion: "DECRETO_768_2022_V1",
+  economicActivitySourceReference: "Decreto 768 de 2022",
+  employeeCount: 10,
+  riskClass: 2,
+};
+
 describe("public assessment profile suggestion", () => {
   it.each([
     [10, 1, "RES0312_P07"],
@@ -52,12 +64,13 @@ describe("public assessment scoring", () => {
 
 describe("public assessment validation", () => {
   it("validates minimal company data and rejects malformed CIIU", () => {
-    expect(publicAssessmentCompanySchema.safeParse({ legalName: "Empresa Demo SAS", employeeCount: "10", riskClass: "3", taxId: "", ciiuCode: "1234", economicActivity: "" }).success).toBe(true);
-    expect(publicAssessmentCompanySchema.safeParse({ legalName: "Empresa Demo SAS", employeeCount: "10", riskClass: "3", ciiuCode: "12" }).success).toBe(false);
+    expect(publicAssessmentCompanySchema.safeParse(company).success).toBe(true);
+    expect(publicAssessmentCompanySchema.safeParse({ ...company, ciiuCode: "0161" }).success).toBe(false);
+    expect(publicAssessmentCompanySchema.safeParse({ ...company, economicActivityEntryId: "" }).success).toBe(false);
   });
 
   it("freezes the profile snapshot when creating a record", () => {
-    const record = createAssessmentRecord({ legalName: "Empresa Demo SAS", taxId: "", employeeCount: 10, riskClass: 2, ciiuCode: "", economicActivity: "" }, profile, "11111111-1111-4111-8111-111111111111", "2026-09-06T12:00:00.000Z");
+    const record = createAssessmentRecord(company, profile, "11111111-1111-4111-8111-111111111111", "2026-09-06T12:00:00.000Z");
     profile.standards[0].title = "Cambio posterior";
     expect(record.profile.standards[0].title).toBe("Estándar uno");
   });

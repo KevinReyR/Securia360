@@ -6,10 +6,10 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { clearAssessments, deleteAssessment, readAssessments } from "./storage";
 import { formatColombiaDate, RESULT_BANDS } from "./logic";
-import type { PublicAssessmentRecord } from "./schemas";
+import type { StoredPublicAssessmentRecord } from "./schemas";
 
 export function AssessmentHistory() {
-  const [records, setRecords] = useState<PublicAssessmentRecord[]>([]);
+  const [records, setRecords] = useState<StoredPublicAssessmentRecord[]>([]);
   const [corrupted, setCorrupted] = useState(false);
   const [ready, setReady] = useState(false);
 
@@ -25,7 +25,7 @@ export function AssessmentHistory() {
     return () => { active = false; };
   }, []);
 
-  function removeOne(record: PublicAssessmentRecord) {
+  function removeOne(record: StoredPublicAssessmentRecord) {
     if (!window.confirm(`¿Eliminar la evaluación de ${record.company.legalName}? Esta acción no se puede deshacer.`)) return;
     deleteAssessment(record.id);
     setRecords((current) => current.filter((item) => item.id !== record.id));

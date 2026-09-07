@@ -25,8 +25,13 @@
 | Notificaciones | preferencias, plantillas, bandeja, entregas y `notification_event_consumptions` | Bandeja privada, consumo idempotente independiente del outbox, quiet hours solo para correo y Realtime limitado al destinatario. |
 | Automatizaciones | `automation_rules`, versiones y ejecuciones | Motor declarativo, versionado, con apagado de emergencia, cron, reintentos e idempotencia por evento. |
 | Administración SaaS | `billing_plans`, `billing_plan_versions`, `billing_subscriptions`, `billing_usage_periods`, `billing_reconciliations`, `saas_support_sessions`, `saas_admin_roles`, `saas_admin_audit` | Planes comerciales versionados, suscripción anclada a versión, conciliación manual y soporte interno sin alterar RBAC/RLS del tenant. |
+| Catálogo público CIIU | `public_catalog.economic_activity_catalog_versions`, `public_catalog.economic_activity_catalog_entries` | Clasificación versionada del Decreto 768 de 2022, aislada del Data API y consultable solo mediante un RPC público de lectura limitada. |
 
 ## Convenciones
+
+- `20260907023807_add_public_economic_activity_catalog.sql`: carga 1.067 actividades normalizadas, conserva opciones de distinto riesgo para un mismo código y expone una búsqueda pública de solo lectura con máximo 50 resultados.
+- `20260907025326_add_economic_catalog_fk_index.sql`: cubre la clave foránea desde la versión del catálogo CIIU hacia su versión normativa.
+- `20260907025702_normalize_economic_catalog_entry_uuids.sql`: normaliza las huellas deterministas del catálogo a identificadores UUID v5 aceptados por clientes estrictos.
 
 - UUID como clave primaria expuesta.
 - `snake_case`, `timestamptz` y UTC.

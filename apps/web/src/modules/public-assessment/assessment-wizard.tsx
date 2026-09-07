@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { CiiuActivityCombobox } from "./ciiu-activity-combobox";
 import { loadPublicAssessmentCatalog } from "./catalog";
+import type { EconomicActivityOption } from "./economic-activities";
 import { calculatePublicAssessment, createAssessmentRecord, explainSuggestedProfile, PHVA_LABELS, suggestedProfileCode } from "./logic";
 import { findAssessment, saveAssessment } from "./storage";
-import { PHVA_CYCLES, publicAssessmentCompanySchema, type PublicAssessmentCatalog, type PublicAssessmentCompany, type PublicAssessmentProfile, type PublicAssessmentRecord, type PublicAssessmentResponse } from "./schemas";
+import { PHVA_CYCLES, publicAssessmentCompanySchema, type PublicAssessmentCatalog, type PublicAssessmentCompany, type PublicAssessmentProfile, type PublicAssessmentRecord, type PublicAssessmentResponse, type StoredPublicAssessmentRecord } from "./schemas";
 
 type Stage = "company" | "confirm" | "questions" | "review";
 
@@ -17,9 +19,12 @@ const emptyCompany = {
   legalName: "",
   taxId: "",
   employeeCount: "",
-  riskClass: "1",
+  riskClass: "",
+  economicActivityEntryId: "",
   ciiuCode: "",
   economicActivity: "",
+  economicActivityCatalogVersion: "",
+  economicActivitySourceReference: "",
 };
 
 function Field({ label, required, error, children }: { label: string; required?: boolean; error?: string; children: React.ReactNode }) {
@@ -46,6 +51,8 @@ export function AssessmentWizard({ resumeId }: { resumeId?: string }) {
   const [loading, setLoading] = useState(true);
   const [stage, setStage] = useState<Stage>("company");
   const [companyForm, setCompanyForm] = useState(emptyCompany);
+  const [selectedActivity, setSelectedActivity] = useState<EconomicActivityOption | null>(null);
+  const [legacyDraft, setLegacyDraft] = useState<StoredPublicAssessmentRecord | null>(null);
   const [company, setCompany] = useState<PublicAssessmentCompany | null>(null);
   const [suggestedProfile, setSuggestedProfile] = useState<PublicAssessmentProfile | null>(null);
   const [record, setRecord] = useState<PublicAssessmentRecord | null>(null);
@@ -63,7 +70,17 @@ export function AssessmentWizard({ resumeId }: { resumeId?: string }) {
         router.replace(`/evaluacion-inicial/${resumed.id}`);
         return;
       }
-      if (resumed) {
+      if (resumed?.schemaVersion === 1) {
+        setLegacyDraft(resumed);
+        setCompanyForm({
+          ...emptyCompany,
+          legalName: resumed.company.legalName,
+          taxId: resumed.company.taxId,
+          employeeCount: String(resumed.company.employeeCount),
+        });
+        setSaveMessage("Selecciona la actividad CIIU para continuar este borrador anterior. Tus respuestas se conservarán si el perfil no cambia.");
+        setStage("company");
+      } else if (resumed) {
         setRecord(resumed);
         setCompany(resumed.company);
         const index = PHVA_CYCLES.indexOf(resumed.currentCycle);
@@ -107,12 +124,27 @@ export function AssessmentWizard({ resumeId }: { resumeId?: string }) {
 
   function confirmProfile() {
     if (!company || !suggestedProfile) return;
-    const next = createAssessmentRecord(company, suggestedProfile);
+    const profileChanged = legacyDraft?.profile.code !== suggestedProfile.code;
+    const created = createAssessmentRecord(
+      company,
+      suggestedProfile,
+      legacyDraft?.id,
+      legacyDraft?.createdAt,
+    );
+    const next: PublicAssessmentRecord = legacyDraft ? {
+      ...created,
+      responses: profileChanged ? {} : Object.fromEntries(
+        Object.entries(legacyDraft.responses).filter(([code]) => suggestedProfile.standards.some((standard) => standard.code === code)),
+      ),
+      currentCycle: profileChanged ? "PLAN" : legacyDraft.currentCycle,
+      updatedAt: new Date().toISOString(),
+    } : created;
     saveAssessment(next);
+    setLegacyDraft(null);
     setRecord(next);
     setCycleIndex(0);
     setStage("questions");
-    setSaveMessage("Borrador guardado en este navegador.");
+    setSaveMessage(profileChanged ? "El perfil cambió y se reiniciaron las respuestas incompatibles." : "Borrador guardado en este navegador.");
     router.replace(`/evaluacion-inicial/nueva?assessment=${next.id}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -166,16 +198,40 @@ export function AssessmentWizard({ resumeId }: { resumeId?: string }) {
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Razón social" required error={fieldErrors.legalName}><Input value={companyForm.legalName} onChange={(e) => setCompanyForm({ ...companyForm, legalName: e.target.value })} autoComplete="organization" aria-invalid={Boolean(fieldErrors.legalName)} /></Field>
             <Field label="NIT (opcional)" error={fieldErrors.taxId}><Input value={companyForm.taxId} onChange={(e) => setCompanyForm({ ...companyForm, taxId: e.target.value })} inputMode="text" aria-invalid={Boolean(fieldErrors.taxId)} /></Field>
+            <div className="grid gap-1.5 sm:col-span-2">
+              <span className="text-sm font-medium">Código CIIU y actividad económica<span className="sr-only">, obligatorio</span></span>
+              <CiiuActivityCombobox
+                value={selectedActivity}
+                invalid={Boolean(fieldErrors.economicActivityEntryId || fieldErrors.ciiuCode)}
+                onChange={(option) => {
+                  setSelectedActivity(option);
+                  setCompanyForm((current) => ({
+                    ...current,
+                    economicActivityEntryId: option.entry_id,
+                    ciiuCode: option.ciiu_code,
+                    economicActivity: option.activity,
+                    economicActivityCatalogVersion: option.catalog_version,
+                    economicActivitySourceReference: option.source_reference,
+                    riskClass: String(option.risk_class),
+                  }));
+                  setFieldErrors((current) => ({ ...current, economicActivityEntryId: "", ciiuCode: "", economicActivity: "", riskClass: "" }));
+                }}
+              />
+              {fieldErrors.economicActivityEntryId || fieldErrors.ciiuCode ? <span className="text-xs font-medium text-[var(--danger)]">{fieldErrors.economicActivityEntryId || fieldErrors.ciiuCode}</span> : null}
+            </div>
+            {selectedActivity ? (
+              <div className="sm:col-span-2 rounded-[12px] border border-[var(--border)] bg-[var(--muted-surface)] px-4 py-3">
+                <p className="text-xs font-semibold text-[var(--muted)]">Actividad seleccionada</p>
+                <p className="mt-1 text-sm leading-6 text-[var(--foreground)]">{selectedActivity.activity}</p>
+              </div>
+            ) : null}
             <Field label="Número de trabajadores" required error={fieldErrors.employeeCount}><Input value={companyForm.employeeCount} onChange={(e) => setCompanyForm({ ...companyForm, employeeCount: e.target.value })} type="number" min={1} max={1000000} inputMode="numeric" aria-invalid={Boolean(fieldErrors.employeeCount)} /></Field>
             <Field label="Clase de riesgo" required error={fieldErrors.riskClass}>
-              <select value={companyForm.riskClass} onChange={(e) => setCompanyForm({ ...companyForm, riskClass: e.target.value })} className="h-10 rounded-lg border border-[var(--border)] bg-white px-3 text-sm shadow-[var(--shadow-control)] outline-none focus-visible:border-[var(--brand)] focus-visible:ring-3 focus-visible:ring-[var(--focus-ring)]">
-                {[1, 2, 3, 4, 5].map((value) => <option key={value} value={value}>Clase {value === 1 ? "I" : value === 2 ? "II" : value === 3 ? "III" : value === 4 ? "IV" : "V"}</option>)}
-              </select>
+              <Input value={companyForm.riskClass ? `Clase ${["", "I", "II", "III", "IV", "V"][Number(companyForm.riskClass)]}` : "Se asigna al elegir la actividad"} readOnly aria-readonly="true" className="bg-[var(--muted-surface)]" />
             </Field>
-            <Field label="Código CIIU (opcional)" error={fieldErrors.ciiuCode}><Input value={companyForm.ciiuCode} onChange={(e) => setCompanyForm({ ...companyForm, ciiuCode: e.target.value })} inputMode="numeric" maxLength={4} aria-invalid={Boolean(fieldErrors.ciiuCode)} /></Field>
-            <Field label="Actividad económica (opcional)" error={fieldErrors.economicActivity}><Input value={companyForm.economicActivity} onChange={(e) => setCompanyForm({ ...companyForm, economicActivity: e.target.value })} /></Field>
           </div>
-          <div className="flex items-start gap-3 rounded-[12px] bg-[var(--muted-surface)] px-4 py-3 text-sm leading-6 text-[var(--muted-strong)]"><Info size={19} className="mt-0.5 shrink-0 text-[var(--brand)]" /><p>La clase de riesgo debe verificarse con la información vigente de la organización. El perfil sugerido deberá confirmarse antes de responder.</p></div>
+          {legacyDraft ? <div role="status" className="flex items-start gap-3 rounded-[12px] bg-[var(--warning-soft)] px-4 py-3 text-sm leading-6 text-[var(--warning)]"><WarningCircle size={19} className="mt-0.5 shrink-0" /><p>{saveMessage}</p></div> : null}
+          <div className="flex items-start gap-3 rounded-[12px] bg-[var(--muted-surface)] px-4 py-3 text-sm leading-6 text-[var(--muted-strong)]"><Info size={19} className="mt-0.5 shrink-0 text-[var(--brand)]" /><p>Confirma que la descripción seleccionada corresponda a la actividad real de la empresa. El catálogo asigna la clase de riesgo; la selección y el perfil sugerido requieren validación profesional.</p></div>
           <Button type="submit" size="lg" className="justify-self-end">Continuar <ArrowRight size={17} /></Button>
         </form>
       </div>
@@ -190,6 +246,8 @@ export function AssessmentWizard({ resumeId }: { resumeId?: string }) {
         <div className="mt-8 rounded-[16px] border border-[var(--success-border)] bg-white p-6 shadow-[var(--shadow-control)] sm:p-8">
           <div className="flex items-start gap-4"><span className="grid size-11 shrink-0 place-items-center rounded-[12px] bg-[var(--success-soft)] text-[var(--brand)]"><ShieldCheck size={23} weight="duotone" /></span><div><p className="text-sm font-semibold text-[var(--brand)]">{company.legalName}</p><h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em]">{suggestedProfile.name}</h2><p className="mt-2 text-sm leading-6 text-[var(--muted)]">{suggestedProfile.standards.length} estándares · {explainSuggestedProfile(company.employeeCount, company.riskClass)}</p></div></div>
           <dl className="mt-7 grid gap-4 border-t border-[var(--border)] pt-6 sm:grid-cols-2"><div><dt className="text-xs font-semibold text-[var(--muted)]">Versión del perfil</dt><dd className="mt-1 text-sm font-medium">{suggestedProfile.versionCode}</dd></div><div><dt className="text-xs font-semibold text-[var(--muted)]">Referencia</dt><dd className="mt-1 text-sm font-medium">{suggestedProfile.source.officialReference}</dd></div></dl>
+          <dl className="mt-4 grid gap-4 rounded-[12px] bg-[var(--muted-surface)] p-4 sm:grid-cols-[120px_1fr]"><div><dt className="text-xs font-semibold text-[var(--muted)]">CIIU y riesgo</dt><dd className="mt-1 font-mono text-sm font-semibold">{company.ciiuCode} · Clase {["", "I", "II", "III", "IV", "V"][company.riskClass]}</dd></div><div><dt className="text-xs font-semibold text-[var(--muted)]">Actividad</dt><dd className="mt-1 text-sm leading-6">{company.economicActivity}</dd></div></dl>
+          {legacyDraft && legacyDraft.profile.code !== suggestedProfile.code ? <p role="alert" className="mt-4 rounded-[12px] border border-[var(--danger-border)] bg-[var(--danger-soft)] px-4 py-3 text-sm leading-6 text-[var(--danger)]">El riesgo de la actividad cambia el perfil de {legacyDraft.profile.standards.length} a {suggestedProfile.standards.length} estándares. Al confirmar se reiniciarán las respuestas anteriores porque no son compatibles con el nuevo conjunto.</p> : null}
           <p className="mt-6 rounded-[12px] bg-[var(--warning-soft)] px-4 py-3 text-sm leading-6 text-[var(--warning)]">La sugerencia es orientativa y depende de los datos suministrados. Confirma la información con una persona competente antes de usar el resultado para decisiones formales.</p>
           <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><Button variant="secondary" onClick={() => setStage("company")}><ArrowLeft size={16} /> Corregir datos</Button><Button onClick={confirmProfile}>Confirmar e iniciar <ArrowRight size={16} /></Button></div>
         </div>

@@ -1,6 +1,8 @@
 import { z } from "zod";
 
-export const PUBLIC_ASSESSMENT_SCHEMA_VERSION = 1 as const;
+export const PUBLIC_ASSESSMENT_SCHEMA_VERSION = 2 as const;
+export const LEGACY_PUBLIC_ASSESSMENT_SCHEMA_VERSION = 1 as const;
+export const PUBLIC_ASSESSMENT_CATALOG_SCHEMA_VERSION = 1 as const;
 export const PHVA_CYCLES = ["PLAN", "DO", "CHECK", "ACT"] as const;
 
 export const publicAssessmentResponseSchema = z.enum(["met", "not_met"]);
@@ -39,18 +41,30 @@ export const publicAssessmentProfileSchema = z.object({
 });
 
 export const publicAssessmentCatalogSchema = z.object({
-  schemaVersion: z.literal(PUBLIC_ASSESSMENT_SCHEMA_VERSION),
+  schemaVersion: z.literal(PUBLIC_ASSESSMENT_CATALOG_SCHEMA_VERSION),
   generatedAt: z.string().datetime({ offset: true }),
   profiles: z.array(publicAssessmentProfileSchema).max(3),
 });
 
-export const publicAssessmentCompanySchema = z.object({
+export const legacyPublicAssessmentCompanySchema = z.object({
   legalName: z.string().trim().min(3, "Escribe la razón social.").max(160),
   taxId: z.string().trim().max(30).regex(/^[0-9A-Za-z.-]*$/, "Usa solo letras, números, puntos o guiones.").optional().default(""),
   employeeCount: z.coerce.number().int().min(1, "Debe existir al menos un trabajador.").max(1_000_000),
   riskClass: z.coerce.number().int().min(1).max(5),
   ciiuCode: z.string().trim().regex(/^$|^[0-9]{4}$/, "El código CIIU debe tener cuatro dígitos.").optional().default(""),
   economicActivity: z.string().trim().max(500).optional().default(""),
+});
+
+export const publicAssessmentCompanySchema = z.object({
+  legalName: z.string().trim().min(3, "Escribe la razón social.").max(160),
+  taxId: z.string().trim().max(30).regex(/^[0-9A-Za-z.-]*$/, "Usa solo letras, números, puntos o guiones.").optional().default(""),
+  economicActivityEntryId: z.uuid("Selecciona una actividad económica del catálogo."),
+  ciiuCode: z.string().trim().regex(/^[0-9]{1,4}-[0-9]{2}$/, "Selecciona un código CIIU válido del catálogo."),
+  economicActivity: z.string().trim().min(3, "Selecciona la actividad económica.").max(2_000),
+  economicActivityCatalogVersion: z.string().trim().min(1).max(80),
+  economicActivitySourceReference: z.string().trim().min(3).max(300),
+  employeeCount: z.coerce.number().int().min(1, "Debe existir al menos un trabajador.").max(1_000_000),
+  riskClass: z.coerce.number().int().min(1).max(5),
 });
 
 export const publicAssessmentCycleResultSchema = z.object({
@@ -85,6 +99,16 @@ export const publicAssessmentRecordSchema = z.object({
   result: publicAssessmentResultSchema.nullable(),
 });
 
+export const legacyPublicAssessmentRecordSchema = publicAssessmentRecordSchema.extend({
+  schemaVersion: z.literal(LEGACY_PUBLIC_ASSESSMENT_SCHEMA_VERSION),
+  company: legacyPublicAssessmentCompanySchema,
+});
+
+export const storedPublicAssessmentRecordSchema = z.union([
+  publicAssessmentRecordSchema,
+  legacyPublicAssessmentRecordSchema,
+]);
+
 export const publicAssessmentStoreSchema = z.object({
   schemaVersion: z.literal(PUBLIC_ASSESSMENT_SCHEMA_VERSION),
   assessments: z.array(publicAssessmentRecordSchema),
@@ -94,6 +118,7 @@ export type PublicAssessmentCatalog = z.infer<typeof publicAssessmentCatalogSche
 export type PublicAssessmentCompany = z.infer<typeof publicAssessmentCompanySchema>;
 export type PublicAssessmentProfile = z.infer<typeof publicAssessmentProfileSchema>;
 export type PublicAssessmentRecord = z.infer<typeof publicAssessmentRecordSchema>;
+export type StoredPublicAssessmentRecord = z.infer<typeof storedPublicAssessmentRecordSchema>;
 export type PublicAssessmentResponse = z.infer<typeof publicAssessmentResponseSchema>;
 export type PublicAssessmentResult = z.infer<typeof publicAssessmentResultSchema>;
 export type PublicAssessmentStandard = z.infer<typeof publicAssessmentStandardSchema>;

@@ -1,11 +1,11 @@
-import { PUBLIC_ASSESSMENT_SCHEMA_VERSION, publicAssessmentRecordSchema, type PublicAssessmentRecord } from "./schemas";
+import { PUBLIC_ASSESSMENT_SCHEMA_VERSION, storedPublicAssessmentRecordSchema, type StoredPublicAssessmentRecord } from "./schemas";
 
 export const PUBLIC_ASSESSMENT_STORAGE_KEY = "securia360:public-initial-assessments:v1";
 
 type BrowserStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
 export type AssessmentStoreRead = {
-  records: PublicAssessmentRecord[];
+  records: StoredPublicAssessmentRecord[];
   corrupted: boolean;
 };
 
@@ -26,10 +26,10 @@ export function readAssessments(storage?: BrowserStorage): AssessmentStoreRead {
     if (!parsed || typeof parsed !== "object" || !("assessments" in parsed) || !Array.isArray(parsed.assessments)) {
       return { records: [], corrupted: true };
     }
-    const records: PublicAssessmentRecord[] = [];
-    let corrupted = (parsed as { schemaVersion?: unknown }).schemaVersion !== PUBLIC_ASSESSMENT_SCHEMA_VERSION;
+    const records: StoredPublicAssessmentRecord[] = [];
+    let corrupted = ![1, PUBLIC_ASSESSMENT_SCHEMA_VERSION].includes(Number((parsed as { schemaVersion?: unknown }).schemaVersion));
     for (const candidate of parsed.assessments) {
-      const result = publicAssessmentRecordSchema.safeParse(candidate);
+      const result = storedPublicAssessmentRecordSchema.safeParse(candidate);
       if (result.success) records.push(result.data);
       else corrupted = true;
     }
@@ -39,13 +39,13 @@ export function readAssessments(storage?: BrowserStorage): AssessmentStoreRead {
   }
 }
 
-export function writeAssessments(records: PublicAssessmentRecord[], storage?: BrowserStorage) {
+export function writeAssessments(records: StoredPublicAssessmentRecord[], storage?: BrowserStorage) {
   const target = resolveStorage(storage);
   if (!target) return;
   target.setItem(PUBLIC_ASSESSMENT_STORAGE_KEY, JSON.stringify({ schemaVersion: PUBLIC_ASSESSMENT_SCHEMA_VERSION, assessments: records }));
 }
 
-export function saveAssessment(record: PublicAssessmentRecord, storage?: BrowserStorage) {
+export function saveAssessment(record: StoredPublicAssessmentRecord, storage?: BrowserStorage) {
   const current = readAssessments(storage).records.filter((item) => item.id !== record.id);
   writeAssessments([record, ...current], storage);
 }

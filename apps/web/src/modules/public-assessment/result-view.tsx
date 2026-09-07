@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { formatColombiaDate, PHVA_LABELS, RESULT_BANDS } from "./logic";
 import { deleteAssessment, findAssessment } from "./storage";
-import type { PublicAssessmentRecord } from "./schemas";
+import type { StoredPublicAssessmentRecord } from "./schemas";
 
 const OFFICIAL_RESOLUTION_URL = "https://www1.funcionpublica.gov.co/documents/34645357/34703621/Resolucion_0312_de_2019.pdf/3c93008d-dd8e-8b0d-e5ea-ec6699db86e7";
 
@@ -17,7 +17,7 @@ function MissingResult() {
 
 export function AssessmentResultView({ assessmentId }: { assessmentId: string }) {
   const router = useRouter();
-  const [record, setRecord] = useState<PublicAssessmentRecord | null | undefined>(undefined);
+  const [record, setRecord] = useState<StoredPublicAssessmentRecord | null | undefined>(undefined);
 
   useEffect(() => {
     let active = true;
