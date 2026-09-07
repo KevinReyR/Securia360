@@ -13,10 +13,38 @@ for (const viewport of viewports) {
     await page.goto("/");
     await expect(page.getByRole("heading", { name: /Del requisito a la mejora/ })).toBeVisible();
     await expect(page.getByRole("link", { name: /Crear cuenta/ }).first()).toBeVisible();
+    await expect(page.getByTestId("landing-network")).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
     expect(overflow).toBe(false);
   });
 }
+
+test("landing network remains decorative and can be paused", async ({ page }) => {
+  await page.goto("/");
+  const network = page.getByTestId("landing-network");
+  await expect(network).toHaveCSS("pointer-events", "none");
+
+  const control = page.getByRole("button", { name: "Pausar fondo" });
+  await expect(control).toHaveAttribute("aria-pressed", "false");
+  await control.click();
+  await expect(page.getByRole("button", { name: "Activar fondo" })).toHaveAttribute("aria-pressed", "true");
+});
+
+test("landing network becomes static when reduced motion is requested", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await expect(page.getByTestId("landing-network")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Pausar fondo" })).toBeHidden();
+});
+
+test("landing retains a readable fallback without JavaScript", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: /Del requisito a la mejora/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Crear cuenta/ }).first()).toBeVisible();
+  await context.close();
+});
 
 test("access and password recovery use clear labels", async ({ page }) => {
   await page.goto("/auth/login");

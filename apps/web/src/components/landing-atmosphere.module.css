@@ -4,48 +4,28 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  background: #edf3ef;
+  background: #eaf1ed;
 }
 
-.aurora {
+.canvas,
+.fallback {
   position: absolute;
-  inset: -15%;
-  background: radial-gradient(ellipse at 80% 20%, #b9dace88, transparent 48%),
-    radial-gradient(ellipse at 15% 65%, #d0dce988, transparent 52%),
-    radial-gradient(ellipse at 50% 15%, #ffffffee, transparent 65%);
-  animation: drift 28s cubic-bezier(.77, 0, .175, 1) infinite alternate;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.stars {
-  position: absolute;
-  inset: -3%;
-  opacity: .4;
-  background-image: radial-gradient(circle, #547b68 1px, transparent 1.6px), radial-gradient(circle, #fff 1.5px, transparent 2px);
-  background-size: 193px 167px, 277px 239px;
-  background-position: 37px 61px, 140px 20px;
-  animation: drift 38s cubic-bezier(.77, 0, .175, 1) infinite alternate-reverse;
+.canvas {
+  z-index: 1;
+  display: block;
+  pointer-events: none;
 }
 
-.farMountain, .nearMountain {
-  position: absolute;
-  inset: auto -5% 0;
-  height: 46%;
-  background: #96b4a426;
-  clip-path: polygon(0 70%, 12% 42%, 21% 53%, 35% 10%, 44% 37%, 52% 22%, 69% 63%, 82% 32%, 100% 72%, 100% 100%, 0 100%);
+.fallback {
+  z-index: 0;
+  background: #eaf1ed;
 }
-.nearMountain {
-  height: 30%;
-  background: #74998120;
-  clip-path: polygon(0 38%, 13% 65%, 26% 30%, 38% 72%, 52% 48%, 70% 78%, 86% 20%, 100% 59%, 100% 100%, 0 100%);
-}
-.forest {
-  position: absolute;
-  inset: auto -30px -24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  color: #527d651c;
-}
+
 .control {
   position: fixed;
   bottom: 16px;
@@ -62,21 +42,18 @@
   color: #344d3e;
   font-size: 12px;
   cursor: pointer;
+  box-shadow: 0 8px 24px rgb(35 72 51 / 8%);
+  transition: border-color 160ms cubic-bezier(.23, 1, .32, 1),
+    background-color 160ms cubic-bezier(.23, 1, .32, 1);
 }
+
+.control:hover { border-color: #8eaa99; background: #fff; }
 .control:focus-visible { outline: 2px solid #12663b; outline-offset: 3px; }
-.scene[data-paused="true"] > div { animation-play-state: paused; }
-@keyframes drift {
-  from { transform: translate3d(-1%, 0, 0) scale(1); }
-  to { transform: translate3d(2%, -1%, 0) scale(1.04); }
-}
-@media (max-width: 767px) {
-  .forest { opacity: .65; }
-  .forest svg:nth-child(even) { display: none; }
-}
+
 @media (prefers-reduced-motion: reduce) {
-  .scene > div { animation: none; }
   .control { display: none; }
 }
+
 @media print {
   .scene, .control { display: none; }
 }
