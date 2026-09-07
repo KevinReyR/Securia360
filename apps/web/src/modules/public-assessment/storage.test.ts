@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
+// @vitest-environment jsdom
+
+import { describe, expect, it, vi } from "vitest";
 import { createAssessmentRecord } from "./logic";
-import { clearAssessments, deleteAssessment, findAssessment, PUBLIC_ASSESSMENT_STORAGE_KEY, readAssessments, saveAssessment } from "./storage";
+import { clearAssessments, deleteAssessment, findAssessment, PUBLIC_ASSESSMENTS_CHANGED_EVENT, PUBLIC_ASSESSMENT_STORAGE_KEY, readAssessments, saveAssessment, writeAssessments } from "./storage";
 import type { PublicAssessmentProfile } from "./schemas";
 
 function memoryStorage() {
@@ -62,14 +64,36 @@ describe("public assessment local storage", () => {
     };
     storage.setItem(PUBLIC_ASSESSMENT_STORAGE_KEY, JSON.stringify({ schemaVersion: 1, assessments: [legacy] }));
     expect(readAssessments(storage).records[0]).toMatchObject({ schemaVersion: 1, status: "completed" });
-    expect(readAssessments(storage).corrupted).toBe(false);
+    expect(readAssessments(storage)).toMatchObject({ corrupted: false, available: true });
   });
 
   it("does not crash on malformed JSON and can clear it", () => {
     const storage = memoryStorage();
     storage.setItem(PUBLIC_ASSESSMENT_STORAGE_KEY, "not-json");
-    expect(readAssessments(storage)).toEqual({ records: [], corrupted: true });
+    expect(readAssessments(storage)).toEqual({ records: [], corrupted: true, available: true });
     clearAssessments(storage);
     expect(storage.getItem(PUBLIC_ASSESSMENT_STORAGE_KEY)).toBeNull();
+  });
+
+  it("reports unavailable storage without throwing", () => {
+    const unavailable = {
+      getItem: () => { throw new Error("storage blocked"); },
+      setItem: () => { throw new Error("storage blocked"); },
+      removeItem: () => { throw new Error("storage blocked"); },
+    };
+    expect(readAssessments(unavailable)).toEqual({ records: [], corrupted: false, available: false });
+    expect(clearAssessments(unavailable)).toBe(false);
+  });
+
+  it("notifies the current tab after a successful local change", () => {
+    const listener = vi.fn();
+    window.addEventListener(PUBLIC_ASSESSMENTS_CHANGED_EVENT, listener);
+    try {
+      expect(writeAssessments([record])).toBe(true);
+      expect(listener).toHaveBeenCalledOnce();
+    } finally {
+      window.removeEventListener(PUBLIC_ASSESSMENTS_CHANGED_EVENT, listener);
+      clearAssessments();
+    }
   });
 });

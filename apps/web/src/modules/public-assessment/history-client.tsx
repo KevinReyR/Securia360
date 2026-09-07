@@ -2,40 +2,56 @@
 
 import { ArrowRight, ClockCounterClockwise, FileText, ShieldCheck, Trash } from "@phosphor-icons/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { clearAssessments, deleteAssessment, readAssessments } from "./storage";
+import { clearAssessments, deleteAssessment, PUBLIC_ASSESSMENT_STORAGE_KEY, PUBLIC_ASSESSMENTS_CHANGED_EVENT, readAssessments } from "./storage";
 import { formatColombiaDate, RESULT_BANDS } from "./logic";
 import type { StoredPublicAssessmentRecord } from "./schemas";
 
 export function AssessmentHistory() {
   const [records, setRecords] = useState<StoredPublicAssessmentRecord[]>([]);
   const [corrupted, setCorrupted] = useState(false);
+  const [storageAvailable, setStorageAvailable] = useState(true);
   const [ready, setReady] = useState(false);
+
+  const refresh = useCallback(() => {
+    const result = readAssessments();
+    setRecords(result.records);
+    setCorrupted(result.corrupted);
+    setStorageAvailable(result.available);
+    setReady(true);
+  }, []);
 
   useEffect(() => {
     let active = true;
-    Promise.resolve().then(() => {
-      if (!active) return;
-      const result = readAssessments();
-      setRecords(result.records);
-      setCorrupted(result.corrupted);
-      setReady(true);
-    });
-    return () => { active = false; };
-  }, []);
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== null && event.key !== PUBLIC_ASSESSMENT_STORAGE_KEY) return;
+      refresh();
+    };
+    const onVisibilityChange = () => { if (document.visibilityState === "visible") refresh(); };
+
+    queueMicrotask(() => { if (active) refresh(); });
+    window.addEventListener(PUBLIC_ASSESSMENTS_CHANGED_EVENT, refresh);
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("pageshow", refresh);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      active = false;
+      window.removeEventListener(PUBLIC_ASSESSMENTS_CHANGED_EVENT, refresh);
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("pageshow", refresh);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [refresh]);
 
   function removeOne(record: StoredPublicAssessmentRecord) {
     if (!window.confirm(`¿Eliminar la evaluación de ${record.company.legalName}? Esta acción no se puede deshacer.`)) return;
-    deleteAssessment(record.id);
-    setRecords((current) => current.filter((item) => item.id !== record.id));
+    if (!deleteAssessment(record.id)) refresh();
   }
 
   function removeAll() {
     if (!window.confirm("¿Eliminar todo el historial guardado en este navegador? Esta acción no se puede deshacer.")) return;
-    clearAssessments();
-    setRecords([]);
-    setCorrupted(false);
+    if (!clearAssessments()) refresh();
   }
 
   if (!ready) {
@@ -58,7 +74,14 @@ export function AssessmentHistory() {
         </div>
       ) : null}
 
-      {records.length === 0 ? (
+      {!storageAvailable ? (
+        <div role="alert" className="mt-5 rounded-[14px] border border-[var(--warning-border)] bg-[var(--warning-soft)] px-4 py-3 text-sm leading-6 text-[var(--warning)]">
+          Este navegador está bloqueando el almacenamiento local, por lo que no podemos mostrar ni conservar evaluaciones aquí. Habilita los datos del sitio para Securia360 y vuelve a intentarlo.
+          <Button variant="ghost" className="ml-2 h-auto px-1 py-0 align-baseline" onClick={refresh}>Reintentar</Button>
+        </div>
+      ) : null}
+
+      {!storageAvailable ? null : records.length === 0 ? (
         <div className="mt-6 grid min-h-56 place-items-center rounded-[16px] border border-dashed border-[var(--border-strong)] bg-white px-6 text-center">
           <div className="max-w-md py-10">
             <ClockCounterClockwise size={32} weight="duotone" className="mx-auto text-[var(--brand)]" />
