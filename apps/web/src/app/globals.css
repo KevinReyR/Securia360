@@ -86,6 +86,30 @@ select {
   color: var(--foreground);
 }
 
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  .public-assessment-result {
+    max-width: none;
+  }
+
+  .public-assessment-result article,
+  .public-assessment-result section,
+  .public-assessment-result aside {
+    break-inside: avoid;
+  }
+
+  .public-assessment-result details > summary {
+    display: none;
+  }
+
+  .public-assessment-result details > div {
+    display: grid;
+  }
+}
+
 :focus-visible {
   scroll-margin: 6rem;
 }

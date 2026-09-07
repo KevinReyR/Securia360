@@ -49,6 +49,8 @@ Las entidades normativas (`normative_sources`, `requirements`, `minimum_standard
 
 ## Migraciones
 
+- `20260907003606_public_initial_assessment_catalog.sql`: expone una función pública de solo lectura con la proyección mínima de perfiles, ponderaciones y estándares 0312 publicados y revisados. `anon` no recibe acceso directo a las tablas ni capacidad de escritura.
+- `20260907005224_harden_public_initial_assessment_catalog.sql`: mueve la lectura privilegiada del catálogo a un esquema no expuesto y conserva un wrapper público `security invoker`, evitando que una función `security definer` quede expuesta directamente en Data API.
 - `20260905130138_load_0312_standard_inventory.sql`: carga 60 estándares mínimos y los perfiles 7/21/60 de la Resolución 0312 desde un inventario controlado, registra ponderaciones y reglas de scoring en borrador, y sincroniza decisiones de revisión humana sin publicar conjuntos incompletos.
 - `20260905131319_record_0312_inventory_provenance.sql`: completa el campo de procedencia dedicado de los 154 artefactos de revisión derivados del inventario 0312, conservando en cada snapshot su huella SHA-256.
 - `20260905133542_register_classification_evaluator_review.sql`: registra y sincroniza el artefacto revisable de `SOURCE_DATA_REVIEW v1`, con FK, RLS y decisión humana append-only.

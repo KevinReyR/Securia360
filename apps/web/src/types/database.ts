@@ -10851,6 +10851,7 @@ export type Database = {
         }
         Returns: string
       }
+      get_public_initial_assessment_catalog: { Args: never; Returns: Json }
       create_ppe_inventory: {
         Args: {
           p_organization_id: string

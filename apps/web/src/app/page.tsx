@@ -47,6 +47,7 @@ export default function HomePage() {
             <a href="#capacidades" className="hover:text-[var(--foreground)]">Capacidades</a>
             <a href="#marco-normativo" className="hover:text-[var(--foreground)]">Marco normativo</a>
             <a href="#seguridad" className="hover:text-[var(--foreground)]">Seguridad</a>
+            <Link href="/evaluacion-inicial" className="rounded-[9px] border border-[var(--success-border)] bg-[var(--success-soft)] px-3 py-1.5 font-semibold text-[var(--brand)] hover:bg-emerald-100/70">Evaluación inicial</Link>
             <a href="#contacto" className="hover:text-[var(--foreground)]">Contacto</a>
           </nav>
           <div className="flex items-center gap-2">
@@ -54,6 +55,9 @@ export default function HomePage() {
             <Button asChild><Link href="/auth/signup">Crear cuenta <ArrowRight size={16} /></Link></Button>
           </div>
         </div>
+        <nav aria-label="Acceso móvil a evaluación" className="border-t border-black/[.05] px-5 py-2 text-center lg:hidden">
+          <Link href="/evaluacion-inicial" className="inline-flex items-center gap-2 rounded-[9px] px-3 py-1.5 text-sm font-semibold text-[var(--brand)] outline-none hover:bg-[var(--success-soft)] focus-visible:ring-3 focus-visible:ring-[var(--focus-ring)]">Evaluación inicial gratuita <ArrowRight size={15} /></Link>
+        </nav>
       </header>
 
       <section className="mx-auto grid min-h-[calc(100dvh-4rem)] max-w-[1440px] items-center gap-10 px-5 py-10 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:px-12 lg:py-14">
