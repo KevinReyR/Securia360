@@ -1,0 +1,36 @@
+.landing {
+  position: relative;
+  isolation: isolate;
+  /* Keep secondary copy legible over the light landscape at every frame. */
+  --muted: #4e6055;
+}
+.landing > section[id="capacidades"],
+.landing > section[id="marco-normativo"] {
+  background: rgb(250 253 251 / 45%);
+}
+.landing > header, .landing > footer {
+  background: rgb(255 255 255 / 92%);
+}
+.landing > footer { padding-bottom: 56px; }
+.glass {
+  background: rgb(255 255 255 / 80%);
+  border: 1px solid rgb(196 213 202 / 85%);
+  border-radius: 18px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgb(28 64 43 / 3%);
+}
+.darkGlass {
+  background: rgb(20 35 27 / 95%);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgb(119 158 134 / 35%);
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .glass { background: #fff; backdrop-filter: none; }
+  .darkGlass { background: #14231b; backdrop-filter: none; }
+  .landing > section[id], .landing > header, .landing > footer { background: #fff; }
+  .landing > section[id="contacto"] { background: #12663b; }
+}
+@supports not (backdrop-filter: blur(8px)) {
+  .glass { background: #fff; }
+  .darkGlass { background: #14231b; }
+}

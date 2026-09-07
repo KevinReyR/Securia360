@@ -4,6 +4,8 @@ import Link from "next/link";
 import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
 import { brand } from "@/config/brand";
+import { LandingAtmosphere } from "@/components/landing-atmosphere";
+import styles from "./landing.module.css";
 
 const capabilities = [
   ["Cumplimiento conectado", "Convierte evaluaciones y requisitos en brechas, responsables y acciones verificables.", ClipboardText],
@@ -36,7 +38,8 @@ const regulatoryFramework = [
 
 export default function HomePage() {
   return (
-    <main className="min-h-[100dvh] bg-white text-[var(--foreground)]">
+    <main className={`${styles.landing} min-h-[100dvh] text-[var(--foreground)]`}>
+      <LandingAtmosphere />
       <header className="sticky top-0 z-40 border-b border-black/[.06] bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-5 px-5 sm:px-8 lg:px-12">
           <BrandMark />
@@ -87,7 +90,7 @@ export default function HomePage() {
               <h2 className="text-balance mt-3 text-4xl font-semibold leading-tight tracking-[-0.04em]">El SG-SST avanza cuando el trabajo está conectado.</h2>
               <p className="mt-5 text-base leading-7 text-[var(--muted)]">Securia360 reúne cumplimiento, prevención y seguimiento en un espacio común para que cada persona sepa qué debe hacer y por qué.</p>
             </div>
-            <div className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
+            <div className={`${styles.glass} divide-y divide-[var(--border)] px-6`}>
               {capabilities.map(([title, description, Icon], index) => (
                 <article key={title} className="grid gap-4 py-7 sm:grid-cols-[48px_1fr_auto] sm:items-center">
                   <span className="grid size-11 place-items-center rounded-[12px] bg-white text-[var(--brand)] shadow-[var(--shadow-control)]"><Icon size={22} weight="duotone" /></span>
@@ -108,7 +111,7 @@ export default function HomePage() {
             <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted)]">{brand.name} está diseñado para apoyar una gestión estructurada y trazable del SG-SST, tomando como referencia las principales disposiciones legales y técnicas aplicables en Colombia.</p>
           </div>
 
-          <div className="mt-12 grid border-t border-[var(--border)] md:grid-cols-2">
+          <div className={`${styles.glass} mt-12 grid px-6 md:grid-cols-2`}>
             {regulatoryFramework.map((item, index) => (
               <article
                 key={item.title}
@@ -131,7 +134,7 @@ export default function HomePage() {
       </section>
 
       <section id="seguridad" className="mx-auto grid max-w-[1280px] gap-12 px-5 py-20 sm:px-8 lg:grid-cols-2 lg:px-12 lg:py-28">
-        <div className="rounded-[20px] bg-[var(--sidebar)] p-8 text-white sm:p-10">
+        <div className={`${styles.darkGlass} rounded-[20px] p-8 text-white sm:p-10`}>
           <LockKey size={28} className="text-emerald-300" weight="duotone" />
           <h2 className="mt-8 text-3xl font-semibold tracking-[-0.04em]">Cada empresa ve únicamente lo que le corresponde.</h2>
           <p className="mt-4 max-w-lg leading-7 text-[var(--sidebar-muted)]">La separación de datos, los permisos por capacidad y el historial de cambios forman parte del núcleo de la plataforma.</p>
