@@ -1,8 +1,6 @@
-// @vitest-environment jsdom
-
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { createAssessmentRecord } from "./logic";
-import { clearAssessments, deleteAssessment, findAssessment, PUBLIC_ASSESSMENTS_CHANGED_EVENT, PUBLIC_ASSESSMENT_STORAGE_KEY, readAssessments, saveAssessment, writeAssessments } from "./storage";
+import { findAssessment, PUBLIC_ASSESSMENT_STORAGE_KEY, readAssessments, saveAssessment } from "./storage";
 import type { PublicAssessmentProfile } from "./schemas";
 
 function memoryStorage() {
@@ -30,15 +28,13 @@ const record = createAssessmentRecord({
 }, profile, "11111111-1111-4111-8111-111111111111", "2026-09-06T12:00:00.000Z");
 
 describe("public assessment local storage", () => {
-  it("saves, updates, finds and deletes a versioned assessment", () => {
+  it("saves, updates and finds a versioned assessment", () => {
     const storage = memoryStorage();
     saveAssessment(record, storage);
     expect(findAssessment(record.id, storage)?.company.legalName).toBe("Empresa Demo SAS");
     saveAssessment({ ...record, company: { ...record.company, legalName: "Empresa Actualizada SAS" } }, storage);
     expect(readAssessments(storage).records).toHaveLength(1);
     expect(findAssessment(record.id, storage)?.company.legalName).toBe("Empresa Actualizada SAS");
-    deleteAssessment(record.id, storage);
-    expect(readAssessments(storage).records).toEqual([]);
   });
 
   it("recovers valid records from a partially corrupted store", () => {
@@ -64,15 +60,13 @@ describe("public assessment local storage", () => {
     };
     storage.setItem(PUBLIC_ASSESSMENT_STORAGE_KEY, JSON.stringify({ schemaVersion: 1, assessments: [legacy] }));
     expect(readAssessments(storage).records[0]).toMatchObject({ schemaVersion: 1, status: "completed" });
-    expect(readAssessments(storage)).toMatchObject({ corrupted: false, available: true });
+    expect(readAssessments(storage)).toMatchObject({ corrupted: false });
   });
 
-  it("does not crash on malformed JSON and can clear it", () => {
+  it("does not crash on malformed JSON", () => {
     const storage = memoryStorage();
     storage.setItem(PUBLIC_ASSESSMENT_STORAGE_KEY, "not-json");
-    expect(readAssessments(storage)).toEqual({ records: [], corrupted: true, available: true });
-    clearAssessments(storage);
-    expect(storage.getItem(PUBLIC_ASSESSMENT_STORAGE_KEY)).toBeNull();
+    expect(readAssessments(storage)).toEqual({ records: [], corrupted: true });
   });
 
   it("reports unavailable storage without throwing", () => {
@@ -81,19 +75,6 @@ describe("public assessment local storage", () => {
       setItem: () => { throw new Error("storage blocked"); },
       removeItem: () => { throw new Error("storage blocked"); },
     };
-    expect(readAssessments(unavailable)).toEqual({ records: [], corrupted: false, available: false });
-    expect(clearAssessments(unavailable)).toBe(false);
-  });
-
-  it("notifies the current tab after a successful local change", () => {
-    const listener = vi.fn();
-    window.addEventListener(PUBLIC_ASSESSMENTS_CHANGED_EVENT, listener);
-    try {
-      expect(writeAssessments([record])).toBe(true);
-      expect(listener).toHaveBeenCalledOnce();
-    } finally {
-      window.removeEventListener(PUBLIC_ASSESSMENTS_CHANGED_EVENT, listener);
-      clearAssessments();
-    }
+    expect(readAssessments(unavailable)).toEqual({ records: [], corrupted: false });
   });
 });

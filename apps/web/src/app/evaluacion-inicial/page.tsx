@@ -3,7 +3,6 @@ import { ArrowRight, Browser, CheckCircle, LockKey, ShieldCheck } from "@phospho
 import Link from "next/link";
 import { LandingAtmosphere } from "@/components/landing-atmosphere";
 import { Button } from "@/components/ui/button";
-import { AssessmentHistory } from "@/modules/public-assessment/history-client";
 import { PublicAssessmentShell } from "@/modules/public-assessment/public-assessment-shell";
 
 export const metadata: Metadata = {
@@ -23,7 +22,6 @@ export default function InitialAssessmentPage() {
             <p className="mt-6 max-w-xl text-lg leading-8 text-[var(--muted-strong)]">Responde los estándares que corresponden al tamaño y nivel de riesgo de tu empresa. Obtendrás un resultado orientativo y una lista priorizada de oportunidades de mejora.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button size="lg" asChild><Link href="/evaluacion-inicial/nueva">Iniciar evaluación <ArrowRight size={18} /></Link></Button>
-              <Button size="lg" variant="secondary" asChild><a href="#mis-evaluaciones">Ver mis evaluaciones</a></Button>
             </div>
           </div>
           <aside className="self-end rounded-[18px] border border-white/70 bg-white/88 p-6 shadow-[0_24px_80px_rgba(18,54,37,.10)] backdrop-blur-md sm:p-8">
@@ -35,9 +33,6 @@ export default function InitialAssessmentPage() {
             </div>
           </aside>
         </section>
-      </div>
-      <div id="mis-evaluaciones" className="scroll-mt-8 border-t border-[var(--border)] bg-[var(--background)]">
-        <div className="mx-auto max-w-[1280px] px-4 py-12 sm:px-8 lg:px-12 lg:py-16"><AssessmentHistory /></div>
       </div>
     </PublicAssessmentShell>
   );

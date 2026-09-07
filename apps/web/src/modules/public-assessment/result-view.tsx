@@ -1,12 +1,11 @@
 "use client";
 
-import { ArrowRight, CheckCircle, Printer, ShieldCheck, Trash, WarningCircle } from "@phosphor-icons/react";
+import { ArrowRight, CheckCircle, Printer, ShieldCheck, WarningCircle } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { formatColombiaDate, PHVA_LABELS, RESULT_BANDS } from "./logic";
-import { deleteAssessment, findAssessment } from "./storage";
+import { findAssessment } from "./storage";
 import type { StoredPublicAssessmentRecord } from "./schemas";
 
 const OFFICIAL_RESOLUTION_URL = "https://www1.funcionpublica.gov.co/documents/34645357/34703621/Resolucion_0312_de_2019.pdf/3c93008d-dd8e-8b0d-e5ea-ec6699db86e7";
@@ -16,7 +15,6 @@ function MissingResult() {
 }
 
 export function AssessmentResultView({ assessmentId }: { assessmentId: string }) {
-  const router = useRouter();
   const [record, setRecord] = useState<StoredPublicAssessmentRecord | null | undefined>(undefined);
 
   useEffect(() => {
@@ -34,17 +32,11 @@ export function AssessmentResultView({ assessmentId }: { assessmentId: string })
   const { result } = record;
   const band = RESULT_BANDS[result.band];
 
-  function remove() {
-    if (!window.confirm("¿Eliminar este resultado del navegador? Esta acción no se puede deshacer.")) return;
-    deleteAssessment(record!.id);
-    router.push("/evaluacion-inicial");
-  }
-
   return (
     <article className="public-assessment-result mx-auto max-w-[1120px]">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between print:hidden">
         <div><p className="text-sm font-semibold text-[var(--brand)]">Resultado guardado localmente</p><h1 className="mt-1 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Evaluación inicial SG-SST</h1></div>
-        <div className="flex flex-wrap gap-2"><Button variant="secondary" onClick={() => window.print()}><Printer size={17} /> Imprimir o guardar PDF</Button><Button variant="ghost" onClick={remove}><Trash size={17} /> Eliminar</Button></div>
+        <div className="flex flex-wrap gap-2"><Button variant="secondary" onClick={() => window.print()}><Printer size={17} /> Imprimir o guardar PDF</Button></div>
       </div>
 
       <section className="mt-8 grid overflow-hidden rounded-[18px] border border-[var(--border)] bg-white shadow-[var(--shadow-control)] md:grid-cols-[.9fr_1.1fr] print:mt-4">
