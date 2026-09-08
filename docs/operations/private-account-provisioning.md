@@ -14,7 +14,7 @@ El correo transaccional siempre se entrega desde Securia360. La dirección del a
 
 Antes de habilitar el flujo en producción, un operador con acceso al proyecto Supabase debe:
 
-- Desactivar **Enable Email Signups** en Authentication → Providers → Email.
+- Desactivar **Allow new users to sign up** en la configuración general de Authentication y mantener habilitado el proveedor Email para que los usuarios invitados puedan iniciar sesión y recuperar su contraseña.
 - Establecer la URL del sitio y permitir `https://securia360-web.vercel.app/auth/callback` como URL de redirección.
 - Configurar el secreto de Edge Function `APP_URL` con `https://securia360-web.vercel.app`.
 - Desplegar las funciones `invite-member` y `provision-saas-customer` junto con la migración versionada.
