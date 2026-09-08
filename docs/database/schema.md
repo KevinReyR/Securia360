@@ -94,6 +94,7 @@ Las entidades normativas (`normative_sources`, `requirements`, `minimum_standard
 - `20260826131521_allow_tenant_cascade_cleanup.sql`: conserva esa protección en operaciones directas sin bloquear cascadas del tenant.
 - `20260826131659_skip_audit_during_tenant_cascade.sql`: evita recrear auditoría hija durante el borrado explícito de una organización.
 - `20260826132501_preserve_existing_membership_status.sql`: una reinvitación no degrada membresías activas o suspendidas.
+- `20260908032248_add_private_customer_provisioning.sql`: código comercial opcional de organización y aprovisionamiento transaccional de empresa, suscripción y administrador invitado para `saas_admin`.
 - `20260826144326_add_transactional_onboarding.sql`: progreso por pasos, finalización atómica, responsable SST y evento de cambio de datos fuente.
 - `20260826144539_harden_transactional_onboarding.sql`: mueve las implementaciones privilegiadas al esquema privado y deja wrappers invoker en la API.
 - `20260826144941_verify_transactional_onboarding.sql`: valida reanudación, idempotencia, roles, evento único y denegación entre tenants con fixtures efímeros.

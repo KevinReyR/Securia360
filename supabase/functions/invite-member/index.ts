@@ -16,7 +16,8 @@ Deno.serve(async (request) => {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const publishableKey = Deno.env.get("SUPABASE_ANON_KEY");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!supabaseUrl || !publishableKey || !serviceRoleKey) return response(500, "Configuración incompleta.");
+  const appUrl = Deno.env.get("APP_URL");
+  if (!supabaseUrl || !publishableKey || !serviceRoleKey || !appUrl) return response(500, "Configuración incompleta.");
 
   let body: { organizationId?: string; email?: string; role_id?: string; site_id?: string | null };
   try { body = await request.json(); } catch { return response(400, "Solicitud inválida."); }
@@ -57,8 +58,11 @@ Deno.serve(async (request) => {
 
   let createdNewUser = false;
   if (!targetUser) {
+    let redirectTo: string;
+    try { redirectTo = new URL("/auth/callback?next=/auth/reset-password", appUrl).toString(); } catch { return response(500, "Configuración de acceso inválida."); }
     const { data: invited, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(normalizedEmail, {
       data: { invited_by: caller.user.id },
+      redirectTo,
     });
     if (inviteError || !invited.user) return response(409, "No fue posible enviar la invitación.");
     targetUser = invited.user;

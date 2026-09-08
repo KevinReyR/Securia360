@@ -37,6 +37,7 @@ const regulatoryFramework = [
 ] as const;
 
 export default function HomePage() {
+  const whatsappUrl = `https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(brand.whatsappMessage)}`;
   return (
     <main className={`${styles.landing} min-h-[100dvh] text-[var(--foreground)]`}>
       <LandingAtmosphere />
@@ -52,7 +53,7 @@ export default function HomePage() {
           </nav>
           <div className="flex items-center gap-2">
             <Button variant="ghost" asChild className="hidden sm:inline-flex"><Link href="/auth/login">Ingresar</Link></Button>
-            <Button asChild><Link href="/auth/signup">Crear cuenta <ArrowRight size={16} /></Link></Button>
+            <Button asChild><a href={whatsappUrl} target="_blank" rel="noreferrer">Contáctanos <ArrowRight size={16} /></a></Button>
           </div>
         </div>
         <nav aria-label="Acceso móvil a evaluación" className="border-t border-black/[.05] px-5 py-2 text-center lg:hidden">
@@ -68,7 +69,7 @@ export default function HomePage() {
           <h1 className="text-balance text-[clamp(2.6rem,6vw,5.6rem)] font-semibold leading-[.96] tracking-[-0.06em]">Del requisito a la mejora, sin perder el control.</h1>
           <p className="text-pretty mt-6 max-w-lg text-lg leading-8 text-[var(--muted)]">{brand.tagline}</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button size="lg" asChild><Link href="/auth/signup">Empezar ahora <ArrowRight size={18} /></Link></Button>
+            <Button size="lg" asChild><a href="#contacto">Empezar ahora <ArrowRight size={18} /></a></Button>
             <Button size="lg" variant="secondary" asChild><Link href="/auth/login">Ver mi organización</Link></Button>
           </div>
           <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-[var(--muted-strong)]">
@@ -154,8 +155,8 @@ export default function HomePage() {
 
       <section id="contacto" className="bg-[var(--brand)] text-white scroll-mt-20">
         <div className="mx-auto flex max-w-[1280px] flex-col justify-between gap-8 px-5 py-16 sm:px-8 md:flex-row md:items-center lg:px-12">
-          <div><h2 className="text-3xl font-semibold tracking-[-0.035em]">Empieza a ordenar tu gestión preventiva.</h2><p className="mt-2 text-emerald-100">Crea tu cuenta o conversa con el equipo de Reinova Labs.</p></div>
-          <div className="flex flex-col gap-3 sm:flex-row"><Button size="lg" variant="secondary" asChild><Link href="/auth/signup">Crear cuenta</Link></Button><Button size="lg" className="bg-white/10 hover:bg-white/20" asChild><a href={`mailto:${brand.contactEmail}`}>Hablar con nosotros</a></Button></div>
+          <div><h2 className="text-3xl font-semibold tracking-[-0.035em]">Empieza a ordenar tu gestión preventiva.</h2><p className="mt-2 text-emerald-100">Conversemos sobre el servicio y habilitaremos los accesos de tu empresa.</p></div>
+          <div className="flex flex-col gap-3 sm:flex-row"><Button size="lg" variant="secondary" asChild><a href={whatsappUrl} target="_blank" rel="noreferrer">Hablar por WhatsApp</a></Button></div>
         </div>
       </section>
 

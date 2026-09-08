@@ -27,16 +27,26 @@ export const createPlanSchema = planFieldsSchema.extend({
 export const createPlanVersionSchema = planFieldsSchema.extend({ planId: z.uuid() });
 export const planTransitionSchema = z.object({ planId: z.uuid().optional(), versionId: z.uuid().optional(), action: z.enum(["publish", "archive"]) });
 
-export const subscriptionSchema = z.object({
+const subscriptionFieldsSchema = z.object({
   organizationId: z.uuid(), planVersionId: z.uuid(),
   status: z.enum(["trialing", "active", "past_due", "suspended", "cancelled"]),
   trialEndsAt: optionalDateTime, periodStart: optionalDateTime, periodEnd: optionalDateTime,
   customerReference: z.string().trim().max(160), subscriptionReference: z.string().trim().max(160),
   note: z.string().trim().max(2000),
-}).superRefine((value, context) => {
+});
+
+const validateSubscriptionWindow = (value: { periodStart: string | null; periodEnd: string | null; status: string; trialEndsAt: string | null }, context: z.RefinementCtx) => {
   if (value.periodStart && (!value.periodEnd || value.periodEnd <= value.periodStart)) context.addIssue({ code: "custom", message: "El cierre del período debe ser posterior al inicio.", path: ["periodEnd"] });
   if (value.status === "trialing" && !value.trialEndsAt) context.addIssue({ code: "custom", message: "La fecha de finalización de la prueba es obligatoria.", path: ["trialEndsAt"] });
-});
+};
+
+export const subscriptionSchema = subscriptionFieldsSchema.superRefine(validateSubscriptionWindow);
+
+export const provisionCustomerSchema = subscriptionFieldsSchema.omit({ organizationId: true }).extend({
+  code: z.string().trim().toUpperCase().regex(/^[A-Z0-9][A-Z0-9_-]{1,29}$/),
+  name: z.string().trim().min(2).max(160),
+  administratorEmail: z.email("Ingresa el correo del administrador."),
+}).superRefine(validateSubscriptionWindow);
 
 export const reconciliationSchema = z.object({
   subscriptionId: z.uuid(), reference: z.string().trim().min(2).max(160),

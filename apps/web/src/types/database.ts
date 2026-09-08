@@ -7373,6 +7373,7 @@ export type Database = {
       }
       organizations: {
         Row: {
+          code: string | null
           country_code: string
           created_at: string
           created_by: string | null
@@ -7387,6 +7388,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          code?: string | null
           country_code?: string
           created_at?: string
           created_by?: string | null
@@ -7401,6 +7403,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          code?: string | null
           country_code?: string
           created_at?: string
           created_by?: string | null
@@ -11005,6 +11008,22 @@ export type Database = {
           p_status: string
           p_subscription_reference?: string
           p_trial_ends_at: string
+        }
+        Returns: string
+      }
+      provision_saas_customer: {
+        Args: {
+          p_administrator_user_id: string
+          p_code: string
+          p_customer_reference?: string
+          p_name: string
+          p_note?: string
+          p_period_end?: string
+          p_period_start?: string
+          p_plan_version_id: string
+          p_status: string
+          p_subscription_reference?: string
+          p_trial_ends_at?: string
         }
         Returns: string
       }

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAuthenticatedUser } from "@/modules/organizations/tenant";
 import { requireSaasRole } from "./access";
-import { createPlanSchema, createPlanVersionSchema, planConfiguration, planTransitionSchema, reconciliationResolutionSchema, reconciliationSchema, subscriptionSchema, supportSessionSchema } from "./schemas";
+import { createPlanSchema, createPlanVersionSchema, planConfiguration, planTransitionSchema, provisionCustomerSchema, reconciliationResolutionSchema, reconciliationSchema, subscriptionSchema, supportSessionSchema } from "./schemas";
 
 type RpcClient = { rpc: (name: string, args: Record<string, unknown>) => Promise<{ error: { code?: string } | null }> };
 const route = (view: string, notice: string) => `/internal/saas-admin?view=${view}&notice=${notice}`;
@@ -43,6 +43,14 @@ export async function saveSubscription(formData: FormData) {
     p_trial_ends_at: parsed.data.trialEndsAt, p_period_start: parsed.data.periodStart, p_period_end: parsed.data.periodEnd,
     p_customer_reference: parsed.data.customerReference, p_subscription_reference: parsed.data.subscriptionReference, p_note: parsed.data.note,
   });
+}
+export async function provisionCustomer(formData: FormData) {
+  const parsed = provisionCustomerSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) redirect(route("subscriptions", "invalid"));
+  const { supabase } = await requireSaasRole({ adminOnly: true });
+  const { error } = await supabase.functions.invoke("provision-saas-customer", { body: parsed.data });
+  revalidatePath("/internal/saas-admin");
+  redirect(route("subscriptions", error ? errorNotice((error as { context?: { code?: string } }).context?.code) : "customer-provisioned"));
 }
 export async function recordReconciliation(formData: FormData) {
   const parsed = reconciliationSchema.safeParse(Object.fromEntries(formData));

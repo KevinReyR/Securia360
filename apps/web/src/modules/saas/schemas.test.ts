@@ -1,8 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { createPlanSchema, planConfiguration, reconciliationResolutionSchema, reconciliationSchema, subscriptionSchema, supportSessionSchema } from "./schemas";
+import { createPlanSchema, planConfiguration, provisionCustomerSchema, reconciliationResolutionSchema, reconciliationSchema, subscriptionSchema, supportSessionSchema } from "./schemas";
 
 const id = "8cd058fb-6a76-4af6-8e16-9260442b6b9f";
 const basePlan = { name: "Empresa", members: "100", sites: "2", storageMb: "2048", copilot: "on", automations: "", imports: "on", analytics: "on", mobile: "" };
+const provisionBase = {
+  code: "EMPRESA_DEMO",
+  name: "Empresa Demo Colombia SAS",
+  administratorEmail: "admin@example.com",
+  planVersionId: "00000000-0000-4000-8000-000000000001",
+  status: "trialing",
+  trialEndsAt: "2026-10-01T00:00",
+  periodStart: "",
+  periodEnd: "",
+  customerReference: "",
+  subscriptionReference: "",
+  note: "",
+};
 
 describe("SaaS administration validation", () => {
   it("normalizes allowed plan limits and boolean capabilities", () => {
@@ -26,5 +39,17 @@ describe("SaaS administration validation", () => {
   it("requires an existing session for start and end transitions", () => {
     expect(supportSessionSchema.safeParse({ organizationId: id, action: "request", reason: "Acompañamiento solicitado", sessionId: null }).success).toBe(true);
     expect(supportSessionSchema.safeParse({ organizationId: id, action: "end", reason: "Trabajo completado", sessionId: null }).success).toBe(false);
+  });
+
+  it("normalizes the company code and accepts an administrator invitation", () => {
+    const result = provisionCustomerSchema.parse({ ...provisionBase, code: "empresa_demo" });
+    expect(result.code).toBe("EMPRESA_DEMO");
+    expect(result.administratorEmail).toBe("admin@example.com");
+  });
+
+  it("rejects an invalid company code, administrator email, or trial without an end date", () => {
+    expect(provisionCustomerSchema.safeParse({ ...provisionBase, code: "empresa demo" }).success).toBe(false);
+    expect(provisionCustomerSchema.safeParse({ ...provisionBase, administratorEmail: "invalid" }).success).toBe(false);
+    expect(provisionCustomerSchema.safeParse({ ...provisionBase, trialEndsAt: "" }).success).toBe(false);
   });
 });

@@ -17,6 +17,10 @@ Los límites admitidos son personas, sedes y almacenamiento en MB. Las capacidad
 
 ## Suscripciones y conciliación
 
+Un `saas_admin` puede aprovisionar una empresa cliente desde Suscripciones. El proceso solicita código único, nombre, versión publicada, estado comercial y correo del administrador operativo. Crea la organización, la suscripción y una membresía `organization_admin` invitada sin convertir al operador interno en miembro del tenant. Si la cuenta no existe, recibe un enlace para definir contraseña; si existe, podrá aceptar la nueva membresía al iniciar sesión.
+
+El correo transaccional se entrega desde Securia360. El administrador invitado es el actor que posteriormente gestiona invitaciones de su empresa y queda identificado en auditoría. No se configura SMTP o suplantación de remitente por cliente.
+
 Una suscripción puede estar en prueba, activa, con pago pendiente, suspendida o cancelada. La suspensión comercial no elimina datos, membresías ni documentos y no modifica la autorización del tenant.
 
 `billing_reconciliations` registra referencias administrativas manuales. No representa una transacción de pago. Los registros conciliados o anulados son inmutables y conservan actor, fechas y fundamento de resolución.

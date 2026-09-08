@@ -15,4 +15,4 @@ Los datos son soporte de trabajo SST/jurídico. No sustituyen revisión profesio
 
 ## Acceso
 
-Los administradores internos gestionan revisores usando cuentas de Auth que ya existan y tengan correo confirmado. El flujo normal de registro es el único mecanismo para crear una cuenta; el navegador nunca recibe una credencial privilegiada.
+Los administradores internos gestionan revisores usando cuentas de Auth existentes y con correo confirmado. Las cuentas se habilitan mediante una invitación autorizada; no existe registro público. El navegador nunca recibe una credencial privilegiada.

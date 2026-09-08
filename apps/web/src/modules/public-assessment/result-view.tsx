@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle, Printer, ShieldCheck, WarningCircle } from "@p
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { brand } from "@/config/brand";
 import { formatColombiaDate, PHVA_LABELS, RESULT_BANDS } from "./logic";
 import { findAssessment } from "./storage";
 import type { StoredPublicAssessmentRecord } from "./schemas";
@@ -83,8 +84,8 @@ export function AssessmentResultView({ assessmentId }: { assessmentId: string })
       </aside>
 
       <section className="mt-10 flex flex-col justify-between gap-6 rounded-[16px] bg-[var(--brand)] p-6 text-white sm:flex-row sm:items-center sm:p-8 print:hidden">
-        <div><h2 className="text-xl font-semibold">Continúa la gestión en Securia360</h2><p className="mt-2 max-w-xl text-sm leading-6 text-emerald-100">Crea una cuenta para organizar responsables, evidencias, tareas y seguimiento. Este resultado local no se importará automáticamente.</p></div>
-        <div className="flex shrink-0 flex-col gap-2 sm:flex-row"><Button variant="secondary" asChild><Link href="/auth/login">Ya tengo una cuenta</Link></Button><Button className="bg-white text-[var(--brand)] hover:bg-emerald-50" asChild><Link href="/auth/signup">Crear cuenta <ArrowRight size={16} /></Link></Button></div>
+        <div><h2 className="text-xl font-semibold">Continúa la gestión en Securia360</h2><p className="mt-2 max-w-xl text-sm leading-6 text-emerald-100">Contáctanos para habilitar los accesos de tu empresa. Este resultado local no se importará automáticamente.</p></div>
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row"><Button variant="secondary" asChild><Link href="/auth/login">Ya tengo una cuenta</Link></Button><Button className="bg-white text-[var(--brand)] hover:bg-emerald-50" asChild><a href={`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(brand.whatsappMessage)}`} target="_blank" rel="noreferrer">Contáctanos <ArrowRight size={16} /></a></Button></div>
       </section>
     </article>
   );

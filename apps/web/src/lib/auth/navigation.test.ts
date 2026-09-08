@@ -15,11 +15,11 @@ describe("safeNextPath", () => {
 });
 
 describe("isPublicAuthPath", () => {
-  it.each(["/", "/evaluacion-inicial", "/evaluacion-inicial/nueva", "/evaluacion-inicial/local-id", "/auth/login", "/auth/signup", "/auth/callback", "/auth/forgot-password", "/auth/reset-password"])("allows %s without a session", (path) => {
+  it.each(["/", "/evaluacion-inicial", "/evaluacion-inicial/nueva", "/evaluacion-inicial/local-id", "/auth/login", "/auth/callback", "/auth/forgot-password", "/auth/reset-password"])("allows %s without a session", (path) => {
     expect(isPublicAuthPath(path)).toBe(true);
   });
 
-  it.each(["/dashboard", "/auth/admin", "/evaluacion-inicial-maliciosa"])("keeps %s protected", (path) => {
+  it.each(["/dashboard", "/auth/admin", "/auth/signup", "/evaluacion-inicial-maliciosa"])("keeps %s protected", (path) => {
     expect(isPublicAuthPath(path)).toBe(false);
   });
 });

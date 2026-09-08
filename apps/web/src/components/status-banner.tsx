@@ -4,6 +4,7 @@ export function StatusBanner({ status }: { status?: string }) {
   if (!status) return null;
   const messages: Record<string, { variant: "success" | "danger" | "warning"; text: string }> = {
     saved: { variant: "success", text: "Cambios guardados correctamente." },
+    "customer-provisioned": { variant: "success", text: "La empresa quedó creada y el administrador recibió su acceso por invitación." },
     submitted: { variant: "success", text: "El documento se envió para revisión y permanece privado." },
     "calculation-requested": { variant: "success", text: "El cálculo fue solicitado. El resultado histórico se generará en el servidor." },
     "import-completed": { variant: "success", text: "La importación terminó sin duplicar registros ni eventos." },
