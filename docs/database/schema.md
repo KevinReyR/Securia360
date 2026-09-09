@@ -54,6 +54,8 @@ Las entidades normativas (`normative_sources`, `requirements`, `minimum_standard
 
 ## Migraciones
 
+- `20260909194739_add_actionable_dashboard_and_initial_assessment.sql`: añade inicio idempotente, respuesta limitada y finalización transaccional de la Evaluación Inicial empresarial; enriquece el snapshot normativo y expone una vista `security_invoker` de tareas, acciones y documentos próximos a vencer.
+
 - `20260907003606_public_initial_assessment_catalog.sql`: expone una función pública de solo lectura con la proyección mínima de perfiles, ponderaciones y estándares 0312 publicados y revisados. `anon` no recibe acceso directo a las tablas ni capacidad de escritura.
 - `20260907005224_harden_public_initial_assessment_catalog.sql`: mueve la lectura privilegiada del catálogo a un esquema no expuesto y conserva un wrapper público `security invoker`, evitando que una función `security definer` quede expuesta directamente en Data API.
 - `20260905130138_load_0312_standard_inventory.sql`: carga 60 estándares mínimos y los perfiles 7/21/60 de la Resolución 0312 desde un inventario controlado, registra ponderaciones y reglas de scoring en borrador, y sincroniza decisiones de revisión humana sin publicar conjuntos incompletos.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildStandardQuestion } from "./assessment-wizard";
+import { buildStandardQuestion } from "../compliance/standard-question";
 
 describe("preguntas de estándares", () => {
   it("convierte un criterio en una pregunta binaria clara", () => {

@@ -25,11 +25,11 @@ const entityLabels: Record<string, string> = {
 
 export default async function DocumentsPage({ params, searchParams }: {
   params: Promise<{ organizationId: string }>;
-  searchParams: Promise<{ status?: string; q?: string; state?: string; page?: string }>;
+  searchParams: Promise<{ status?: string; q?: string; state?: string; expiry?: string; page?: string }>;
 }) {
   const { organizationId } = await params;
   await requireTenant(organizationId);
-  const { status, q = "", state = "active", page = "1" } = await searchParams;
+  const { status, q = "", state = "active", expiry = "all", page = "1" } = await searchParams;
   const currentPage = Math.max(1, Number.parseInt(page, 10) || 1);
   const pageSize = 12;
   const supabase = await createClient();
@@ -44,6 +44,7 @@ export default async function DocumentsPage({ params, searchParams }: {
 
   const currentTime = new Date();
   const expiresBefore = new Date(currentTime.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+  if (expiry === "attention") query = query.not("expires_at", "is", null).lte("expires_at", expiresBefore);
   const [documents, mayUpload, mayRead, activeCount, archivedCount, expiringCount] = await Promise.all([
     query.range((currentPage - 1) * pageSize, currentPage * pageSize - 1),
     can(organizationId, "documents.create"),
@@ -53,7 +54,7 @@ export default async function DocumentsPage({ params, searchParams }: {
     supabase.from("documents").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).eq("status", "active").gte("expires_at", currentTime.toISOString()).lte("expires_at", expiresBefore),
   ]);
   const totalPages = Math.max(1, Math.ceil((documents.count ?? 0) / pageSize));
-  const pageHref = (next: number) => `/org/${organizationId}/documents?${new URLSearchParams({ ...(q ? { q } : {}), ...(state !== "active" ? { state } : {}), page: String(next) }).toString()}`;
+  const pageHref = (next: number) => `/org/${organizationId}/documents?${new URLSearchParams({ ...(q ? { q } : {}), ...(state !== "active" ? { state } : {}), ...(expiry !== "all" ? { expiry } : {}), page: String(next) }).toString()}`;
 
   if (!mayRead) return <EmptyState title="No puedes consultar documentos" description="Solicita acceso al responsable de tu organización." />;
 

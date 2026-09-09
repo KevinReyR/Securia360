@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       activities: {
@@ -6039,6 +6064,7 @@ export type Database = {
           artifact_key: string
           artifact_type: string
           assessment_scoring_rule_id: string | null
+          classification_evaluator_version_id: string | null
           content_snapshot: Json
           created_at: string
           created_by: string
@@ -6061,6 +6087,7 @@ export type Database = {
           artifact_key: string
           artifact_type: string
           assessment_scoring_rule_id?: string | null
+          classification_evaluator_version_id?: string | null
           content_snapshot: Json
           created_at?: string
           created_by: string
@@ -6083,6 +6110,7 @@ export type Database = {
           artifact_key?: string
           artifact_type?: string
           assessment_scoring_rule_id?: string | null
+          classification_evaluator_version_id?: string | null
           content_snapshot?: Json
           created_at?: string
           created_by?: string
@@ -6113,6 +6141,13 @@ export type Database = {
             columns: ["assessment_scoring_rule_id"]
             isOneToOne: false
             referencedRelation: "assessment_scoring_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normative_review_artifacts_classification_evaluator_versio_fkey"
+            columns: ["classification_evaluator_version_id"]
+            isOneToOne: false
+            referencedRelation: "classification_evaluator_versions"
             referencedColumns: ["id"]
           },
           {
@@ -10746,6 +10781,18 @@ export type Database = {
           },
         ]
       }
+      workspace_due_items: {
+        Row: {
+          due_at: string | null
+          item_id: string | null
+          item_type: string | null
+          organization_id: string | null
+          priority: string | null
+          status: string | null
+          title: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_my_invitations: { Args: never; Returns: number }
@@ -10780,6 +10827,10 @@ export type Database = {
       }
       commit_import_job: { Args: { p_import_job_id: string }; Returns: string }
       complete_assessment: {
+        Args: { p_assessment_id: string }
+        Returns: number
+      }
+      complete_initial_assessment: {
         Args: { p_assessment_id: string }
         Returns: number
       }
@@ -10853,19 +10904,6 @@ export type Database = {
           p_snapshot_type: string
         }
         Returns: string
-      }
-      get_public_initial_assessment_catalog: { Args: never; Returns: Json }
-      search_public_economic_activities: {
-        Args: { p_limit?: number; p_query?: string }
-        Returns: {
-          activity: string
-          catalog_version: string
-          ciiu_code: string
-          entry_id: string
-          risk_class: number
-          source_reference: string
-          source_review_status: string
-        }[]
       }
       create_ppe_inventory: {
         Args: {
@@ -10944,6 +10982,7 @@ export type Database = {
         Args: { p_as_of?: string; p_organization_id: string }
         Returns: number
       }
+      get_public_initial_assessment_catalog: { Args: never; Returns: Json }
       get_request_auth_context: {
         Args: never
         Returns: {
@@ -11011,6 +11050,15 @@ export type Database = {
         }
         Returns: string
       }
+      manage_saas_support_session: {
+        Args: {
+          p_action: string
+          p_organization_id: string
+          p_reason: string
+          p_session_id?: string
+        }
+        Returns: string
+      }
       provision_saas_customer: {
         Args: {
           p_administrator_user_id: string
@@ -11024,15 +11072,6 @@ export type Database = {
           p_status: string
           p_subscription_reference?: string
           p_trial_ends_at?: string
-        }
-        Returns: string
-      }
-      manage_saas_support_session: {
-        Args: {
-          p_action: string
-          p_organization_id: string
-          p_reason: string
-          p_session_id?: string
         }
         Returns: string
       }
@@ -11148,9 +11187,25 @@ export type Database = {
         Returns: undefined
       }
       rollback_import_job: { Args: { p_import_job_id: string }; Returns: Json }
+      save_initial_assessment_response: {
+        Args: { p_assessment_id: string; p_item_id: string; p_response: string }
+        Returns: string
+      }
       save_organization_onboarding_step: {
         Args: { p_data: Json; p_organization_id: string; p_step: number }
         Returns: Json
+      }
+      search_public_economic_activities: {
+        Args: { p_limit?: number; p_query?: string }
+        Returns: {
+          activity: string
+          catalog_version: string
+          ciiu_code: string
+          entry_id: string
+          risk_class: number
+          source_reference: string
+          source_review_status: string
+        }[]
       }
       stage_import_job: {
         Args: {
@@ -11165,6 +11220,10 @@ export type Database = {
           p_storage_path: string
           p_target_entity_type: string
         }
+        Returns: string
+      }
+      start_or_resume_initial_assessment: {
+        Args: { p_organization_id: string }
         Returns: string
       }
     }
@@ -11295,6 +11354,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

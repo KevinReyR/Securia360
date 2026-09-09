@@ -17,6 +17,8 @@ export function StatusBanner({ status }: { status?: string }) {
     "snapshot-created": { variant: "success", text: "El snapshot manual quedó congelado e inmutable." },
     "assessment-created": { variant: "success", text: "La evaluación se creó a partir del snapshot seleccionado." },
     completed: { variant: "success", text: "La evaluación fue completada con la regla de puntuación aprobada." },
+    incomplete: { variant: "warning", text: "Aún faltan respuestas válidas. Completa todos los estándares antes de calcular." },
+    unavailable: { variant: "warning", text: "No fue posible iniciar la evaluación. Revisa la clasificación, el perfil y la regla de puntuación vigentes." },
     validated: { variant: "success", text: "La evaluación fue validada y ya no admite cambios." },
     forbidden: { variant: "danger", text: "No tienes permiso para realizar esta operación." },
     "expert-pending": { variant: "warning", text: "Esta operación requiere un perfil, regla o contenido revisado y aprobado por un experto." },

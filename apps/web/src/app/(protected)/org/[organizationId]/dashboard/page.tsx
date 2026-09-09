@@ -14,11 +14,15 @@ function formatDate(value: string | null) {
   return new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", timeZone: "America/Bogota" }).format(new Date(value));
 }
 
-export default async function TenantDashboard({ params }: { params: Promise<{ organizationId: string }> }) {
+export default async function TenantDashboard({ params, searchParams }: { params: Promise<{ organizationId: string }>; searchParams: Promise<{ view?: string; page?: string }> }) {
   const { organizationId } = await params;
+  const query = await searchParams;
+  const dueView = query.view === "due-soon";
+  const duePage = Math.max(1, Number.parseInt(query.page ?? "1", 10) || 1);
   const { organization } = await requireTenant(organizationId);
-  const dashboard = await loadRoleDashboard(organizationId);
+  const dashboard = await loadRoleDashboard(organizationId, { duePage, duePageSize: dueView ? 12 : 7 });
   const score = dashboard.latestAssessment?.score;
+  const assessmentHref = dashboard.openAssessment ? `/org/${organizationId}/compliance/initial-assessment/${dashboard.openAssessment.id}` : dashboard.latestAssessment ? `/org/${organizationId}/compliance/initial-assessment/${dashboard.latestAssessment.id}` : `/org/${organizationId}/compliance/initial-assessment`;
 
   return (
     <div className="grid gap-7">
@@ -27,20 +31,21 @@ export default async function TenantDashboard({ params }: { params: Promise<{ or
       {dashboard.hasErrors ? <div role="status" className="flex items-start gap-3 rounded-[12px] border border-[var(--warning-border)] bg-[var(--warning-soft)] p-4 text-sm text-[var(--warning)]"><WarningCircle size={19} className="mt-0.5 shrink-0" /><div><p className="font-semibold">Algunos indicadores no están disponibles</p><p className="mt-1 opacity-90">Puedes continuar trabajando. Actualiza la página en unos minutos para consultar el resumen completo.</p></div></div> : null}
 
       <section aria-label="Indicadores principales" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard label="Evaluación SG-SST" value={typeof score === "number" ? `${score.toLocaleString("es-CO", { maximumFractionDigits: 1 })}%` : "Sin evaluar"} description={dashboard.latestAssessment ? "Último resultado disponible" : "Inicia una evaluación cuando el contenido esté revisado"} icon={<Gauge size={19} />} />
-        <KpiCard label="Tareas abiertas" value={dashboard.metrics.open_tasks ?? 0} description={dashboard.latestPlan ? `${dashboard.latestPlan.name} · ${dashboard.latestPlan.year}` : "Sin plan anual activo"} icon={<CalendarCheck size={19} />} />
-        <KpiCard label="Acciones de mejora" value={dashboard.metrics.open_actions ?? 0} description="Pendientes de ejecución o verificación" icon={<CheckCircle size={19} />} />
-        <KpiCard label="Próximos vencimientos" value={dashboard.dueSoon} description="Tareas, acciones y documentos en 30 días" icon={<Clock size={19} />} />
+        {dashboard.permissions.assessmentRead ? <KpiCard label="Evaluación SG-SST" value={dashboard.openAssessment ? `${dashboard.openAssessment.answered} de ${dashboard.openAssessment.total}` : typeof score === "number" ? `${score.toLocaleString("es-CO", { maximumFractionDigits: 1 })}%` : "Sin evaluar"} description={dashboard.openAssessment ? "Evaluación en curso" : dashboard.latestAssessment ? "Último resultado disponible" : "Inicia la evaluación con la clasificación vigente"} icon={<Gauge size={19} />} href={assessmentHref} actionLabel={dashboard.openAssessment ? "Continuar evaluación" : dashboard.latestAssessment ? "Ver resultado" : dashboard.permissions.assessmentManage && dashboard.permissions.snapshotCreate ? "Iniciar evaluación" : "Consultar evaluaciones"} /> : null}
+        {dashboard.permissions.planningRead ? <KpiCard label="Tareas abiertas" value={dashboard.metrics.open_tasks ?? 0} description={dashboard.latestPlan ? `${dashboard.latestPlan.name} · ${dashboard.latestPlan.year}` : "Sin plan anual activo"} icon={<CalendarCheck size={19} />} href={`/org/${organizationId}/planning?taskStatus=open`} actionLabel="Ver tareas abiertas" /> : null}
+        {dashboard.permissions.improvementRead ? <KpiCard label="Acciones de mejora" value={dashboard.metrics.open_actions ?? 0} description="Pendientes de ejecución o verificación" icon={<CheckCircle size={19} />} href={`/org/${organizationId}/improvement-plan?actionState=open`} actionLabel="Ver acciones abiertas" /> : null}
+        {dashboard.permissions.planningRead || dashboard.permissions.improvementRead || dashboard.permissions.documentRead ? <KpiCard label="Próximos vencimientos" value={dashboard.dueSoon} description="Vencidos o por vencer en 30 días" icon={<Clock size={19} />} href={`/org/${organizationId}/dashboard?view=due-soon#requiere-atencion`} actionLabel="Ver vencimientos" /> : null}
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[1.35fr_.65fr]">
-        <Card>
+        <Card id="requiere-atencion" className="scroll-mt-6">
           <CardHeader className="flex flex-row items-start justify-between gap-4"><div><CardTitle>Requiere tu atención</CardTitle><CardDescription>Lo más próximo a vencer aparece primero.</CardDescription></div><Badge variant="neutral">{dashboard.inbox.length} pendientes</Badge></CardHeader>
           <CardContent className="p-0">
             {dashboard.inbox.length ? <ul className="divide-y divide-[var(--border)]">{dashboard.inbox.map((item) => {
               return <li key={`${item.type}-${item.id}`}><Link href={item.href} className="group grid gap-2 px-5 py-4 outline-none transition-colors hover:bg-[var(--muted-surface)] focus-visible:bg-[var(--muted-surface)] sm:grid-cols-[1fr_auto] sm:items-center"><div className="min-w-0"><div className="flex items-center gap-2"><span className={`size-2 rounded-full ${item.priority === "critical" || item.overdue ? "bg-[var(--danger)]" : item.priority === "high" ? "bg-[var(--warning)]" : "bg-[var(--brand)]"}`} /><p className="truncate text-sm font-semibold">{item.title}</p></div><p className="ml-4 mt-1 text-xs text-[var(--muted)]">{item.context} · {item.dueLabel}</p></div><span className="flex items-center gap-2 text-xs font-medium text-[var(--muted)]">{formatDate(item.dueAt)}<ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" /></span></Link></li>;
             })}</ul> : <div className="p-5"><EmptyState title="Todo al día" description="No hay tareas, acciones ni documentos próximos que requieran atención." /></div>}
           </CardContent>
+          {dueView && dashboard.duePages > 1 ? <nav aria-label="Paginación de vencimientos" className="flex items-center justify-between border-t border-[var(--border)] px-5 py-4 text-sm"><Button asChild size="sm" variant="ghost"><Link aria-disabled={duePage === 1} href={`/org/${organizationId}/dashboard?view=due-soon&page=${Math.max(1, duePage - 1)}#requiere-atencion`}>Anterior</Link></Button><span className="text-[var(--muted)]">Página {duePage} de {dashboard.duePages}</span><Button asChild size="sm" variant="ghost"><Link aria-disabled={duePage === dashboard.duePages} href={`/org/${organizationId}/dashboard?view=due-soon&page=${Math.min(dashboard.duePages, duePage + 1)}#requiere-atencion`}>Siguiente</Link></Button></nav> : null}
         </Card>
 
         <div className="grid gap-5">
