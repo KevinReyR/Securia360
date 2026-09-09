@@ -43,8 +43,11 @@ const validateSubscriptionWindow = (value: { periodStart: string | null; periodE
 export const subscriptionSchema = subscriptionFieldsSchema.superRefine(validateSubscriptionWindow);
 
 export const provisionCustomerSchema = subscriptionFieldsSchema.omit({ organizationId: true }).extend({
-  code: z.string().trim().toUpperCase().regex(/^[A-Z0-9][A-Z0-9_-]{1,29}$/),
-  name: z.string().trim().min(2).max(160),
+  code: z.string().trim().toUpperCase()
+    .min(2, "Ingresa un código de al menos 2 caracteres.")
+    .max(30, "El código no puede superar 30 caracteres.")
+    .regex(/^[A-Z0-9][A-Z0-9_-]{1,29}$/, "Usa letras, números, guion o guion bajo; sin espacios."),
+  name: z.string().trim().min(2, "Ingresa el nombre de la empresa.").max(160, "El nombre no puede superar 160 caracteres."),
   administratorEmail: z.email("Ingresa el correo del administrador."),
 }).superRefine(validateSubscriptionWindow);
 

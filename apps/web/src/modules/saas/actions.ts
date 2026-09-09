@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 import { requireAuthenticatedUser } from "@/modules/organizations/tenant";
 import { requireSaasRole } from "./access";
 import { createPlanSchema, createPlanVersionSchema, planConfiguration, planTransitionSchema, provisionCustomerSchema, reconciliationResolutionSchema, reconciliationSchema, subscriptionSchema, supportSessionSchema } from "./schemas";
@@ -44,13 +45,49 @@ export async function saveSubscription(formData: FormData) {
     p_customer_reference: parsed.data.customerReference, p_subscription_reference: parsed.data.subscriptionReference, p_note: parsed.data.note,
   });
 }
-export async function provisionCustomer(formData: FormData) {
+
+export type ProvisionCustomerActionState = {
+  status: "idle" | "error";
+  message?: string;
+  fieldErrors?: Record<string, string[] | undefined>;
+  fields?: Record<string, string>;
+};
+
+const provisionCustomerFieldNames = ["code", "name", "administratorEmail", "planVersionId", "status", "trialEndsAt", "periodStart", "periodEnd", "customerReference", "subscriptionReference", "note"] as const;
+const provisionCustomerFields = (formData: FormData) => Object.fromEntries(
+  provisionCustomerFieldNames.map((name) => [name, String(formData.get(name) ?? "")]),
+);
+
+async function provisionCustomerErrorMessage(error: unknown) {
+  if (error instanceof FunctionsHttpError) {
+    try {
+      const body = await error.context.json() as { message?: unknown };
+      if (typeof body.message === "string" && body.message.length <= 240) return body.message;
+    } catch {
+      // The response body may already have been consumed. Use the safe fallback below.
+    }
+  }
+  return "No fue posible crear la empresa ni enviar la invitación. Intenta nuevamente.";
+}
+
+export async function provisionCustomer(_previousState: ProvisionCustomerActionState, formData: FormData): Promise<ProvisionCustomerActionState> {
+  const fields = provisionCustomerFields(formData);
   const parsed = provisionCustomerSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) redirect(route("subscriptions", "invalid"));
+  if (!parsed.success) {
+    return {
+      status: "error",
+      message: "Corrige los campos señalados para continuar.",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+      fields,
+    };
+  }
   const { supabase } = await requireSaasRole({ adminOnly: true });
   const { error } = await supabase.functions.invoke("provision-saas-customer", { body: parsed.data });
+  if (error) {
+    return { status: "error", message: await provisionCustomerErrorMessage(error), fields };
+  }
   revalidatePath("/internal/saas-admin");
-  redirect(route("subscriptions", error ? errorNotice((error as { context?: { code?: string } }).context?.code) : "customer-provisioned"));
+  redirect(route("subscriptions", "customer-provisioned"));
 }
 export async function recordReconciliation(formData: FormData) {
   const parsed = reconciliationSchema.safeParse(Object.fromEntries(formData));

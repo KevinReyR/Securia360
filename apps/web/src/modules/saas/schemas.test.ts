@@ -50,6 +50,22 @@ describe("SaaS administration validation", () => {
   it("rejects an invalid company code, administrator email, or trial without an end date", () => {
     expect(provisionCustomerSchema.safeParse({ ...provisionBase, code: "empresa demo" }).success).toBe(false);
     expect(provisionCustomerSchema.safeParse({ ...provisionBase, administratorEmail: "invalid" }).success).toBe(false);
-    expect(provisionCustomerSchema.safeParse({ ...provisionBase, trialEndsAt: "" }).success).toBe(false);
+    const missingTrialEnd = provisionCustomerSchema.safeParse({ ...provisionBase, trialEndsAt: "" });
+    expect(missingTrialEnd.success).toBe(false);
+    if (!missingTrialEnd.success) {
+      expect(missingTrialEnd.error.flatten().fieldErrors.trialEndsAt).toContain("La fecha de finalización de la prueba es obligatoria.");
+    }
+  });
+
+  it("assigns period ordering errors to the field that needs correction", () => {
+    const result = provisionCustomerSchema.safeParse({
+      ...provisionBase,
+      periodStart: "2026-10-02T08:00",
+      periodEnd: "2026-10-01T08:00",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.periodEnd).toContain("El cierre del período debe ser posterior al inicio.");
+    }
   });
 });
