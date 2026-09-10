@@ -5,6 +5,7 @@ import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
 import { brand } from "@/config/brand";
 import { LandingAtmosphere } from "@/components/landing-atmosphere";
+import { LandingPhva } from "@/components/landing-phva";
 import styles from "./landing.module.css";
 
 const capabilities = [
@@ -94,6 +95,7 @@ export default function HomePage() {
               <p className="text-sm font-semibold text-[var(--brand)]">Una operación, no otro archivo</p>
               <h2 className="text-balance mt-3 text-4xl font-semibold leading-tight tracking-[-0.04em]">El SG-SST avanza cuando el trabajo está conectado.</h2>
               <p className="mt-5 text-base leading-7 text-[var(--muted)]">Securia360 reúne cumplimiento, prevención y seguimiento en un espacio común para que cada persona sepa qué debe hacer y por qué.</p>
+              <a href="#funcionalidades-phva" className="mt-5 inline-flex items-center gap-2 rounded text-sm font-semibold text-[var(--brand)] outline-none hover:underline focus-visible:ring-3 focus-visible:ring-[var(--focus-ring)]">Explorar funcionalidades por PHVA <ArrowRight size={16} aria-hidden="true" /></a>
             </div>
             <div className={`${styles.glass} divide-y divide-[var(--border)] px-6`}>
               {capabilities.map(([title, description, Icon], index) => (
@@ -107,6 +109,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <LandingPhva />
 
       <section id="marco-normativo" className="scroll-mt-20 border-b border-[var(--border)] bg-white">
         <div className="mx-auto max-w-[1280px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
