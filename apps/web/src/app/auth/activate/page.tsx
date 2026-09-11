@@ -3,7 +3,6 @@ import { AuthShell } from "@/components/auth-shell";
 import { Alert } from "@/components/ui/alert";
 import { activationPath } from "@/lib/auth/invitation";
 import { createClient } from "@/lib/supabase/server";
-import { ActivateAccountForm } from "./activate-account-form";
 import { InvitationSessionBridge } from "./invitation-session-bridge";
 
 type ActivatePageProps = { searchParams: Promise<{ organizationId?: string; status?: string }> };
@@ -24,17 +23,9 @@ export default async function ActivatePage({ searchParams }: ActivatePageProps) 
     );
   }
 
-  if (!data.user) {
-    return (
-      <AuthShell title="Preparando tu cuenta" description="Estamos validando la invitación y creando tu sesión segura.">
-        <InvitationSessionBridge organizationId={params.organizationId!} />
-      </AuthShell>
-    );
-  }
-
   return (
     <AuthShell title="Activa tu cuenta" description="Crea tu contraseña y completa los datos con los que te identificarás en Securia360.">
-      <ActivateAccountForm organizationId={params.organizationId!} />
+      <InvitationSessionBridge organizationId={params.organizationId!} hasServerSession={Boolean(data.user)} />
     </AuthShell>
   );
 }

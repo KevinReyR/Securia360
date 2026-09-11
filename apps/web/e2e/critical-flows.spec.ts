@@ -97,6 +97,9 @@ test.describe("critical isolated SaaS flows", () => {
       });
       expect(assignment.error).toBeNull();
 
+      // The invitation must replace an unrelated session left open in the
+      // browser by the person who provisioned the organization.
+      await login(page, fixture.internalAdmin.email, fixture.internalAdmin.password);
       await page.goto(actionLink!);
       await expect(page).toHaveURL(new RegExp(`/auth/activate\\?organizationId=${organizationId}$`));
       await expect(page.getByRole("heading", { name: "Activa tu cuenta" })).toBeVisible();
