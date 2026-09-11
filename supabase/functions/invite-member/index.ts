@@ -59,7 +59,11 @@ Deno.serve(async (request) => {
   let createdNewUser = false;
   if (!targetUser) {
     let redirectTo: string;
-    try { redirectTo = new URL("/auth/callback?next=/auth/reset-password", appUrl).toString(); } catch { return response(500, "Configuración de acceso inválida."); }
+    try {
+      const activationUrl = new URL("/auth/activate", appUrl);
+      activationUrl.searchParams.set("organizationId", body.organizationId);
+      redirectTo = activationUrl.toString();
+    } catch { return response(500, "Configuración de acceso inválida."); }
     const { data: invited, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(normalizedEmail, {
       data: { invited_by: caller.user.id },
       redirectTo,

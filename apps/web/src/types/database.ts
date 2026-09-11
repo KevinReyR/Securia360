@@ -11066,6 +11066,7 @@ export type Database = {
           p_customer_reference?: string
           p_name: string
           p_note?: string
+          p_organization_id: string
           p_period_end?: string
           p_period_start?: string
           p_plan_version_id: string

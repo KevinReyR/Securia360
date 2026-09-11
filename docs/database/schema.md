@@ -70,6 +70,7 @@ Las entidades normativas (`normative_sources`, `requirements`, `minimum_standard
 
 - `20260826013555_harden_core_security_and_tenant_api.sql`: defaults seguros, RPC `can`, identidad inmutable de membresía y auditoría.
 - `20260826014615_add_secure_member_invitation_api.sql`: invitación atómica y aceptación de membresías.
+- `20260911153531_fix_invited_user_activation.sql`: permite preasignar el UUID de la organización para enlazar de forma segura la invitación con su activación.
 - `20260826015115_protect_last_organization_admin.sql`: evita dejar un tenant sin administrador activo.
 - `20260826243000_allow_creator_admin_bootstrap.sql`: permite únicamente la asignación inicial y segura del creador como administrador global durante el bootstrap de su organización.
 - `20260826250000_add_improvement_plan.sql`: convierte resultados no cumplidos en brechas y acciones idempotentes, con evidencia, validación, auditoría y RLS.

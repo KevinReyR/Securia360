@@ -1,4 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 import { createE2EFixture, type E2EFixture } from "./fixtures";
 
 const enabled = [
@@ -53,6 +55,76 @@ test.describe("critical isolated SaaS flows", () => {
     await login(page, fixture.userA.email, fixture.userA.password);
     await page.goto("/internal/saas-admin");
     await expect(page).toHaveURL(/\/organizations$/);
+  });
+
+  test("accepts an invitation, completes the administrator profile and opens onboarding", async ({ page, baseURL }) => {
+    const serviceUrl = process.env.SUPABASE_TEST_URL!;
+    const serviceKey = process.env.SUPABASE_TEST_SERVICE_ROLE_KEY!;
+    const admin = createClient<Database>(serviceUrl, serviceKey, { auth: { autoRefreshToken: false, persistSession: false } });
+    const email = `e2e-invite-${crypto.randomUUID()}@example.invalid`;
+    const organizationId = crypto.randomUUID();
+    const organizationName = `E2E Invitación ${organizationId.slice(0, 8)}`;
+    let userId: string | undefined;
+
+    try {
+      const activationUrl = `${baseURL}/auth/activate?organizationId=${organizationId}`;
+      const invitation = await admin.auth.admin.generateLink({ type: "invite", email, options: { redirectTo: activationUrl } });
+      expect(invitation.error).toBeNull();
+      userId = invitation.data.user?.id;
+      const tokenHash = invitation.data.properties?.hashed_token;
+      expect(userId).toBeTruthy();
+      expect(tokenHash).toBeTruthy();
+
+      const organization = await admin.from("organizations").insert({
+        id: organizationId,
+        name: organizationName,
+        slug: `e2e-invite-${organizationId.slice(0, 8)}`,
+        status: "active",
+      });
+      expect(organization.error).toBeNull();
+      const membership = await admin.from("organization_members").insert({
+        organization_id: organizationId,
+        user_id: userId!,
+        status: "invited",
+      }).select("id").single();
+      expect(membership.error).toBeNull();
+      const role = await admin.from("roles").select("id").is("organization_id", null).eq("code", "organization_admin").single();
+      expect(role.error).toBeNull();
+      const assignment = await admin.from("member_roles").insert({
+        organization_id: organizationId,
+        organization_member_id: membership.data!.id,
+        role_id: role.data!.id,
+      });
+      expect(assignment.error).toBeNull();
+
+      const confirmUrl = new URL("/auth/confirm", baseURL);
+      confirmUrl.searchParams.set("token_hash", tokenHash!);
+      confirmUrl.searchParams.set("type", "invite");
+      confirmUrl.searchParams.set("next", activationUrl);
+      await page.goto(confirmUrl.toString());
+      await expect(page).toHaveURL(new RegExp(`/auth/activate\\?organizationId=${organizationId}$`));
+      await expect(page.getByRole("heading", { name: "Activa tu cuenta" })).toBeVisible();
+
+      await page.getByLabel("Primer nombre").fill("Ana");
+      await page.getByLabel("Segundo nombre").fill("María");
+      await page.getByLabel("Primer apellido").fill("Pérez");
+      await page.getByLabel("Segundo apellido").fill("Gómez");
+      await page.getByLabel("Teléfono").fill("+57 300 123 4567");
+      await page.getByLabel("Nueva contraseña").fill("Securia360-E2E-Invite-A9!");
+      await page.getByLabel("Confirma la contraseña").fill("Securia360-E2E-Invite-A9!");
+      await page.getByRole("button", { name: "Activar mi cuenta" }).click();
+      await page.waitForURL(new RegExp(`/org/${organizationId}/onboarding$`));
+      await expect(page.getByRole("heading", { name: "Configura tu organización" })).toBeVisible();
+
+      const profile = await admin.from("profiles").select("first_name,middle_name,last_name,second_last_name,phone").eq("id", userId!).single();
+      expect(profile.data).toEqual({ first_name: "Ana", middle_name: "María", last_name: "Pérez", second_last_name: "Gómez", phone: "+57 300 123 4567" });
+      const accepted = await admin.from("organization_members").select("status,joined_at").eq("id", membership.data!.id).single();
+      expect(accepted.data?.status).toBe("active");
+      expect(accepted.data?.joined_at).toBeTruthy();
+    } finally {
+      await admin.from("organizations").delete().eq("id", organizationId);
+      if (userId) await admin.auth.admin.deleteUser(userId);
+    }
   });
 
   test("signs up without email confirmation, resumes onboarding, completes it, and logs out", async ({ page }) => {

@@ -14,7 +14,7 @@ Núcleo SaaS multiempresa de Reinova Labs para Securia360. Esta iteración incor
 1. Instala dependencias con `npm install` en la raíz.
 2. Copia `apps/web/.env.example` a `apps/web/.env.local`.
 3. En Supabase, abre **Project Settings → API** y copia la URL y la clave publicable. Nunca uses la clave secreta o `service_role` en variables `NEXT_PUBLIC_*`.
-4. En **Authentication → URL Configuration**, configura `http://localhost:3000` como Site URL y agrega `http://localhost:3000/auth/callback` a Redirect URLs.
+4. En **Authentication → URL Configuration**, configura `http://localhost:3000` como Site URL y permite `/auth/callback`, `/auth/confirm` y `/auth/activate` bajo el origen de la aplicación.
 5. Define `NEXT_PUBLIC_SITE_URL` con la URL canónica de la aplicación. En local usa `http://localhost:3000`.
 6. Ejecuta `npm run dev` y abre `http://localhost:3000`.
 

@@ -36,6 +36,7 @@ Deno.serve(async (request) => {
   if (role?.role !== "saas_admin" || role.status !== "active") return reply(403, "No tienes permiso para aprovisionar empresas.");
 
   const admin = createClient(url, serviceRoleKey, { auth: { persistSession: false, autoRefreshToken: false } });
+  const organizationId = crypto.randomUUID();
   let target: { id: string } | undefined;
   let page = 1;
   while (!target) {
@@ -49,7 +50,11 @@ Deno.serve(async (request) => {
   let createdUser = false;
   if (!target) {
     let redirectTo: string;
-    try { redirectTo = new URL("/auth/callback?next=/auth/reset-password", appUrl).toString(); } catch { return reply(500, "La URL de la aplicación no es válida."); }
+    try {
+      const activationUrl = new URL("/auth/activate", appUrl);
+      activationUrl.searchParams.set("organizationId", organizationId);
+      redirectTo = activationUrl.toString();
+    } catch { return reply(500, "La URL de la aplicación no es válida."); }
     const { data, error } = await admin.auth.admin.inviteUserByEmail(administratorEmail, { redirectTo });
     if (error || !data.user) return reply(409, "No fue posible enviar la invitación al administrador.");
     target = data.user;
@@ -57,7 +62,7 @@ Deno.serve(async (request) => {
   }
 
   const args = {
-    p_code: code, p_name: name, p_administrator_user_id: target.id, p_plan_version_id: planVersionId,
+    p_organization_id: organizationId, p_code: code, p_name: name, p_administrator_user_id: target.id, p_plan_version_id: planVersionId,
     p_status: status, p_trial_ends_at: body.trialEndsAt || null, p_period_start: body.periodStart || null,
     p_period_end: body.periodEnd || null, p_customer_reference: body.customerReference || null,
     p_subscription_reference: body.subscriptionReference || null, p_note: body.note || null,

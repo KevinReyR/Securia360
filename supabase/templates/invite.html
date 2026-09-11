@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="es">
+  <body style="margin:0;background:#f4f7f6;font-family:Arial,sans-serif;color:#16312b">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:32px 16px">
+      <tr><td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border:1px solid #dce7e3;border-radius:16px;padding:32px">
+          <tr><td>
+            <p style="margin:0 0 20px;color:#16705b;font-size:14px;font-weight:700">SECURIA360</p>
+            <h1 style="margin:0 0 12px;font-size:28px;line-height:1.2">Activa tu cuenta</h1>
+            <p style="margin:0 0 24px;color:#52645f;font-size:16px;line-height:1.6">Has sido invitado a Securia360. Usa este enlace seguro para crear tu contraseña y completar tus datos personales.</p>
+            <p style="margin:0 0 24px">
+              <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=invite&amp;next={{ .RedirectTo }}" style="display:inline-block;border-radius:10px;background:#16705b;padding:13px 20px;color:#ffffff;text-decoration:none;font-weight:700">Crear contraseña y continuar</a>
+            </p>
+            <p style="margin:0;color:#70817c;font-size:13px;line-height:1.5">El enlace es personal, vence y solo puede utilizarse una vez. Si no esperabas esta invitación, ignora este mensaje.</p>
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body>
+</html>
