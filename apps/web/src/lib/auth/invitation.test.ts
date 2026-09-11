@@ -20,10 +20,11 @@ describe("invitation navigation", () => {
 });
 
 describe("accountActivationSchema", () => {
+  const validPassword = "a".repeat(10);
   const valid = {
     organizationId,
-    password: "Securia360-segura",
-    confirmation: "Securia360-segura",
+    password: validPassword,
+    confirmation: validPassword,
     first_name: "Ana",
     middle_name: "",
     last_name: "Pérez",
@@ -34,6 +35,6 @@ describe("accountActivationSchema", () => {
   it("requires identity, phone and matching password", () => {
     expect(accountActivationSchema.safeParse(valid).success).toBe(true);
     expect(accountActivationSchema.safeParse({ ...valid, phone: "" }).success).toBe(false);
-    expect(accountActivationSchema.safeParse({ ...valid, confirmation: "otra-clave-segura" }).success).toBe(false);
+    expect(accountActivationSchema.safeParse({ ...valid, confirmation: "b".repeat(10) }).success).toBe(false);
   });
 });
