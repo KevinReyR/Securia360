@@ -4,6 +4,7 @@ import { Alert } from "@/components/ui/alert";
 import { activationPath } from "@/lib/auth/invitation";
 import { createClient } from "@/lib/supabase/server";
 import { ActivateAccountForm } from "./activate-account-form";
+import { InvitationSessionBridge } from "./invitation-session-bridge";
 
 type ActivatePageProps = { searchParams: Promise<{ organizationId?: string; status?: string }> };
 
@@ -12,13 +13,21 @@ export default async function ActivatePage({ searchParams }: ActivatePageProps) 
   const validPath = params.organizationId ? activationPath(params.organizationId) : null;
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
-  const invalid = params.status === "invalid" || !validPath || !data.user;
+  const invalid = params.status === "invalid" || !validPath;
 
   if (invalid) {
     return (
       <AuthShell title="La invitación no está disponible" description="El enlace venció, ya fue utilizado o no corresponde a una invitación válida." footer={<Link href="/auth/login" className="font-semibold text-[var(--brand)] hover:underline">Volver al inicio de sesión</Link>}>
         <Alert variant="danger" className="mt-8">Solicita una nueva invitación al administrador. Si ya habías creado una contraseña, también puedes recuperar tu acceso.</Alert>
         <Link href="/auth/forgot-password" className="mt-5 inline-flex text-sm font-semibold text-[var(--brand)] hover:underline">Recuperar contraseña</Link>
+      </AuthShell>
+    );
+  }
+
+  if (!data.user) {
+    return (
+      <AuthShell title="Preparando tu cuenta" description="Estamos validando la invitación y creando tu sesión segura.">
+        <InvitationSessionBridge />
       </AuthShell>
     );
   }

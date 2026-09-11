@@ -71,9 +71,9 @@ test.describe("critical isolated SaaS flows", () => {
       const invitation = await admin.auth.admin.generateLink({ type: "invite", email, options: { redirectTo: activationUrl } });
       expect(invitation.error).toBeNull();
       userId = invitation.data.user?.id;
-      const tokenHash = invitation.data.properties?.hashed_token;
+      const actionLink = invitation.data.properties?.action_link;
       expect(userId).toBeTruthy();
-      expect(tokenHash).toBeTruthy();
+      expect(actionLink).toBeTruthy();
 
       const organization = await admin.from("organizations").insert({
         id: organizationId,
@@ -97,11 +97,7 @@ test.describe("critical isolated SaaS flows", () => {
       });
       expect(assignment.error).toBeNull();
 
-      const confirmUrl = new URL("/auth/confirm", baseURL);
-      confirmUrl.searchParams.set("token_hash", tokenHash!);
-      confirmUrl.searchParams.set("type", "invite");
-      confirmUrl.searchParams.set("next", activationUrl);
-      await page.goto(confirmUrl.toString());
+      await page.goto(actionLink!);
       await expect(page).toHaveURL(new RegExp(`/auth/activate\\?organizationId=${organizationId}$`));
       await expect(page.getByRole("heading", { name: "Activa tu cuenta" })).toBeVisible();
 
