@@ -69,6 +69,12 @@ Deno.serve(async (request) => {
   };
   const { error } = await caller.rpc("provision_saas_customer", args);
   if (error) {
+    console.error("provision_saas_customer RPC failed", {
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+      message: error.message,
+    });
     if (createdUser) await admin.auth.admin.deleteUser(target.id);
     return reply(error.code === "23505" ? 409 : error.code === "42501" ? 403 : 400, "No fue posible crear la empresa. Revisa los datos e inténtalo de nuevo.");
   }
