@@ -14,22 +14,10 @@ export async function activateAccount(_state: ActivateAccountState, formData: Fo
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError || !userData.user) return { error: "La invitación venció o ya fue utilizada. Solicita una nueva." };
 
-  const { data: organization, error: organizationError } = await supabase
-    .from("organizations")
-    .select("id")
-    .eq("id", parsed.data.organizationId)
-    .eq("status", "active")
-    .maybeSingle();
-  if (organizationError || !organization) return { error: "Esta invitación no concede acceso a la organización indicada." };
-
-  const { data: membership, error: membershipError } = await supabase
-    .from("organization_members")
-    .select("id")
-    .eq("organization_id", parsed.data.organizationId)
-    .eq("user_id", userData.user.id)
-    .eq("status", "active")
-    .maybeSingle();
-  if (membershipError || !membership) return { error: "Esta invitación no concede acceso a la organización indicada." };
+  const { data: invitation, error: membershipError } = await supabase
+    .rpc("accept_my_organization_invitation", { p_organization_id: parsed.data.organizationId })
+    .single();
+  if (membershipError || !invitation) return { error: "Esta invitación no concede acceso a la organización indicada." };
 
   const { error: passwordError } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (passwordError) return { error: "No fue posible guardar la contraseña. Solicita una nueva invitación." };
@@ -48,16 +36,6 @@ export async function activateAccount(_state: ActivateAccountState, formData: Fo
     .single();
   if (profileError || !profile) return { error: "La contraseña se guardó, pero no pudimos completar tus datos. Intenta enviarlos nuevamente." };
 
-  const { data: assignments } = await supabase
-    .from("member_roles")
-    .select("role_id")
-    .eq("organization_id", parsed.data.organizationId)
-    .eq("organization_member_id", membership.id)
-    .is("site_id", null);
-  const roleIds = assignments?.map((assignment) => assignment.role_id) ?? [];
-  const { data: adminRole } = roleIds.length
-    ? await supabase.from("roles").select("id").in("id", roleIds).eq("code", "organization_admin").maybeSingle()
-    : { data: null };
-  const destination = adminRole ? "onboarding" : "dashboard";
+  const destination = invitation.is_organization_admin ? "onboarding" : "dashboard";
   redirect(`/org/${parsed.data.organizationId}/${destination}`);
 }

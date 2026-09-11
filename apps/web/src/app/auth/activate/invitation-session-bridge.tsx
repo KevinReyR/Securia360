@@ -5,7 +5,7 @@ import { SpinnerGap } from "@phosphor-icons/react";
 import { Alert } from "@/components/ui/alert";
 import { createClient } from "@/lib/supabase/client";
 
-export function InvitationSessionBridge() {
+export function InvitationSessionBridge({ organizationId }: { organizationId: string }) {
   const [message, setMessage] = useState("Validando el enlace seguro...");
   const started = useRef(false);
 
@@ -36,7 +36,9 @@ export function InvitationSessionBridge() {
       }
 
       if (active) setMessage("Activando tu acceso a la empresa...");
-      const { error: membershipError } = await supabase.rpc("accept_my_invitations");
+      const { error: membershipError } = await supabase.rpc("accept_my_organization_invitation", {
+        p_organization_id: organizationId,
+      });
       if (membershipError) {
         await supabase.auth.signOut({ scope: "local" });
         window.location.replace("/auth/activate?status=invalid");
@@ -49,7 +51,7 @@ export function InvitationSessionBridge() {
 
     void establishSession();
     return () => { active = false; };
-  }, []);
+  }, [organizationId]);
 
   return (
     <Alert className="mt-8 flex items-center gap-3">

@@ -10,8 +10,11 @@ export async function confirmInvitation(formData: FormData) {
   const tokenHash = String(formData.get("token_hash") ?? "");
   const type = String(formData.get("type") ?? "");
   const destination = resolveInviteRedirect(String(formData.get("next") ?? ""), internalOrigin);
+  const organizationId = destination
+    ? new URL(destination, internalOrigin).searchParams.get("organizationId")
+    : null;
 
-  if (!tokenHash || type !== "invite" || !destination) {
+  if (!tokenHash || type !== "invite" || !destination || !organizationId) {
     redirect("/auth/activate?status=invalid");
   }
 
@@ -19,7 +22,9 @@ export async function confirmInvitation(formData: FormData) {
   const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "invite" });
   if (error) redirect("/auth/activate?status=invalid");
 
-  const { error: membershipError } = await supabase.rpc("accept_my_invitations");
+  const { error: membershipError } = await supabase.rpc("accept_my_organization_invitation", {
+    p_organization_id: organizationId,
+  });
   if (membershipError) {
     await supabase.auth.signOut({ scope: "local" });
     redirect("/auth/activate?status=invalid");

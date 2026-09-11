@@ -27,7 +27,7 @@ export default async function ActivatePage({ searchParams }: ActivatePageProps) 
   if (!data.user) {
     return (
       <AuthShell title="Preparando tu cuenta" description="Estamos validando la invitación y creando tu sesión segura.">
-        <InvitationSessionBridge />
+        <InvitationSessionBridge organizationId={params.organizationId!} />
       </AuthShell>
     );
   }
