@@ -13,6 +13,15 @@ export default async function ActivatePage({ searchParams }: ActivatePageProps) 
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
   const invalid = params.status === "invalid" || !validPath;
+  const { data: membership } = data.user && params.organizationId
+    ? await supabase
+        .from("organization_members")
+        .select("id")
+        .eq("organization_id", params.organizationId)
+        .eq("user_id", data.user.id)
+        .eq("status", "active")
+        .maybeSingle()
+    : { data: null };
 
   if (invalid) {
     return (
@@ -25,7 +34,11 @@ export default async function ActivatePage({ searchParams }: ActivatePageProps) 
 
   return (
     <AuthShell title="Activa tu cuenta" description="Crea tu contraseña y completa los datos con los que te identificarás en Securia360.">
-      <InvitationSessionBridge organizationId={params.organizationId!} hasServerSession={Boolean(data.user)} />
+      <InvitationSessionBridge
+        organizationId={params.organizationId!}
+        hasServerSession={Boolean(data.user)}
+        hasServerAccess={Boolean(membership)}
+      />
     </AuthShell>
   );
 }

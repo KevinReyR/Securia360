@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { accountActivationSchema, activationPath, resolveInviteRedirect } from "./invitation";
+import {
+  accountActivationSchema,
+  activationPath,
+  invitationSessionSchema,
+  isSameOriginRequest,
+  resolveInviteRedirect,
+} from "./invitation";
 
 const organizationId = "20000000-0000-4000-8000-000000000001";
 
@@ -36,5 +42,25 @@ describe("accountActivationSchema", () => {
     expect(accountActivationSchema.safeParse(valid).success).toBe(true);
     expect(accountActivationSchema.safeParse({ ...valid, phone: "" }).success).toBe(false);
     expect(accountActivationSchema.safeParse({ ...valid, confirmation: "b".repeat(10) }).success).toBe(false);
+  });
+});
+
+describe("invitation session handoff", () => {
+  it("accepts only a complete, scoped token payload", () => {
+    expect(invitationSessionSchema.safeParse({
+      accessToken: "x",
+      refreshToken: "y",
+      organizationId,
+    }).success).toBe(true);
+    expect(invitationSessionSchema.safeParse({
+      accessToken: "x",
+      organizationId,
+    }).success).toBe(false);
+  });
+
+  it("requires the request to come from the application origin", () => {
+    expect(isSameOriginRequest("https://app.example", "https://app.example/auth/invitation-session")).toBe(true);
+    expect(isSameOriginRequest("https://evil.example", "https://app.example/auth/invitation-session")).toBe(false);
+    expect(isSameOriginRequest(null, "https://app.example/auth/invitation-session")).toBe(false);
   });
 });

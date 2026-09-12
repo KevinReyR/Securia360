@@ -2,6 +2,12 @@ import { z } from "zod";
 
 const organizationIdSchema = z.uuid();
 
+export const invitationSessionSchema = z.object({
+  accessToken: z.string().min(1).max(8192),
+  refreshToken: z.string().min(1).max(2048),
+  organizationId: organizationIdSchema,
+}).strict();
+
 export const accountActivationSchema = z.object({
   organizationId: organizationIdSchema,
   password: z.string().min(10, "Usa al menos 10 caracteres.").max(72),
@@ -34,5 +40,15 @@ export function resolveInviteRedirect(value: string | null, applicationOrigin: s
     return activationPath(organizationId);
   } catch {
     return null;
+  }
+}
+
+export function isSameOriginRequest(origin: string | null, requestUrl: string) {
+  if (!origin) return false;
+
+  try {
+    return new URL(origin).origin === new URL(requestUrl).origin;
+  } catch {
+    return false;
   }
 }

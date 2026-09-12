@@ -7,5 +7,5 @@ export function safeNextPath(value: FormDataEntryValue | string | null | undefin
 }
 
 export function isPublicAuthPath(pathname: string) {
-  return pathname === "/" || pathname === "/evaluacion-inicial" || pathname.startsWith("/evaluacion-inicial/") || pathname === "/auth/login" || pathname === "/auth/callback" || pathname === "/auth/confirm" || pathname === "/auth/activate" || pathname === "/auth/forgot-password" || pathname === "/auth/reset-password";
+  return pathname === "/" || pathname === "/evaluacion-inicial" || pathname.startsWith("/evaluacion-inicial/") || pathname === "/auth/login" || pathname === "/auth/callback" || pathname === "/auth/confirm" || pathname === "/auth/activate" || pathname === "/auth/invitation-session" || pathname === "/auth/forgot-password" || pathname === "/auth/reset-password";
 }

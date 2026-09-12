@@ -10,9 +10,10 @@ import { ActivateAccountForm } from "./activate-account-form";
 type InvitationSessionBridgeProps = {
   organizationId: string;
   hasServerSession: boolean;
+  hasServerAccess: boolean;
 };
 
-export function InvitationSessionBridge({ organizationId, hasServerSession }: InvitationSessionBridgeProps) {
+export function InvitationSessionBridge({ organizationId, hasServerSession, hasServerAccess }: InvitationSessionBridgeProps) {
   const [message, setMessage] = useState("Validando el enlace seguro...");
   const [status, setStatus] = useState<"checking" | "ready" | "wrong-account">("checking");
   const started = useRef(false);
@@ -35,47 +36,34 @@ export function InvitationSessionBridge({ organizationId, hasServerSession }: In
         return;
       }
 
-      const supabase = createClient();
       if (hasInviteSession) {
-        const { error: sessionError } = await supabase.auth.setSession({
-          access_token: accessToken!,
-          refresh_token: refreshToken!,
-        });
-        if (sessionError) {
+        if (active) setMessage("Activando tu acceso a la empresa...");
+        const response = await fetch("/auth/invitation-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          cache: "no-store",
+          body: JSON.stringify({ accessToken, refreshToken, organizationId }),
+        }).catch(() => null);
+        if (!response?.ok) {
           window.location.replace("/auth/activate?status=invalid");
           return;
         }
-      } else if (!hasServerSession) {
-        window.location.replace("/auth/activate?status=invalid");
+        window.location.replace(`${window.location.pathname}${window.location.search}`);
         return;
       }
 
-      if (active) setMessage("Activando tu acceso a la empresa...");
-      const { error: membershipError } = await supabase.rpc("accept_my_organization_invitation", {
-        p_organization_id: organizationId,
-      });
-      if (membershipError) {
-        if (hasInviteSession) {
-          await supabase.auth.signOut({ scope: "local" });
-          window.location.replace("/auth/activate?status=invalid");
-          return;
-        }
+      if (hasServerAccess) {
+        if (active) setStatus("ready");
+      } else if (hasServerSession) {
         if (active) setStatus("wrong-account");
-        return;
+      } else {
+        window.location.replace("/auth/activate?status=invalid");
       }
-
-      if (hasInviteSession) {
-        window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
-        window.location.reload();
-        return;
-      }
-
-      if (active) setStatus("ready");
     }
 
     void establishSession();
     return () => { active = false; };
-  }, [hasServerSession, organizationId]);
+  }, [hasServerAccess, hasServerSession, organizationId]);
 
   async function clearCurrentSession() {
     const supabase = createClient();
