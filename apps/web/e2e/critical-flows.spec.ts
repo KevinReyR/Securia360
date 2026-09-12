@@ -304,21 +304,24 @@ test.describe("critical isolated SaaS flows", () => {
     const title = `E2E Acción ${fixture.runId.slice(0, 8)}`;
     await login(page, fixture.userA.email, fixture.userA.password);
     await page.goto(`/org/${fixture.organizationA}/improvement-plan`);
-    const gapCard = page.getByRole("heading", { name: fixture.improvementGapTitle }).locator("xpath=ancestor::div[contains(@class, 'border')][1]");
-    await gapCard.getByLabel("Nueva acción").fill(title);
-    await gapCard.getByLabel("Descripción").first().fill("Completar evidencia verificable.");
-    await gapCard.getByRole("button", { name: "Crear acción" }).click();
+    const gapCard = page.getByRole("heading", { name: fixture.improvementGapTitle }).locator("xpath=ancestor::div[contains(@class, 'overflow-hidden')][1]");
+    await gapCard.getByRole("button", { name: "Agregar acción" }).click();
+    const quickComposer = gapCard.getByRole("form", { name: "Agregar acción" });
+    await quickComposer.getByLabel("Acción").fill(title);
+    await quickComposer.getByRole("button", { name: "Agregar", exact: true }).click();
     await expect(page.getByText(title, { exact: true })).toBeVisible();
 
-    const actionCard = page.getByText(title, { exact: true }).locator("xpath=ancestor::article[1]");
+    const actionCard = page.getByText(title, { exact: true }).locator("xpath=ancestor::details[1]");
+    await actionCard.locator("summary").click();
     await actionCard.getByLabel("Cargar evidencia privada").setInputFiles({ name: "evidencia.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\nE2E improvement evidence") });
     await actionCard.getByRole("button", { name: "Vincular evidencia" }).click();
-    await expect(actionCard.getByText("evidence_submitted", { exact: true })).toBeVisible();
+    await expect(actionCard.getByText("Evidencia enviada", { exact: true })).toBeVisible();
+    await actionCard.locator("summary").click();
     await actionCard.getByLabel("Nota de validación").fill("Evidencia revisada y suficiente.");
     await actionCard.getByRole("button", { name: "Validar y cerrar acción" }).click();
-    await expect(actionCard.getByText("verified", { exact: true })).toBeVisible();
-    await gapCard.getByRole("button", { name: "Cerrar brecha validada" }).click();
-    await expect(gapCard.getByText("resolved", { exact: true })).toBeVisible();
+    await expect(actionCard.getByText("Verificada", { exact: true })).toBeVisible();
+    await gapCard.getByRole("button", { name: "Cerrar oportunidad validada" }).click();
+    await expect(gapCard.getByText("Resuelta", { exact: true })).toBeVisible();
     await logout(page);
   });
 

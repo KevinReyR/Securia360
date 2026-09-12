@@ -16,6 +16,13 @@ import { requireAuthenticatedUser } from "./tenant";
 
 const tenantIdSchema = z.uuid();
 
+export type ImprovementActionCreateState = {
+  status: "idle" | "success" | "error";
+  message?: string;
+  actionId?: string;
+  fieldErrors?: Record<string, string>;
+};
+
 function route(organizationId: string, status: string) {
   return `/org/${organizationId}/improvement-plan?status=${status}`;
 }
@@ -33,19 +40,38 @@ function documentPath(organizationId: string, entityId: string, documentId: stri
   return `${organizationId}/improvement_action/${entityId}/${documentId}/${safeName}`;
 }
 
-export async function createImprovementAction(formData: FormData) {
-  const organizationId = tenantIdSchema.parse(formData.get("organizationId"));
+export async function createImprovementAction(_previousState: ImprovementActionCreateState, formData: FormData): Promise<ImprovementActionCreateState> {
+  const organizationIdResult = tenantIdSchema.safeParse(formData.get("organizationId"));
+  if (!organizationIdResult.success) return { status: "error", message: "No pudimos identificar la organización." };
+  const organizationId = organizationIdResult.data;
   const parsed = improvementActionCreateSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) redirect(route(organizationId, "error"));
-  await requirePermission(organizationId, "improvements.manage");
+  if (!parsed.success) {
+    const fieldErrors = Object.fromEntries(
+      Object.entries(parsed.error.flatten().fieldErrors)
+        .filter(([, messages]) => messages?.length)
+        .map(([field, messages]) => [field, messages?.[0] ?? "Revisa este campo."]),
+    );
+    return { status: "error", message: "Revisa los datos de la acción.", fieldErrors };
+  }
+  if (!(await can(organizationId, "improvements.manage"))) return { status: "error", message: "No tienes permiso para agregar acciones." };
   const { userId } = await requireAuthenticatedUser();
   const supabase = await createClient();
-  const { data: gap } = await supabase.from("improvement_gaps").select("id,status").eq("organization_id", organizationId).eq("id", parsed.data.gap_id).maybeSingle();
-  if (!gap) redirect(route(organizationId, "notfound"));
-  if (gap.status === "resolved") redirect(route(organizationId, "gap-already-closed"));
-  const { error } = await supabase.from("improvement_actions").insert({ organization_id: organizationId, gap_id: parsed.data.gap_id, title: parsed.data.title, description: parsed.data.description, priority: parsed.data.priority, target_date: parsed.data.target_date, responsible_user_id: parsed.data.responsible_user_id, created_by: userId });
+  const { data: gap } = await supabase.from("improvement_gaps").select("id,status,priority").eq("organization_id", organizationId).eq("id", parsed.data.gap_id).maybeSingle();
+  if (!gap) return { status: "error", message: "La oportunidad no existe o ya no está disponible." };
+  if (gap.status === "resolved") return { status: "error", message: "La oportunidad ya se encuentra cerrada." };
+  const { data: action, error } = await supabase.from("improvement_actions").insert({
+    organization_id: organizationId,
+    gap_id: parsed.data.gap_id,
+    title: parsed.data.title,
+    description: parsed.data.description ?? null,
+    priority: parsed.data.priority ?? gap.priority,
+    target_date: parsed.data.target_date ?? null,
+    responsible_user_id: parsed.data.responsible_user_id ?? null,
+    created_by: userId,
+  }).select("id").single();
+  if (error || !action) return { status: "error", message: "No pudimos agregar la acción. Inténtalo de nuevo." };
   revalidatePath(`/org/${organizationId}/improvement-plan`);
-  redirect(route(organizationId, error ? "error" : "created"));
+  return { status: "success", message: "Acción agregada.", actionId: action.id };
 }
 
 export async function updateImprovementAction(formData: FormData) {

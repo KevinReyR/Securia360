@@ -11,8 +11,13 @@ describe("improvement workflow schemas", () => {
 
   it("normalizes a manual action and requires a valid gap identity", () => {
     const action = improvementActionCreateSchema.parse({ gap_id: ids.gap_id, title: "Corregir evidencia", description: "", priority: "high", target_date: "2026-12-01", responsible_user_id: ids.responsible_user_id });
-    expect(action.description).toBeNull();
+    expect(action.description).toBeUndefined();
     expect(improvementActionCreateSchema.safeParse({ ...action, gap_id: "cross-tenant" }).success).toBe(false);
+  });
+
+  it("requires only the action title during quick capture", () => {
+    expect(improvementActionCreateSchema.parse({ gap_id: ids.gap_id, title: "Actualizar matriz de peligros" })).toEqual({ gap_id: ids.gap_id, title: "Actualizar matriz de peligros" });
+    expect(improvementActionCreateSchema.safeParse({ gap_id: ids.gap_id, title: "" }).success).toBe(false);
   });
 
   it("accepts only known action states and document version identities", () => {
