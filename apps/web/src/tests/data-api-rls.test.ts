@@ -22,8 +22,11 @@ type Fixture = {
   userAId: string;
   userBId: string;
   userCId: string;
+  userDId: string;
   userAEmail: string;
   userBEmail: string;
+  userDEmail: string;
+  memberD: string;
   documentPath: string;
   adminRole: string;
   siteManagerRole: string;
@@ -47,8 +50,8 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
     admin = createClient<Database>(config.url!, config.serviceRoleKey!, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const [userA, userB, userC] = await Promise.all(
-      ["a", "b", "c"].map(async (suffix) => {
+    const [userA, userB, userC, userD] = await Promise.all(
+      ["a", "b", "c", "d"].map(async (suffix) => {
         const result = await admin.auth.admin.createUser({
           email: `${prefix}-${suffix}@example.invalid`,
           password,
@@ -73,20 +76,19 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
     const siteManagerRole = roleResult.data!.find((role) => role.code === "site_manager")!.id;
 
     // The organization bootstrap trigger creates an active administrator membership
-    // for each creator. Only User C needs an explicit membership in Org A.
-    const createMemberC = await admin.from("organization_members").insert({
-      organization_id: organizationA,
-      user_id: userC.id,
-      status: "active",
-      joined_at: new Date().toISOString(),
-    });
-    await assertNoError(createMemberC, "create User C membership");
+    // for each creator. Users C and D need explicit memberships in Org A.
+    const createAdditionalMembers = await admin.from("organization_members").insert([
+      { organization_id: organizationA, user_id: userC.id, status: "active", joined_at: new Date().toISOString() },
+      { organization_id: organizationA, user_id: userD.id, status: "active", joined_at: new Date().toISOString() },
+    ]);
+    await assertNoError(createAdditionalMembers, "create additional memberships");
     const memberships = await admin.from("organization_members")
       .select("id, organization_id, user_id")
       .in("organization_id", [organizationA, organizationB]);
     await assertNoError(memberships, "read memberships");
     const memberA = memberships.data!.find((member) => member.organization_id === organizationA && member.user_id === userA.id)!;
     const memberC = memberships.data!.find((member) => member.organization_id === organizationA && member.user_id === userC.id)!;
+    const memberD = memberships.data!.find((member) => member.organization_id === organizationA && member.user_id === userD.id)!;
     const assignUserCRole = await admin.from("member_roles").insert({
       organization_id: organizationA,
       organization_member_id: memberC.id,
@@ -115,8 +117,11 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
       userAId: userA.id,
       userBId: userB.id,
       userCId: userC.id,
+      userDId: userD.id,
       userAEmail: userA.email!,
       userBEmail: userB.email!,
+      userDEmail: userD.email!,
+      memberD: memberD.id,
       documentPath: `${organizationA}/documents/${crypto.randomUUID()}/${crypto.randomUUID()}/fixture.pdf`,
       adminRole,
       siteManagerRole,
@@ -127,7 +132,7 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
     if (!admin || !fixture) return;
     await admin.storage.from("organization-documents").remove([fixture.documentPath]);
     await admin.from("organizations").delete().in("id", [fixture.organizationA, fixture.organizationB]);
-    await Promise.all([fixture.userAId, fixture.userBId, fixture.userCId].map((id) => admin.auth.admin.deleteUser(id)));
+    await Promise.all([fixture.userAId, fixture.userBId, fixture.userCId, fixture.userDId].map((id) => admin.auth.admin.deleteUser(id)));
   }, 30_000);
 
   it("allows User A in Org A and denies Org B through real PostgREST", async () => {
@@ -247,11 +252,21 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
   }, 30_000);
 
   it("keeps PPE stock atomic and denies PPE records across tenants", async () => {
-    const userA = newPublicClient(); const userB = newPublicClient();
+    const userA = newPublicClient(); const userB = newPublicClient(); const worker = newPublicClient();
     await assertNoError(await userA.auth.signInWithPassword({ email: fixture.userAEmail, password }), "sign in PPE User A");
     await assertNoError(await userB.auth.signInWithPassword({ email: fixture.userBEmail, password }), "sign in PPE User B");
+    await assertNoError(await worker.auth.signInWithPassword({ email: fixture.userDEmail, password }), "sign in PPE worker");
     const catalog = await userA.from("ppe_catalog").insert({ organization_id: fixture.organizationA, code: `CI-PPE-${runId.slice(0, 8)}`, name: "CI helmet", category: "head", useful_life_days: 30 }).select("id").single();
     expect(catalog.error).toBeNull();
+    const unassignedCatalog = await userA.from("ppe_catalog").insert({ organization_id: fixture.organizationA, code: `CI-PPE-U-${runId.slice(0, 8)}`, name: "CI unassigned", category: "head" }).select("id").single();
+    expect(unassignedCatalog.error).toBeNull();
+    const workerAssignment = await userA.from("ppe_assignments").insert({ organization_id: fixture.organizationA, organization_member_id: fixture.memberD, site_id: fixture.siteA, ppe_catalog_id: catalog.data!.id, size_label: "M", created_by: fixture.userAId }).select("id").single();
+    expect(workerAssignment.error).toBeNull();
+    expect(await worker.rpc("can", { p_organization_id: fixture.organizationA, p_permission_code: "ppe.read" })).toMatchObject({ data: false, error: null });
+    expect((await worker.from("ppe_assignments").select("id").eq("organization_member_id", fixture.memberD)).data).toEqual([{ id: workerAssignment.data!.id }]);
+    expect((await worker.from("ppe_catalog").select("id").in("id", [catalog.data!.id, unassignedCatalog.data!.id])).data).toEqual([{ id: catalog.data!.id }]);
+    await assertNoError(await admin.from("ppe_assignments").update({ status: "retired" }).eq("id", workerAssignment.data!.id), "retire worker PPE assignment");
+    expect((await worker.from("ppe_catalog").select("id").eq("id", catalog.data!.id)).data).toEqual([]);
     const inventory = await userA.rpc("create_ppe_inventory", { p_organization_id: fixture.organizationA, p_site_id: fixture.siteA, p_ppe_catalog_id: catalog.data!.id, p_size_label: "M", p_reorder_point: 1 });
     expect(inventory.error).toBeNull();
     expect((await userA.rpc("record_ppe_inventory_movement", { p_inventory_id: inventory.data!, p_movement_type: "purchase", p_quantity: 1, p_note: "fixture", p_evidence_document_version_id: undefined })).error).toBeNull();
@@ -268,7 +283,7 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
     expect((await userB.from("ppe_inventory").select("id").eq("id", inventory.data!)).data).toEqual([]);
     expect((await userB.from("ppe_assignments").select("id").eq("id", assignment.data!.id)).data).toEqual([]);
     expect((await userB.rpc("record_ppe_inventory_movement", { p_inventory_id: inventory.data!, p_movement_type: "purchase", p_quantity: 1, p_note: "cross tenant", p_evidence_document_version_id: undefined })).error).not.toBeNull();
-    await Promise.all([userA.auth.signOut(), userB.auth.signOut()]);
+    await Promise.all([userA.auth.signOut(), userB.auth.signOut(), worker.auth.signOut()]);
   }, 30_000);
 
   it("denies incident and occupational-health sensitive data across tenants", async () => {

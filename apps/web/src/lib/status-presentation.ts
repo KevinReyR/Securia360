@@ -34,6 +34,7 @@ const statusCatalog: Record<string, StatusPresentation> = {
   not_applicable: { label: "No aplica", tone: "neutral", explanation: "La regla revisada no determinó aplicabilidad para los datos considerados." },
   cancelled: { label: "Cancelada", tone: "neutral", explanation: "El proceso fue cancelado y conserva su trazabilidad." },
   closed: { label: "Cerrada", tone: "neutral", explanation: "El caso concluyó y conserva su historial." },
+  retired: { label: "Retirada", tone: "neutral", explanation: "El elemento fue retirado y se conserva su trazabilidad." },
   not_issued: { label: "No emitido", tone: "neutral", explanation: "No existe un concepto emitido para este registro." },
   pending: { label: "Pendiente", tone: "warning", explanation: "Requiere una acción o revisión." },
   staged: { label: "Lista para revisar", tone: "info", explanation: "La información fue procesada y espera confirmación." },

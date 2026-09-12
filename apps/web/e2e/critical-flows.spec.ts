@@ -325,6 +325,90 @@ test.describe("critical isolated SaaS flows", () => {
     await logout(page);
   });
 
+  test("creates and follows an EPP from catalog to retirement while preserving its work area", async ({ page }) => {
+    const suffix = fixture.runId.slice(0, 8);
+    const itemName = `E2E Casco ${suffix}`;
+    await login(page, fixture.userA.email, fixture.userA.password);
+    await page.goto(`/org/${fixture.organizationA}/ppe`);
+    await expect(page.getByRole("heading", { name: "Estado operativo" })).toBeVisible();
+
+    await page.getByRole("link", { name: "Catálogo" }).click();
+    await expect(page).toHaveURL(/\/ppe\?view=catalog$/);
+    await page.getByRole("button", { name: "Nuevo elemento" }).click();
+    let drawer = page.getByRole("dialog");
+    await drawer.getByLabel("Código").fill(`E2E-${suffix}`);
+    await drawer.getByLabel("Nombre").fill(itemName);
+    await drawer.getByLabel("Categoría").fill("Protección de cabeza");
+    await drawer.getByLabel("Vida útil en días").fill("365");
+    await drawer.getByRole("button", { name: "Crear elemento" }).click();
+    await expect(page).toHaveURL(/view=catalog.*notice=saved/);
+    await expect(page.getByText(itemName, { exact: true })).toBeVisible();
+
+    await page.getByRole("link", { name: "Inventario" }).click();
+    await page.getByRole("button", { name: "Nueva ubicación" }).click();
+    drawer = page.getByRole("dialog");
+    await drawer.getByLabel("Elemento").selectOption({ label: itemName });
+    await drawer.getByLabel("Ubicación").selectOption("");
+    await drawer.getByLabel("Talla").fill("M");
+    await drawer.getByLabel("Punto de reposición").fill("1");
+    await drawer.getByRole("button", { name: "Crear ubicación" }).click();
+    await expect(page).toHaveURL(/view=inventory.*notice=saved/);
+
+    await page.getByRole("button", { name: "Registrar movimiento" }).click();
+    drawer = page.getByRole("dialog");
+    await drawer.getByLabel("Tipo").selectOption("purchase");
+    await drawer.getByLabel("Cantidad").fill("2");
+    await drawer.getByLabel("Motivo o referencia").fill("Compra E2E");
+    await drawer.getByRole("button", { name: "Registrar movimiento" }).click();
+    await expect(page).toHaveURL(/view=inventory.*notice=saved/);
+    await expect(page.getByText("2", { exact: true })).toBeVisible();
+
+    await page.getByRole("link", { name: "Asignaciones" }).click();
+    await page.getByRole("button", { name: "Nueva asignación" }).click();
+    drawer = page.getByRole("dialog");
+    await drawer.getByLabel("Trabajador").selectOption({ label: "E2E admin-a Fixture" });
+    await drawer.getByLabel("Elemento").selectOption({ label: itemName });
+    await drawer.getByLabel("Sede").selectOption("");
+    await drawer.getByLabel("Talla").fill("M");
+    await drawer.getByRole("button", { name: "Crear asignación" }).click();
+    await expect(page).toHaveURL(/view=assignments.*notice=saved/);
+
+    let assignment = page.getByText(itemName, { exact: true }).locator("xpath=ancestor::details[1]");
+    await assignment.locator("summary").click();
+    await assignment.getByRole("button", { name: "Registrar entrega" }).click();
+    drawer = page.getByRole("dialog");
+    await drawer.getByLabel("Cantidad").fill("1");
+    await drawer.getByRole("button", { name: "Registrar entrega" }).click();
+    await expect(page).toHaveURL(/view=assignments.*notice=delivered/);
+
+    assignment = page.getByText(itemName, { exact: true }).locator("xpath=ancestor::details[1]");
+    await assignment.locator("summary").click();
+    await assignment.getByRole("button", { name: "Aceptar" }).click();
+    await expect(page).toHaveURL(/view=assignments.*notice=accepted/);
+
+    assignment = page.getByText(itemName, { exact: true }).locator("xpath=ancestor::details[1]");
+    await assignment.locator("summary").click();
+    await assignment.getByRole("button", { name: "Inspeccionar" }).click();
+    drawer = page.getByRole("dialog");
+    await drawer.getByLabel("Resultado").selectOption("suitable");
+    await drawer.getByLabel("Observaciones").fill("Elemento en buen estado");
+    await drawer.getByRole("button", { name: "Guardar inspección" }).click();
+    await expect(page).toHaveURL(/view=assignments.*notice=inspected/);
+
+    assignment = page.getByText(itemName, { exact: true }).locator("xpath=ancestor::details[1]");
+    await assignment.locator("summary").click();
+    await assignment.getByRole("button", { name: "Dar de baja" }).click();
+    drawer = page.getByRole("dialog");
+    await drawer.getByLabel("Motivo").fill("Fin de la prueba E2E");
+    await drawer.getByRole("button", { name: "Confirmar retiro" }).click();
+    await expect(page).toHaveURL(/view=assignments.*notice=retired/);
+    await expect(page.getByText(itemName, { exact: true })).toHaveCount(0);
+
+    await page.getByRole("link", { name: "Historial" }).click();
+    await expect(page.getByText(itemName, { exact: true }).first()).toBeVisible();
+    await logout(page);
+  });
+
   test("denies direct tenant B navigation to a user that only belongs to tenant A", async ({ page }) => {
     await login(page, fixture.userA.email, fixture.userA.password);
     await page.goto(`/org/${fixture.organizationB}/dashboard`);
