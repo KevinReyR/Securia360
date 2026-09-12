@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { economicActivityOptionSchema } from "@/modules/economic-activities/economic-activities";
 
 const optionalText = z.preprocess(
   (value) => (typeof value === "string" && value.trim() === "" ? null : value),
@@ -96,20 +97,12 @@ export const onboardingLegalEntitySchema = z.object({
   tax_id: z.string().trim().min(3, "Ingresa el identificador tributario.").max(40),
 });
 
-export const onboardingEconomicActivitySchema = z.object({
-  economic_activity: z.string().trim().min(3, "Describe la actividad económica.").max(200),
-});
-
-export const onboardingCiiuSchema = z.object({
-  ciiu_code: z.string().trim().regex(/^\d{4}$/, "El CIIU debe contener cuatro dígitos."),
+export const onboardingClassificationSourceSchema = economicActivityOptionSchema.extend({
+  entry_id: z.uuid("Selecciona una actividad económica del catálogo CIIU."),
 });
 
 export const onboardingWorkforceSchema = z.object({
   employee_count: z.coerce.number().int().min(0).max(10_000_000),
-});
-
-export const onboardingRiskSchema = z.object({
-  risk_class: z.coerce.number().int().min(1).max(5),
 });
 
 export const onboardingSiteSchema = z.object({
@@ -150,10 +143,8 @@ export const onboardingCharacteristicsSchema = z.object({
 export const onboardingSchema = z.object({
   organization: onboardingOrganizationSchema,
   legal_entity: onboardingLegalEntitySchema,
-  economic_activity: onboardingEconomicActivitySchema,
-  ciiu: onboardingCiiuSchema,
+  classification: onboardingClassificationSourceSchema,
   workforce: onboardingWorkforceSchema,
-  risk: onboardingRiskSchema,
   sites: onboardingSitesSchema,
   responsible: onboardingResponsibleSchema,
   characteristics: onboardingCharacteristicsSchema,
@@ -162,11 +153,9 @@ export const onboardingSchema = z.object({
 export const onboardingStepSchema = z.discriminatedUnion("step", [
   z.object({ organizationId: z.uuid(), step: z.literal(1), data: onboardingOrganizationSchema }),
   z.object({ organizationId: z.uuid(), step: z.literal(2), data: onboardingLegalEntitySchema }),
-  z.object({ organizationId: z.uuid(), step: z.literal(3), data: onboardingEconomicActivitySchema }),
-  z.object({ organizationId: z.uuid(), step: z.literal(4), data: onboardingCiiuSchema }),
-  z.object({ organizationId: z.uuid(), step: z.literal(5), data: onboardingWorkforceSchema }),
-  z.object({ organizationId: z.uuid(), step: z.literal(6), data: onboardingRiskSchema }),
-  z.object({ organizationId: z.uuid(), step: z.literal(7), data: onboardingSitesSchema }),
-  z.object({ organizationId: z.uuid(), step: z.literal(8), data: onboardingResponsibleSchema }),
-  z.object({ organizationId: z.uuid(), step: z.literal(9), data: onboardingCharacteristicsSchema }),
+  z.object({ organizationId: z.uuid(), step: z.literal(3), data: onboardingClassificationSourceSchema }),
+  z.object({ organizationId: z.uuid(), step: z.literal(4), data: onboardingWorkforceSchema }),
+  z.object({ organizationId: z.uuid(), step: z.literal(5), data: onboardingSitesSchema }),
+  z.object({ organizationId: z.uuid(), step: z.literal(6), data: onboardingResponsibleSchema }),
+  z.object({ organizationId: z.uuid(), step: z.literal(7), data: onboardingCharacteristicsSchema }),
 ]);

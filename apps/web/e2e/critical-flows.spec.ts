@@ -155,18 +155,17 @@ test.describe("critical isolated SaaS flows", () => {
       await page.getByLabel("Razón social").fill(`${name} SAS`);
       await page.getByLabel("Nombre comercial").fill(name);
       await page.getByLabel("Identificación tributaria").fill(`E2E-RS-${fixture.runId.slice(0, 8)}`);
-      await continueOnboarding(page, "Actividad económica");
+      await continueOnboarding(page, "Actividad y CIIU");
 
       await page.reload();
-      await expect(page.getByText("Paso 3 de 9")).toBeVisible();
+      await expect(page.getByText("Paso 3 de 7")).toBeVisible();
       await expect(page).toHaveURL(onboardingUrl);
-      await page.getByLabel("Actividad económica principal").fill("Servicios profesionales");
-      await continueOnboarding(page, "CIIU");
-      await page.getByLabel("Código CIIU").fill("6201");
+      await page.getByRole("combobox", { name: "Código CIIU y actividad económica, obligatorio" }).click();
+      await page.getByLabel("Buscar actividad económica").fill("6201-01");
+      await page.getByRole("option").first().click();
+      await expect(page.getByText(/Riesgo I/).first()).toBeVisible();
       await continueOnboarding(page, "Trabajadores");
       await page.getByLabel("Número de trabajadores").fill("12");
-      await continueOnboarding(page, "Clase de riesgo");
-      await page.getByLabel("Clase de riesgo").selectOption("2");
       await continueOnboarding(page, "Sedes");
       const firstSite = page.getByRole("group", { name: "Sede 1" });
       await firstSite.getByLabel("Nombre").fill("Sede E2E");

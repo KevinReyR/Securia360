@@ -4,7 +4,7 @@ import { StatusBanner } from "@/components/status-banner";
 import { Card, CardContent } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import { OnboardingForm, type OnboardingMemberOption } from "@/modules/organizations/onboarding-form";
-import { onboardingSitesSchema } from "@/modules/organizations/schemas";
+import { onboardingClassificationSourceSchema, onboardingSitesSchema } from "@/modules/organizations/schemas";
 import { requireTenant } from "@/modules/organizations/tenant";
 import type { Json } from "@/types/database";
 
@@ -42,6 +42,16 @@ export default async function OnboardingPage({ params, searchParams }: { params:
     .filter((site) => !entity || site.legal_entity_id === entity.id)
     .map(({ name, code, address, city, department }) => ({ name, code, address: address ?? "", city: city ?? "", department: department ?? "" }));
   const draft = objectValue(progress?.draft_data);
+  const parsedClassification = onboardingClassificationSourceSchema.safeParse(draft.classification);
+  const classification = parsedClassification.success ? parsedClassification.data : {
+    entry_id: "",
+    ciiu_code: "",
+    risk_class: entity?.risk_class ?? 1,
+    activity: entity?.economic_activity ?? "",
+    catalog_version: "",
+    source_reference: "",
+    source_review_status: "reviewed" as const,
+  };
   const parsedDraftSites = onboardingSitesSchema.safeParse(draft.sites);
   const draftSites = parsedDraftSites.success ? parsedDraftSites.data : null;
   const responsibleMembership = members?.find((member) => member.user_id === userId)?.id ?? members?.[0]?.id ?? "";
@@ -49,10 +59,8 @@ export default async function OnboardingPage({ params, searchParams }: { params:
   const initialValues = {
     organization: { name: organization.name, nit: organization.nit ?? "", ...objectValue(draft.organization) },
     legal_entity: { legal_name: entity?.legal_name ?? organization.name, trade_name: entity?.trade_name ?? "", tax_id: entity?.tax_id ?? organization.nit ?? "", ...objectValue(draft.legal_entity) },
-    economic_activity: { economic_activity: entity?.economic_activity ?? "", ...objectValue(draft.economic_activity) },
-    ciiu: { ciiu_code: entity?.ciiu_code ?? "", ...objectValue(draft.ciiu) },
+    classification,
     workforce: { employee_count: entity?.employee_count ?? 0, ...objectValue(draft.workforce) },
-    risk: { risk_class: entity?.risk_class ?? 1, ...objectValue(draft.risk) },
     sites: draftSites ?? (fallbackSites.length ? fallbackSites : [{ name: "Sede principal", code: "PRINCIPAL", address: "", city: "", department: "" }]),
     responsible: { member_id: responsibleMembership, ...objectValue(draft.responsible) },
     characteristics: {
@@ -70,5 +78,7 @@ export default async function OnboardingPage({ params, searchParams }: { params:
   };
   const { status } = await searchParams;
 
-  return <div className="mx-auto max-w-6xl"><PageHeader eyebrow="Puesta en marcha" title="Configura tu organización" description="Avanza paso a paso. Guardaremos el progreso para que puedas continuar después." /><div className="mt-6"><StatusBanner status={status} /><Card><CardContent className="p-6 lg:p-8"><OnboardingForm organizationId={organizationId} initialStep={progress?.current_step ?? 1} initialValues={initialValues} members={memberOptions} /></CardContent></Card></div></div>;
+  const initialStep = !parsedClassification.success && (progress?.current_step ?? 1) > 3 ? 3 : progress?.current_step ?? 1;
+
+  return <div className="mx-auto max-w-6xl"><PageHeader eyebrow="Puesta en marcha" title="Configura tu organización" description="Avanza paso a paso. Guardaremos el progreso para que puedas continuar después." /><div className="mt-6"><StatusBanner status={status} /><Card><CardContent className="p-6 lg:p-8"><OnboardingForm organizationId={organizationId} initialStep={initialStep} initialValues={initialValues} members={memberOptions} /></CardContent></Card></div></div>;
 }

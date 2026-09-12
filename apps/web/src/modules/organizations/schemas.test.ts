@@ -36,19 +36,17 @@ describe("onboardingSchema", () => {
   const validOnboarding = {
     organization: { name: "Empresa Colombia", nit: "900123456-1" },
     legal_entity: { legal_name: "Empresa Colombia SAS", trade_name: "Empresa", tax_id: "900123456-1" },
-    economic_activity: { economic_activity: "Desarrollo de software" },
-    ciiu: { ciiu_code: "6201" },
+    classification: { entry_id: "30000000-0000-4000-8000-000000000001", ciiu_code: "6201-01", risk_class: 2, activity: "Desarrollo de sistemas informáticos", catalog_version: "DECRETO_768_2022_V1", source_reference: "Decreto 768 de 2022", source_review_status: "reviewed" },
     workforce: { employee_count: 42 },
-    risk: { risk_class: 2 },
     sites: [{ name: "Principal", code: "bog", address: "", city: "Bogotá", department: "Bogotá D.C." }],
     responsible: { member_id: "10000000-0000-4000-8000-000000000001" },
     characteristics: { work_at_height: true, confined_spaces: false, chemical_exposure: false, electrical_work: true, transport_operations: false, heavy_machinery: false, night_work: false, remote_work: true, manual_load_handling: false },
   };
 
-  it("validates and normalizes all nine onboarding sections", () => {
+  it("validates and normalizes all seven onboarding sections", () => {
     const result = onboardingSchema.parse(validOnboarding);
     expect(result.sites[0].code).toBe("BOG");
-    expect(result.ciiu.ciiu_code).toBe("6201");
+    expect(result.classification.ciiu_code).toBe("6201-01");
   });
 
   it("rejects duplicate site codes regardless of casing", () => {
@@ -57,5 +55,13 @@ describe("onboardingSchema", () => {
       { ...validOnboarding.sites[0], name: "Secundaria", code: "BOG" },
     ]);
     expect(result.success).toBe(false);
+  });
+
+  it("preserves the catalog source review status for traceability", () => {
+    const result = onboardingSchema.parse({
+      ...validOnboarding,
+      classification: { ...validOnboarding.classification, source_review_status: "pending" },
+    });
+    expect(result.classification.source_review_status).toBe("pending");
   });
 });

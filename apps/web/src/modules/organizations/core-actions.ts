@@ -405,7 +405,7 @@ export async function saveOnboardingStep(input: unknown): Promise<OnboardingActi
   }
 
   const currentStep = Number((data as { current_step?: unknown }).current_step);
-  return { ok: true, currentStep: Number.isInteger(currentStep) ? currentStep : Math.min(parsed.data.step + 1, 9) };
+  return { ok: true, currentStep: Number.isInteger(currentStep) ? currentStep : Math.min(parsed.data.step + 1, 7) };
 }
 
 export async function completeOnboarding(organizationIdInput: string, idempotencyKeyInput: string) {
@@ -418,7 +418,14 @@ export async function completeOnboarding(organizationIdInput: string, idempotenc
     p_idempotency_key: idempotencyKey,
   });
 
-  if (error) redirect(`/org/${organizationId}/onboarding?status=error`);
+  if (error) {
+    const status = error.code === "23505"
+      ? "classification-conflict"
+      : error.code === "22023"
+        ? "catalog-invalid"
+        : "error";
+    redirect(`/org/${organizationId}/onboarding?status=${status}`);
+  }
   revalidatePath(`/org/${organizationId}`, "layout");
   redirect(`/org/${organizationId}/dashboard?onboarding=complete`);
 }

@@ -37,6 +37,8 @@ export function StatusBanner({ status }: { status?: string }) {
     "not-found": { variant: "danger", text: "La evaluación ya no está disponible. Actualiza la página y vuelve a intentarlo." },
     invalid: { variant: "danger", text: "Hay datos incompletos o inválidos. Revisa los campos señalados." },
     conflict: { variant: "warning", text: "Ya existe un registro con esa referencia o hay un borrador pendiente. Revisa el historial antes de continuar." },
+    "classification-conflict": { variant: "warning", text: "Ya existe una clasificación vigente diferente. Revísala antes de finalizar el onboarding." },
+    "catalog-invalid": { variant: "danger", text: "La actividad CIIU seleccionada ya no está disponible o no pertenece al catálogo oficial vigente. Selecciónala nuevamente." },
     "calculation-error": { variant: "danger", text: "No fue posible solicitar el cálculo. Revisa la versión, el período y tus permisos." },
     "commit-error": { variant: "danger", text: "No fue posible confirmar la importación. Revisa sus validaciones y vuelve a intentarlo." },
     "rollback-error": { variant: "danger", text: "No fue posible revertir todos los efectos. Consulta el reporte de conflictos." },

@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { CiiuActivityCombobox, RISK_LABELS } from "@/modules/economic-activities/ciiu-activity-combobox";
+import { economicActivityOptionSchema } from "@/modules/economic-activities/economic-activities";
 import { completeOnboarding, saveOnboardingStep } from "./core-actions";
 import { onboardingSchema } from "./schemas";
 
@@ -28,10 +30,8 @@ type OnboardingFormProps = {
 const steps = [
   { title: "Organización", description: "Datos principales" },
   { title: "Razón social", description: "Información jurídica" },
-  { title: "Actividad económica", description: "Descripción de la operación" },
-  { title: "CIIU", description: "Clasificación económica" },
+  { title: "Actividad y CIIU", description: "Clasificación económica" },
   { title: "Trabajadores", description: "Tamaño de la empresa" },
-  { title: "Clase de riesgo", description: "Información de la actividad" },
   { title: "Sedes", description: "Ubicaciones operativas" },
   { title: "Responsable SST", description: "Miembro responsable" },
   { title: "Caracterización", description: "Condiciones de la operación" },
@@ -40,13 +40,11 @@ const steps = [
 const stepFields: Record<number, string[]> = {
   1: ["organization.name", "organization.nit"],
   2: ["legal_entity.legal_name", "legal_entity.trade_name", "legal_entity.tax_id"],
-  3: ["economic_activity.economic_activity"],
-  4: ["ciiu.ciiu_code"],
-  5: ["workforce.employee_count"],
-  6: ["risk.risk_class"],
-  7: ["sites"],
-  8: ["responsible.member_id"],
-  9: ["characteristics"],
+  3: ["classification"],
+  4: ["workforce.employee_count"],
+  5: ["sites"],
+  6: ["responsible.member_id"],
+  7: ["characteristics"],
 };
 
 const characteristicFields = [
@@ -62,7 +60,7 @@ const characteristicFields = [
 ] as const;
 
 export function OnboardingForm({ organizationId, initialStep, initialValues, members }: OnboardingFormProps) {
-  const firstStep = Math.min(Math.max(initialStep, 1), 9);
+  const firstStep = Math.min(Math.max(initialStep, 1), steps.length);
   const [step, setStep] = useState(firstStep);
   const [maxReached, setMaxReached] = useState(firstStep);
   const [message, setMessage] = useState<string | null>(null);
@@ -76,12 +74,10 @@ export function OnboardingForm({ organizationId, initialStep, initialValues, mem
     switch (currentStep) {
       case 1: return values.organization;
       case 2: return values.legal_entity;
-      case 3: return values.economic_activity;
-      case 4: return values.ciiu;
-      case 5: return values.workforce;
-      case 6: return values.risk;
-      case 7: return values.sites;
-      case 8: return values.responsible;
+      case 3: return values.classification;
+      case 4: return values.workforce;
+      case 5: return values.sites;
+      case 6: return values.responsible;
       default: return values.characteristics;
     }
   }
@@ -101,7 +97,7 @@ export function OnboardingForm({ organizationId, initialStep, initialValues, mem
 
   function continueFlow() {
     startTransition(async () => {
-      if (await saveCurrentStep()) setStep((current) => Math.min(current + 1, 9));
+      if (await saveCurrentStep()) setStep((current) => Math.min(current + 1, steps.length));
     });
   }
 
@@ -118,7 +114,7 @@ export function OnboardingForm({ organizationId, initialStep, initialValues, mem
   return (
     <div className="grid gap-7 lg:grid-cols-[16rem_minmax(0,1fr)]">
       <aside aria-label="Progreso del onboarding">
-        <div className="mb-5 flex items-center justify-between text-sm"><span className="font-semibold">Paso {step} de 9</span><span className="text-[var(--muted)]">{progress}%</span></div>
+        <div className="mb-5 flex items-center justify-between text-sm"><span className="font-semibold">Paso {step} de {steps.length}</span><span className="text-[var(--muted)]">{progress}%</span></div>
         <div className="mb-5 h-1.5 overflow-hidden rounded-full bg-[var(--muted-surface)]" aria-hidden="true"><div className="h-full rounded-full bg-[var(--brand)] transition-[width]" style={{ width: `${progress}%` }} /></div>
         <ol className="grid gap-1">
           {steps.map((item, index) => {
@@ -133,15 +129,17 @@ export function OnboardingForm({ organizationId, initialStep, initialValues, mem
         <div className="mb-6"><p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--brand)]">{steps[step - 1].description}</p><h2 className="mt-2 text-2xl font-semibold tracking-tight">{steps[step - 1].title}</h2></div>
         {step === 1 ? <div className="grid gap-4 sm:grid-cols-2"><Field label="Nombre de la organización" error={form.formState.errors.organization?.name?.message}><Input {...form.register("organization.name")} autoComplete="organization" /></Field><Field label="NIT" error={form.formState.errors.organization?.nit?.message}><Input {...form.register("organization.nit")} /></Field></div> : null}
         {step === 2 ? <div className="grid gap-4 sm:grid-cols-2"><Field label="Razón social" error={form.formState.errors.legal_entity?.legal_name?.message}><Input {...form.register("legal_entity.legal_name")} /></Field><Field label="Nombre comercial" error={form.formState.errors.legal_entity?.trade_name?.message}><Input {...form.register("legal_entity.trade_name")} /></Field><Field label="Identificación tributaria" error={form.formState.errors.legal_entity?.tax_id?.message} className="sm:col-span-2"><Input {...form.register("legal_entity.tax_id")} /></Field></div> : null}
-        {step === 3 ? <Field label="Actividad económica principal" error={form.formState.errors.economic_activity?.economic_activity?.message}><Input {...form.register("economic_activity.economic_activity")} placeholder="Describe brevemente la actividad principal" /></Field> : null}
-        {step === 4 ? <Field label="Código CIIU" error={form.formState.errors.ciiu?.ciiu_code?.message}><Input {...form.register("ciiu.ciiu_code")} inputMode="numeric" maxLength={4} placeholder="Ej. 6201" /></Field> : null}
-        {step === 5 ? <Field label="Número de trabajadores" error={form.formState.errors.workforce?.employee_count?.message}><Input type="number" min={0} max={10_000_000} {...form.register("workforce.employee_count", { valueAsNumber: true })} /></Field> : null}
-        {step === 6 ? <Field label="Clase de riesgo"><Select {...form.register("risk.risk_class", { valueAsNumber: true })}><option value={1}>I - Riesgo mínimo</option><option value={2}>II - Riesgo bajo</option><option value={3}>III - Riesgo medio</option><option value={4}>IV - Riesgo alto</option><option value={5}>V - Riesgo máximo</option></Select></Field> : null}
-        {step === 7 ? <div className="grid gap-4">{sites.fields.map((site, index) => <fieldset key={site.id} className="grid gap-4 rounded-xl border border-[var(--border)] p-4 sm:grid-cols-2"><legend className="px-2 text-sm font-semibold">Sede {index + 1}</legend><Field label="Nombre" error={form.formState.errors.sites?.[index]?.name?.message}><Input {...form.register(`sites.${index}.name`)} /></Field><Field label="Código" error={form.formState.errors.sites?.[index]?.code?.message}><Input {...form.register(`sites.${index}.code`)} /></Field><Field label="Dirección"><Input {...form.register(`sites.${index}.address`)} /></Field><Field label="Ciudad"><Input {...form.register(`sites.${index}.city`)} /></Field><Field label="Departamento"><Input {...form.register(`sites.${index}.department`)} /></Field><div className="flex items-end justify-end"><Button type="button" size="sm" variant="ghost" disabled={sites.fields.length === 1} onClick={() => sites.remove(index)}><Trash aria-hidden="true" /> Retirar sede</Button></div></fieldset>)}<Button type="button" variant="secondary" className="justify-self-start" onClick={() => sites.append({ name: "", code: "", address: "", city: "", department: "" })}><Plus aria-hidden="true" /> Agregar sede</Button></div> : null}
-        {step === 8 ? <div className="grid gap-4"><Field label="Miembro responsable del SG-SST" error={form.formState.errors.responsible?.member_id?.message}><Select {...form.register("responsible.member_id")}><option value="">Selecciona un miembro activo</option>{members.map((member) => <option key={member.id} value={member.id}>{member.label}</option>)}</Select></Field><p className="text-sm text-[var(--muted)]">Al finalizar se asignará el rol global Responsable SST sin retirar los roles existentes.</p></div> : null}
-        {step === 9 ? <fieldset><legend className="mb-4 text-sm font-semibold">Selecciona las condiciones presentes en la operación</legend><div className="grid gap-3 sm:grid-cols-2">{characteristicFields.map(([name, label]) => <Controller key={name} control={form.control} name={`characteristics.${name}`} render={({ field }) => <label className="flex min-h-12 items-center gap-3 rounded-lg border border-[var(--border)] bg-white p-3 text-sm transition-colors hover:bg-[var(--muted-surface)]"><Checkbox checked={field.value} onCheckedChange={(checked) => field.onChange(checked === true)} />{label}</label>} />)}</div></fieldset> : null}
+        {step === 3 ? <Controller control={form.control} name="classification" render={({ field, fieldState }) => {
+          const selected = economicActivityOptionSchema.safeParse(field.value);
+          const value = selected.success ? selected.data : null;
+          return <div className="grid gap-4"><Field label="Código CIIU y actividad económica" error={fieldState.error?.message ?? form.formState.errors.classification?.entry_id?.message}><CiiuActivityCombobox value={value} invalid={Boolean(fieldState.error ?? form.formState.errors.classification)} onChange={(option) => field.onChange(option)} /></Field>{value ? <div className="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--muted-surface)] p-4 sm:grid-cols-[9rem_9rem_minmax(0,1fr)]"><ReadOnlyValue label="Código CIIU" value={value.ciiu_code} /><ReadOnlyValue label="Clase de riesgo" value={`${RISK_LABELS[value.risk_class]} · Riesgo ${value.risk_class}`} /><ReadOnlyValue label="Actividad económica" value={value.activity} /><p className="text-xs text-[var(--muted)] sm:col-span-3">Fuente: {value.source_reference} · Catálogo {value.catalog_version}</p></div> : <p className="text-sm text-[var(--muted)]">Selecciona la actividad exacta. La clase de riesgo se asignará automáticamente según el catálogo oficial.</p>}</div>;
+        }} /> : null}
+        {step === 4 ? <Field label="Número de trabajadores" error={form.formState.errors.workforce?.employee_count?.message}><Input type="number" min={0} max={10_000_000} {...form.register("workforce.employee_count", { valueAsNumber: true })} /></Field> : null}
+        {step === 5 ? <div className="grid gap-4">{sites.fields.map((site, index) => <fieldset key={site.id} className="grid gap-4 rounded-xl border border-[var(--border)] p-4 sm:grid-cols-2"><legend className="px-2 text-sm font-semibold">Sede {index + 1}</legend><Field label="Nombre" error={form.formState.errors.sites?.[index]?.name?.message}><Input {...form.register(`sites.${index}.name`)} /></Field><Field label="Código" error={form.formState.errors.sites?.[index]?.code?.message}><Input {...form.register(`sites.${index}.code`)} /></Field><Field label="Dirección"><Input {...form.register(`sites.${index}.address`)} /></Field><Field label="Ciudad"><Input {...form.register(`sites.${index}.city`)} /></Field><Field label="Departamento"><Input {...form.register(`sites.${index}.department`)} /></Field><div className="flex items-end justify-end"><Button type="button" size="sm" variant="ghost" disabled={sites.fields.length === 1} onClick={() => sites.remove(index)}><Trash aria-hidden="true" /> Retirar sede</Button></div></fieldset>)}<Button type="button" variant="secondary" className="justify-self-start" onClick={() => sites.append({ name: "", code: "", address: "", city: "", department: "" })}><Plus aria-hidden="true" /> Agregar sede</Button></div> : null}
+        {step === 6 ? <div className="grid gap-4"><Field label="Miembro responsable del SG-SST" error={form.formState.errors.responsible?.member_id?.message}><Select {...form.register("responsible.member_id")}><option value="">Selecciona un miembro activo</option>{members.map((member) => <option key={member.id} value={member.id}>{member.label}</option>)}</Select></Field><p className="text-sm text-[var(--muted)]">Al finalizar se asignará el rol global Responsable SST sin retirar los roles existentes.</p></div> : null}
+        {step === 7 ? <fieldset><legend className="mb-4 text-sm font-semibold">Selecciona las condiciones presentes en la operación</legend><div className="grid gap-3 sm:grid-cols-2">{characteristicFields.map(([name, label]) => <Controller key={name} control={form.control} name={`characteristics.${name}`} render={({ field }) => <label className="flex min-h-12 items-center gap-3 rounded-lg border border-[var(--border)] bg-white p-3 text-sm transition-colors hover:bg-[var(--muted-surface)]"><Checkbox checked={field.value} onCheckedChange={(checked) => field.onChange(checked === true)} />{label}</label>} />)}</div></fieldset> : null}
         {message ? <Alert variant="danger" className="mt-6">{message}</Alert> : null}
-        <div className="mt-7 flex flex-wrap justify-between gap-3 border-t border-[var(--border)] pt-5"><Button type="button" variant="secondary" disabled={step === 1 || pending} onClick={() => setStep((current) => Math.max(current - 1, 1))}>Anterior</Button>{step < 9 ? <Button type="button" disabled={pending} onClick={continueFlow}>{pending ? "Guardando..." : "Guardar y continuar"}</Button> : <Button type="button" disabled={pending} onClick={finishFlow}>{pending ? "Finalizando..." : "Finalizar configuración"}</Button>}</div>
+        <div className="mt-7 flex flex-wrap justify-between gap-3 border-t border-[var(--border)] pt-5"><Button type="button" variant="secondary" disabled={step === 1 || pending} onClick={() => setStep((current) => Math.max(current - 1, 1))}>Anterior</Button>{step < steps.length ? <Button type="button" disabled={pending} onClick={continueFlow}>{pending ? "Guardando..." : "Guardar y continuar"}</Button> : <Button type="button" disabled={pending} onClick={finishFlow}>{pending ? "Finalizando..." : "Finalizar configuración"}</Button>}</div>
       </form>
     </div>
   );
@@ -149,4 +147,8 @@ export function OnboardingForm({ organizationId, initialStep, initialValues, mem
 
 function Field({ label, error, className, children }: { label: string; error?: string; className?: string; children: React.ReactNode }) {
   return <label className={`grid gap-2 text-sm font-medium ${className ?? ""}`}>{label}{children}{error ? <span className="text-xs text-[var(--danger)]">{error}</span> : null}</label>;
+}
+
+function ReadOnlyValue({ label, value }: { label: string; value: string }) {
+  return <div><p className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">{label}</p><p className="mt-1 text-sm leading-5">{value}</p></div>;
 }
