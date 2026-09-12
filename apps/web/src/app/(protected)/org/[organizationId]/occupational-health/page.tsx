@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { EmptyState } from "@/components/empty-state";
 import { FormDrawer } from "@/components/form-drawer";
-import { OperationsNav } from "@/components/operations-nav";
 import { PageHeader } from "@/components/page-header";
 import { StatusBanner } from "@/components/status-banner";
 import { Button } from "@/components/ui/button";
@@ -52,7 +51,6 @@ export default async function OccupationalHealthPage({ params, searchParams }: {
 
   return <main className="grid gap-7">
     <PageHeader eyebrow="Acceso sensible" title="Salud ocupacional" description="Administra aptitud funcional, restricciones y vigilancia sin almacenar historias clínicas ni diagnósticos." action={manage ? <FormDrawer triggerLabel="Nuevo programa" title="Programa de vigilancia" description="Registra el objetivo operativo y sus revisiones.">{programForm}</FormDrawer> : undefined} />
-    <OperationsNav organizationId={organizationId} current="occupational-health" />
     <StatusBanner status={status} />
     <aside className="rounded-[14px] border border-[var(--danger-border)] bg-[var(--danger-soft)] p-4 text-sm leading-6 text-[var(--danger)]"><strong>Datos especialmente protegidos.</strong> Cada perfil ve únicamente la información necesaria para su función. Las decisiones que afectan a una persona exigen confirmación humana independiente.</aside>
     <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><KpiCard label="Programas activos" value={programs.filter((item: any) => item.status === "active").length} /><KpiCard label="Personas vinculadas" value={enrollments.length} /><KpiCard label="Revisiones vencidas" value={enrollments.filter((item: any) => isExpired(item.next_review_at)).length} /><KpiCard label="Decisiones pendientes" value={pendingDecisions.length} /></section>

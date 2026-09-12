@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
 import { FormDrawer } from "@/components/form-drawer";
-import { OperationsNav } from "@/components/operations-nav";
 import { PageHeader } from "@/components/page-header";
 import { StatusBanner } from "@/components/status-banner";
 import { Button } from "@/components/ui/button";
@@ -52,7 +51,6 @@ export default async function ContractorsPage({ params, searchParams }: {
 
   return <main className="grid gap-7">
     <PageHeader eyebrow="Operación preventiva" title="Contratistas y proveedores" description="Controla contratos, requisitos documentales y accesos limitados por sede." action={manage ? <FormDrawer triggerLabel="Nuevo contrato" title="Crear contrato" description="Vincula una empresa contratista y define su vigencia.">{contractForm}</FormDrawer> : undefined} />
-    <OperationsNav organizationId={organizationId} current="contractors" />
     <StatusBanner status={filters.status} />
     <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><KpiCard label="Empresas" value={contractors.length} /><KpiCard label="Contratos activos" value={contracts.filter((item: any) => item.status === "active").length} /><KpiCard label="Requisitos pendientes" value={requirements.filter((item: any) => !["approved", "not_applicable"].includes(item.status)).length} /><KpiCard label="Envíos por revisar" value={submissions.filter((item: any) => item.status === "submitted").length} /></section>
 

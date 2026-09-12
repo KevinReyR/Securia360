@@ -2,7 +2,6 @@
 import { CalendarCheck, Certificate, GraduationCap, UsersThree } from "@phosphor-icons/react/dist/ssr";
 import { EmptyState } from "@/components/empty-state";
 import { FormDrawer } from "@/components/form-drawer";
-import { OperationsNav } from "@/components/operations-nav";
 import { PageHeader } from "@/components/page-header";
 import { StatusBanner } from "@/components/status-banner";
 import { Button } from "@/components/ui/button";
@@ -83,7 +82,6 @@ export default async function TrainingPage({ params, searchParams }: {
 
   return <main className="grid gap-7">
     <PageHeader eyebrow="Operación preventiva" title="Capacitaciones y competencias" description="Organiza el plan, confirma asistencia y conserva evaluaciones y certificados trazables." action={manage ? <FormDrawer triggerLabel="Programar sesión" title="Nueva sesión" description="Selecciona el plan, el contenido y el horario de la actividad.">{sessionForm}</FormDrawer> : undefined} />
-    <OperationsNav organizationId={organizationId} current="training" />
     <StatusBanner status={filters.status} />
     <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><KpiCard label="Capacitaciones" value={catalog.length} icon={<GraduationCap size={18} />} /><KpiCard label="Sesiones" value={sessions.length} icon={<CalendarCheck size={18} />} /><KpiCard label="Participaciones" value={enrollments.length} icon={<UsersThree size={18} />} /><KpiCard label="Certificados" value={certificates.length} icon={<Certificate size={18} />} /></section>
 

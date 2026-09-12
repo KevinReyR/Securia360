@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { EmptyState } from "@/components/empty-state";
 import { FormDrawer } from "@/components/form-drawer";
-import { OperationsNav } from "@/components/operations-nav";
 import { PageHeader } from "@/components/page-header";
 import { StatusBanner } from "@/components/status-banner";
 import { Button } from "@/components/ui/button";
@@ -59,7 +58,6 @@ export default async function IncidentsPage({ params, searchParams }: {
 
   return <main className="grid gap-7">
     <PageHeader eyebrow="Operación sensible" title="Incidentes e investigaciones" description="Gestiona el caso con acceso mínimo, evidencia privada y revisión humana. No sustituye reportes oficiales ni decisiones profesionales." action={manage ? <FormDrawer triggerLabel="Reportar incidente" title="Nuevo reporte" description="Registra la información operativa mínima para iniciar el seguimiento.">{reportForm}</FormDrawer> : undefined} />
-    <OperationsNav organizationId={organizationId} current="incidents" />
     <StatusBanner status={filter.notice} />
     <aside className="rounded-[14px] border border-[var(--warning)] bg-[var(--warning-soft)] p-4 text-sm leading-6 text-[var(--warning)]"><strong>Información sensible.</strong> Usa solo los datos necesarios para investigar. No registres diagnósticos, historias clínicas ni conclusiones jurídicas.</aside>
     <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><KpiCard label="Casos visibles" value={incidents.length} /><KpiCard label="En investigación" value={incidents.filter((item: any) => item.status === "under_investigation").length} /><KpiCard label="Con acciones abiertas" value={incidents.filter((item: any) => item.status === "actions_open").length} /><KpiCard label="Evidencias protegidas" value={sensitive ? evidences.length : "Restringido"} /></section>

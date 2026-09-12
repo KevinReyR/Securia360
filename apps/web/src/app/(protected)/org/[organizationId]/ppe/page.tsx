@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { EmptyState } from "@/components/empty-state";
-import { OperationsNav } from "@/components/operations-nav";
 import { PageHeader } from "@/components/page-header";
 import { StatusBanner } from "@/components/status-banner";
 import { Input } from "@/components/ui/input";
@@ -183,7 +182,6 @@ export default async function PpePage({
   return (
     <main className="grid gap-7">
       <PageHeader eyebrow="Operación preventiva" title="Elementos de protección personal" description="Controla existencias, entregas, aceptación, inspecciones y reposiciones con evidencia privada." />
-      <OperationsNav organizationId={organizationId} current="ppe" />
       <StatusBanner status={filters.notice} />
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><KpiCard label="Elementos" value={catalog.length} /><KpiCard label="Unidades disponibles" value={inventory.reduce((total: number, item: any) => total + Number(item.quantity_on_hand ?? 0), 0)} /><KpiCard label="Asignaciones activas" value={assignments.filter((item: any) => item.status === "active").length} /><KpiCard label="Requieren reposición" value={assignments.filter((item: any) => item.replacement_required).length} /></section>
       <Card>
