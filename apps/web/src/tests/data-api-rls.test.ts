@@ -207,10 +207,11 @@ describe.runIf(enabled)("Data API tenant isolation", () => {
     expect(finding.error).toBeNull();
     const gap = await userA.from("improvement_gaps").insert({ organization_id: fixture.organizationA, origin_type: "finding", finding_id: finding.data!.id, deduplication_key: `ci-gap:${runId}`, title: `CI Gap ${runId}`, priority: "high" }).select("id").single();
     expect(gap.error).toBeNull();
-    const action = await userA.from("improvement_actions").insert({ organization_id: fixture.organizationA, gap_id: gap.data!.id, title: `CI Action ${runId}`, priority: "high" }).select("id").single();
+    const action = await userA.from("improvement_actions").insert({ organization_id: fixture.organizationA, gap_id: gap.data!.id, title: `CI Action ${runId}`, expected_evidence: "Acta y soporte de ejecución", priority: "high" }).select("id,expected_evidence,evidence_document_version_id").single();
     expect(action.error).toBeNull();
+    expect(action.data).toMatchObject({ expected_evidence: "Acta y soporte de ejecución", evidence_document_version_id: null });
     expect((await userB.from("improvement_actions").select("id").eq("id", action.data!.id)).data).toEqual([]);
-    expect((await userB.from("improvement_actions").update({ title: "cross-tenant" }).eq("id", action.data!.id).select("id")).data ?? []).toEqual([]);
+    expect((await userB.from("improvement_actions").update({ expected_evidence: "cross-tenant" }).eq("id", action.data!.id).select("id")).data ?? []).toEqual([]);
 
     const documentA = await userA.from("documents").insert({ organization_id: fixture.organizationA, entity_type: "improvement_action", entity_id: action.data!.id, title: `CI Evidence A ${runId}` }).select("id").single();
     expect(documentA.error).toBeNull();

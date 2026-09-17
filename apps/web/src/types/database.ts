@@ -4245,11 +4245,13 @@ export type Database = {
           created_by: string | null
           description: string | null
           evidence_document_version_id: string | null
+          expected_evidence: string | null
           gap_id: string
           generated_key: string | null
           id: string
           organization_id: string
           priority: string
+          recommendation_version: number | null
           responsible_user_id: string | null
           status: string
           target_date: string | null
@@ -4264,11 +4266,13 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           evidence_document_version_id?: string | null
+          expected_evidence?: string | null
           gap_id: string
           generated_key?: string | null
           id?: string
           organization_id: string
           priority: string
+          recommendation_version?: number | null
           responsible_user_id?: string | null
           status?: string
           target_date?: string | null
@@ -4283,11 +4287,13 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           evidence_document_version_id?: string | null
+          expected_evidence?: string | null
           gap_id?: string
           generated_key?: string | null
           id?: string
           organization_id?: string
           priority?: string
+          recommendation_version?: number | null
           responsible_user_id?: string | null
           status?: string
           target_date?: string | null
@@ -10795,6 +10801,7 @@ export type Database = {
       }
     }
     Functions: {
+      accept_my_invitations: { Args: never; Returns: number }
       accept_my_organization_invitation: {
         Args: { p_organization_id: string }
         Returns: {
@@ -10802,7 +10809,6 @@ export type Database = {
           organization_member_id: string
         }[]
       }
-      accept_my_invitations: { Args: never; Returns: number }
       accept_ppe_delivery: {
         Args: { p_delivery_id: string }
         Returns: undefined

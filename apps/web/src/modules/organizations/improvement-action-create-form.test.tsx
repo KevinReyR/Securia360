@@ -41,5 +41,6 @@ describe("ImprovementActionCreateForm", () => {
 
     expect(screen.getByText("Más detalles")).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Heredar: Alta" })).toBeInTheDocument();
+    expect(screen.getByLabelText(/Evidencia esperada/)).toBeInTheDocument();
   });
 });

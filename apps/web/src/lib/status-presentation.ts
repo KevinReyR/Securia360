@@ -24,6 +24,7 @@ const statusCatalog: Record<string, StatusPresentation> = {
   effective: { label: "Eficaz", tone: "success", explanation: "La última verificación confirmó la eficacia del control." },
   draft: { label: "Borrador", tone: "neutral", explanation: "Puede editarse antes de enviarse a revisión." },
   todo: { label: "Por hacer", tone: "neutral", explanation: "La tarea está lista para comenzar." },
+  open: { label: "Abierta", tone: "warning", explanation: "La oportunidad requiere acciones de mejoramiento." },
   inactive: { label: "Inactiva", tone: "neutral", explanation: "No está disponible para nuevas operaciones." },
   archived: { label: "Archivada", tone: "neutral", explanation: "Se conserva como parte del historial." },
   superseded: { label: "Sustituida", tone: "neutral", explanation: "Una versión posterior reemplazó este contenido sin modificar su histórico." },

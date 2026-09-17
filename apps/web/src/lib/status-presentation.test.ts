@@ -5,6 +5,7 @@ describe("presentStatus", () => {
   it("translates known technical states", () => {
     expect(presentStatus("evidence_submitted")).toMatchObject({ label: "Evidencia enviada", tone: "info" });
     expect(presentStatus("pending_review").label).toBe("Pendiente de revisión");
+    expect(presentStatus("open").label).toBe("Abierta");
   });
 
   it("formats unknown values without exposing snake case", () => {

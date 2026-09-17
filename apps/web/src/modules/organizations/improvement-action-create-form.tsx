@@ -63,6 +63,7 @@ export function ImprovementActionCreateForm({ organizationId, gapId, defaultPrio
         <summary className="inline-flex cursor-pointer list-none items-center gap-1 text-sm font-semibold text-[var(--brand)] outline-none focus-visible:rounded focus-visible:ring-3 focus-visible:ring-[var(--focus-ring)]">Más detalles <CaretDown size={15} className="transition-transform group-open:rotate-180" /></summary>
         <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_14rem]">
           <label className="grid gap-1 text-sm font-medium">Descripción <span className="text-xs font-normal text-[var(--muted)]">Opcional</span><Textarea name="description" maxLength={2000} placeholder="Resultado esperado, alcance o instrucciones" disabled={pending} /></label>
+          <label className="grid gap-1 text-sm font-medium">Evidencia esperada <span className="text-xs font-normal text-[var(--muted)]">Opcional</span><Textarea name="expected_evidence" maxLength={2000} placeholder="Documentos o soportes que acreditarán la ejecución" disabled={pending} /></label>
           <label className="grid content-start gap-1 text-sm font-medium">Prioridad <span className="text-xs font-normal text-[var(--muted)]">Opcional</span><Select name="priority" defaultValue="" disabled={pending}><option value="">Heredar: {presentStatus(defaultPriority).label}</option><option value="critical">Crítica</option><option value="high">Alta</option><option value="medium">Media</option><option value="low">Baja</option></Select></label>
         </div>
       </details>

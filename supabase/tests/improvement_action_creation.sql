@@ -1,4 +1,4 @@
--- Regression checks for explicit improvement action creation.
+-- Assessment synchronization creates specific recommendations, not placeholders.
 begin;
 
 do $$
@@ -8,8 +8,8 @@ begin
   select pg_get_functiondef('private.sync_assessment_improvement_plan()'::regprocedure)
   into function_definition;
 
-  if function_definition ilike '%insert into public.improvement_actions%' then
-    raise exception 'assessment synchronization still creates improvement actions';
+  if function_definition not ilike '%populate_gap_recommendations%' then
+    raise exception 'assessment synchronization does not populate recommendations';
   end if;
 
   if exists (

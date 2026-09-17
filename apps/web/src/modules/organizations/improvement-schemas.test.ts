@@ -20,9 +20,18 @@ describe("improvement workflow schemas", () => {
     expect(improvementActionCreateSchema.safeParse({ gap_id: ids.gap_id, title: "" }).success).toBe(false);
   });
 
+  it("keeps expected evidence as editable text separate from an uploaded document", () => {
+    const created = improvementActionCreateSchema.parse({ gap_id: ids.gap_id, title: "Conformar el comité", expected_evidence: "Acta de conformación y designaciones" });
+    expect(created.expected_evidence).toBe("Acta de conformación y designaciones");
+    expect(improvementActionCreateSchema.safeParse({ gap_id: ids.gap_id, title: "Conformar el comité", expected_evidence: "x" }).success).toBe(false);
+    const updated = improvementActionUpdateSchema.parse({ ...ids, title: "Conformar el comité", description: "Convocar elecciones", expected_evidence: "Acta firmada", priority: "high", status: "pending", target_date: "", validation_note: "" });
+    expect(updated.expected_evidence).toBe("Acta firmada");
+    expect(updated.evidence_document_version_id).toBe(ids.evidence_document_version_id);
+  });
+
   it("accepts only known action states and document version identities", () => {
-    expect(improvementActionUpdateSchema.safeParse({ ...ids, title: "Acción", description: "Seguimiento", priority: "medium", status: "evidence_submitted", target_date: "", validation_note: "" }).success).toBe(true);
-    expect(improvementActionUpdateSchema.safeParse({ ...ids, title: "Acción", description: "", priority: "medium", status: "verified_elsewhere", target_date: "", validation_note: "" }).success).toBe(false);
+    expect(improvementActionUpdateSchema.safeParse({ ...ids, title: "Acción", description: "Seguimiento", expected_evidence: "", priority: "medium", status: "evidence_submitted", target_date: "", validation_note: "" }).success).toBe(true);
+    expect(improvementActionUpdateSchema.safeParse({ ...ids, title: "Acción", description: "", expected_evidence: "", priority: "medium", status: "verified_elsewhere", target_date: "", validation_note: "" }).success).toBe(false);
     expect(improvementEvidenceSchema.safeParse({ action_id: ids.action_id, existing_version_id: "foreign-version" }).success).toBe(false);
   });
 

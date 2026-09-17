@@ -64,6 +64,7 @@ export async function createImprovementAction(_previousState: ImprovementActionC
     gap_id: parsed.data.gap_id,
     title: parsed.data.title,
     description: parsed.data.description ?? null,
+    expected_evidence: parsed.data.expected_evidence ?? null,
     priority: parsed.data.priority ?? gap.priority,
     target_date: parsed.data.target_date ?? null,
     responsible_user_id: parsed.data.responsible_user_id ?? null,
@@ -89,7 +90,7 @@ export async function updateImprovementAction(formData: FormData) {
     const { data: version } = await supabase.from("document_versions").select("id").eq("organization_id", organizationId).eq("id", parsed.data.evidence_document_version_id).maybeSingle();
     if (!version) redirect(route(organizationId, "foreign-evidence"));
   }
-  const { error } = await supabase.from("improvement_actions").update({ title: parsed.data.title, description: parsed.data.description, priority: parsed.data.priority, status: parsed.data.status, target_date: parsed.data.target_date, responsible_user_id: parsed.data.responsible_user_id, evidence_document_version_id: parsed.data.evidence_document_version_id, validation_note: parsed.data.validation_note }).eq("organization_id", organizationId).eq("id", parsed.data.action_id);
+  const { error } = await supabase.from("improvement_actions").update({ title: parsed.data.title, description: parsed.data.description, expected_evidence: parsed.data.expected_evidence, priority: parsed.data.priority, status: parsed.data.status, target_date: parsed.data.target_date, responsible_user_id: parsed.data.responsible_user_id, evidence_document_version_id: parsed.data.evidence_document_version_id, validation_note: parsed.data.validation_note }).eq("organization_id", organizationId).eq("id", parsed.data.action_id);
   revalidatePath(`/org/${organizationId}/improvement-plan`);
   redirect(route(organizationId, error ? "error" : "saved"));
 }

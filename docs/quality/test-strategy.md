@@ -9,6 +9,7 @@
 Las factories usan UUID por ejecución, prefijos `ci-rls-` y `e2e-`, y nunca datos reales. Se omiten si no existen variables explícitas de un entorno aislado. Nunca se ejecutan contra Mizpa360 ni contra producción.
 
 Las pruebas de mejoramiento verifican que una acción manual solo se cree desde una brecha del tenant, que una versión documental de otra organización no pueda vincularse, que la validación requiera permiso y evidencia, y que el cierre manual de la brecha ocurra únicamente después de una acción validada.
+La generación desde Evaluación Inicial verifica cobertura de los 60 estándares, múltiples acciones cuando corresponda, idempotencia, conservación de ediciones humanas y separación entre evidencia esperada y archivo aportado.
 
 ## Accesibilidad
 

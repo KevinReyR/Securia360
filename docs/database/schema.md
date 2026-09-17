@@ -12,6 +12,8 @@
 | Eventos | `domain_events` | Evento transaccional interno para el clasificador futuro; sin acceso directo del Data API. |
 | Auditoría | `audit_log` | Estructura append-only; el cliente autenticado solo puede consultar. |
 | Mejoramiento | `improvement_findings`, `improvement_gaps`, `improvement_actions` | Trazabilidad desde la evaluación, requisito o hallazgo hacia acción, evidencia y validación. |
+
+Al completar una Evaluación Inicial, cada estándar no cumplido produce una brecha y propuestas de acción pendientes desde un catálogo interno asociado al estándar y su versión normativa. `improvement_actions.expected_evidence` describe los soportes solicitados; `evidence_document_version_id` solo se diligencia al vincular un documento real. Las acciones generadas se copian para conservar su texto histórico y pueden editarse antes de validarse.
 | Planificación | `annual_plans`, `plan_activities`, `tasks` y tablas auxiliares | Plan anual, actividades y tareas reutilizables con dependencias, recurrencia y evidencia. |
 | Riesgos | `risk_methodologies`, versiones y configuraciones | Metodologías técnicas versionadas y evaluaciones que conservan la versión exacta usada. |
 | Matriz de riesgos | `processes`, `activities`, `risk_tasks`, `risk_identifications`, `risk_controls`, `risk_control_verifications`, `risk_control_alerts` | Cadena auditable de peligro, valoración, control, eficacia histórica y alertas. |
